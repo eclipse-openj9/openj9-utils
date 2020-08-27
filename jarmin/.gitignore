@@ -1,0 +1,4 @@
+bin/*
+minimized_jars/*
+lib/*
+jarmin.jar

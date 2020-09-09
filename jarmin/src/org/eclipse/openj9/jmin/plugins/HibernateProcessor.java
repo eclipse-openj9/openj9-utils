@@ -40,7 +40,7 @@ public class HibernateProcessor extends ClassVisitor {
         super(ASM8, next);
         this.worklist = worklist;
     }
-    
+
     @Override
     public void visit(
         final int version,
@@ -59,9 +59,9 @@ public class HibernateProcessor extends ClassVisitor {
         if (cv != null) {
             cv.visit(version, access, name, signature, superName, interfaces);
         }
-        
+
     }
-    
+
     @Override
     public MethodVisitor visitMethod(int access, java.lang.String name, java.lang.String desc, java.lang.String signature, java.lang.String[] exceptions) {
         if (isSPIInterface && ((access & ACC_PUBLIC) != 0)) {

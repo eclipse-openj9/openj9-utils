@@ -30,19 +30,19 @@ import org.objectweb.asm.tree.analysis.BasicValue;
 public class StringBuilderValue extends BasicValue {
     private ArrayList<BasicValue> contents;
     private boolean appended;
-    
+
     public StringBuilderValue() {
         super(Type.getObjectType("java/lang/String"));
         this.contents = new ArrayList<BasicValue>();
         this.appended = false;
     }
-    
+
     public StringBuilderValue(StringBuilderValue v) {
         super(Type.getObjectType("java/lang/String"));
         this.contents = new ArrayList<BasicValue>(v.contents);
         this.appended = false;
     }
-    
+
     public void append(BasicValue v) {
         //assert !appended : "Cannot append more than once to a StringBuilderValue";
         appended = true;

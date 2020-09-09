@@ -57,7 +57,7 @@ public class WorkList {
         LinkedList<String> classesToCheck = new LinkedList<String>();
         classesToCheck.add(c);
         classesToCheck.addAll(context.getSuperClasses(c));
-        
+
         while (!classesToCheck.isEmpty()) {
             String check = classesToCheck.pop();
             String[] interfaces = context.getClassInterfaces(check);
@@ -137,7 +137,7 @@ public class WorkList {
     private void handleClass(String c) {
         if (!info.isClassReferenced(c)) {
             info.addClass(c).setReferenced();
-            if (info.getClassInfo(c).hasMethod("<clinit>", "()V") 
+            if (info.getClassInfo(c).hasMethod("<clinit>", "()V")
                 && !info.getClassInfo(c).isMethodReferenced("<clinit>", "()V")) {
                 info.getClassInfo(c).markMethodReferenced("<clinit>", "()V");
                 worklist.add(new WorkItem(c, "<clinit>", "()V"));
@@ -213,7 +213,7 @@ public class WorkList {
                     processMethod(c, name, desc);
                 }
             }
-        }      
+        }
     }
 
     public void processVirtualMethod(String clazz, String name, String desc) {

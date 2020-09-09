@@ -30,7 +30,7 @@ import org.objectweb.asm.ClassWriter;
 
 public class NonLoadingClassWriter extends ClassWriter {
     private HierarchyContext context;
-    
+
     public NonLoadingClassWriter(HierarchyContext context, final int flags) {
         super(flags);
         this.context = context;
@@ -81,7 +81,7 @@ public class NonLoadingClassWriter extends ClassWriter {
                 return type1;
             }
         }
-        
+
         String result = "java/lang/Object";
         for (int i = 0; i < shallower.size(); ++i) {
             if (deeper.get(i + deeperOffset).equals(shallower.get(i))) {

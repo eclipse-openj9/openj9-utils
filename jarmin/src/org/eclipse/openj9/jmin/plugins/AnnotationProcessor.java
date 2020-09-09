@@ -57,9 +57,9 @@ public class AnnotationProcessor extends ClassVisitor {
         this.prefixes = new String[0];
         this.info = info;
         this.context = context;
-    }  
-    
-    
+    }
+
+
     boolean matchesAnnotation(String desc, String[] annotations) {
         int start = -1;
         for (String prefix : prefixes) {
@@ -78,7 +78,7 @@ public class AnnotationProcessor extends ClassVisitor {
         }
         return false;
     }
-    
+
     @Override
     public void visit(
         final int version,
@@ -94,19 +94,19 @@ public class AnnotationProcessor extends ClassVisitor {
             cv.visit(version, access, name, signature, superName, interfaces);
         }
     }
-    
+
     @Override
     public AnnotationVisitor visitAnnotation(final String desc, final boolean visible) {
         if (matchesAnnotation(desc, classAnnotations)) {
             worklist.forceInstantiateClass(clazz);
         }
-        
+
         if (cv != null) {
             return cv.visitAnnotation(desc, visible);
         }
         return null;
     }
-    
+
     @Override
     public FieldVisitor visitField(
         final int faccess,
@@ -127,7 +127,7 @@ public class AnnotationProcessor extends ClassVisitor {
             }
         };
     }
-       
+
     @Override
     public MethodVisitor visitMethod(int maccess, java.lang.String mname, java.lang.String mdesc, java.lang.String msignature, java.lang.String[] mexceptions) {
         return new MethodVisitor(ASM8, cv != null ? cv.visitMethod(maccess, mname, mdesc, msignature, mexceptions) : null) {
@@ -142,7 +142,7 @@ public class AnnotationProcessor extends ClassVisitor {
                 }
                 return null;
             }
-            
+
             @Override
             public AnnotationVisitor visitParameterAnnotation(final int parameter, final String desc, final boolean visible) {
                 if (matchesAnnotation(desc, methodParameterAnnotations)) {
@@ -156,7 +156,7 @@ public class AnnotationProcessor extends ClassVisitor {
             }
         };
     }
-    
+
     @Override
     public void visitEnd() {
         if (matched && trace) {

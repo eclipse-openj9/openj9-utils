@@ -166,7 +166,7 @@ public class HierarchyContext {
             }
         }
         //System.out.println("Number of subclasses of Object: " + subMap.get("java/lang/Object").size());
-        
+
         // construct closure of interfaces
         for (String c : superMap.keySet()) {
             for (String s : superMap.get(c)) {
@@ -188,7 +188,7 @@ public class HierarchyContext {
                 }
             }
         }
-        
+
         for (String i : interfaceImplementorMap.keySet()) {
             if (classInterfaces.containsKey(i)) {
                 for (String s : classInterfaces.get(i)) {

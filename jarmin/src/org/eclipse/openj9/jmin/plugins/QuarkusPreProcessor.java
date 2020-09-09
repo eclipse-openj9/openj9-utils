@@ -36,7 +36,7 @@ public class QuarkusPreProcessor extends PreProcessor {
         "io/quarkus/arc/InjectableObserverMethod",
         "io/quarkus/arc/InjectableReferenceProvider"
     };
-    
+
     public QuarkusPreProcessor(WorkList worklist, HierarchyContext context, ReferenceInfo info) {
         super(worklist, context, info);
     }

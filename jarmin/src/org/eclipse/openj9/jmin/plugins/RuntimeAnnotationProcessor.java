@@ -43,7 +43,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
         this.worklist = worklist;
         this.context = context;
     }
-    
+
     @Override
     public void visit(
         final int version,
@@ -56,7 +56,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
             cv.visit(version, access, name, signature, superName, interfaces);
         }
     }
-    
+
     @Override
     public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
         String annotClazz = descriptor.substring(1, descriptor.length() - 2);
@@ -68,7 +68,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
         }
         return null;
     }
-    
+
     @Override
     public AnnotationVisitor visitTypeAnnotation(final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
         String annotClazz = descriptor.substring(1, descriptor.length() - 1);
@@ -80,7 +80,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
         }
         return null;
     }
-    
+
     @Override
     public FieldVisitor visitField(
         final int access,
@@ -113,7 +113,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
             }
         };
     }
-    
+
     @Override
     public MethodVisitor visitMethod(
         final int access,
@@ -133,7 +133,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
                 }
                 return null;
             }
-            
+
             @Override
             public AnnotationVisitor visitTypeAnnotation(final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
                 String annotClazz = descriptor.substring(1, descriptor.length() - 1);
@@ -145,7 +145,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
                 }
                 return null;
             }
-            
+
             @Override
             public AnnotationVisitor visitParameterAnnotation(final int parameter, final String descriptor, final boolean visible) {
                 String annotClazz = descriptor.substring(1, descriptor.length() - 1);
@@ -157,7 +157,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
                 }
                 return null;
             }
-            
+
             @Override
             public AnnotationVisitor visitInsnAnnotation(final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
                 String annotClazz = descriptor.substring(1, descriptor.length() - 1);
@@ -169,7 +169,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
                 }
                 return null;
             }
-            
+
             @Override
             public AnnotationVisitor visitTryCatchAnnotation(final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
                 String annotClazz = descriptor.substring(1, descriptor.length() - 1);
@@ -181,7 +181,7 @@ public class RuntimeAnnotationProcessor extends ClassVisitor {
                 }
                 return null;
             }
-            
+
             @Override
             public AnnotationVisitor visitLocalVariableAnnotation(
                 final int typeRef,

@@ -45,7 +45,7 @@ public class BeanAnnotationProcessor extends AnnotationProcessor {
             "inject/Singleton",
             "inject/Scope",
             "inject/Inject",
-            "ws/rs/Produces",   
+            "ws/rs/Produces",
             "ws/rs/Consumes",
             "ws/rs/ext/Provider"
         };
@@ -75,7 +75,7 @@ public class BeanAnnotationProcessor extends AnnotationProcessor {
             "inject/Inject"
         };
     }
-    
+
     @Override
     public void visit(
         final int version,

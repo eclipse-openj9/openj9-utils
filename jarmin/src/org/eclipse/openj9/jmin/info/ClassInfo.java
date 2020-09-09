@@ -68,7 +68,7 @@ public class ClassInfo {
     }
     public FieldInfo addField(String name, String desc) {
         String key = fieldKey(name, desc);
-        if (!fieldInfo.containsKey(key)) {    
+        if (!fieldInfo.containsKey(key)) {
             fieldInfo.put(key, new FieldInfo(name, desc));
         }
         return fieldInfo.get(key);

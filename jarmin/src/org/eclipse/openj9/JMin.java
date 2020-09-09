@@ -65,30 +65,30 @@ public class JMin {
         "java/util/jar",
         "java/util/zip",
         "com/ibm/oti",
-        "java/lang/invoke", 
-        "java/lang/J9VMInternals", 
-        "sun/misc/JavaUtilZipFileAccess", 
+        "java/lang/invoke",
+        "java/lang/J9VMInternals",
+        "sun/misc/JavaUtilZipFileAccess",
         "java/util/Collections",
-        "java/util/IdentityHashMap", 
-        "java/util/Properties", 
-        "openj9/internal", 
+        "java/util/IdentityHashMap",
+        "java/util/Properties",
+        "openj9/internal",
         "java/io/ByteArrayInputStream",
-        "java/io/ByteArrayOutputStream", 
-        "java/io/File", 
-        "java/io/IOException", 
+        "java/io/ByteArrayOutputStream",
+        "java/io/File",
+        "java/io/IOException",
         "java/io/InputStream",
-        "java/io/OutputStream", 
-        "java/io/PrintStream", 
-        "java/nio/charset/StandardCharsets", 
+        "java/io/OutputStream",
+        "java/io/PrintStream",
+        "java/nio/charset/StandardCharsets",
         "java/nio/file/",
-        "sun/nio/fs/", 
-        "java/security/SecureRandom", 
-        "java/util/EnumSet", 
+        "sun/nio/fs/",
+        "java/security/SecureRandom",
+        "java/util/EnumSet",
         "java/util/Objects",
-        "java/util/Properties", 
-        "java/util/Random", 
-        "java/util/Set", 
-        "java/util/HashMap", 
+        "java/util/Properties",
+        "java/util/Random",
+        "java/util/Set",
+        "java/util/HashMap",
         "java/net/URI",
         "java/lang/reflect/Constructor"
     };
@@ -114,7 +114,7 @@ public class JMin {
         org.eclipse.openj9.jmin.plugins.RuntimeAnnotationProcessor.class
     };
     private ClassVisitor processors;
-    
+
     public JMin(String[] jars, String clazz, String method, String signature) throws IOException {
         this.jars = jars.clone();
         context = new HierarchyContext();

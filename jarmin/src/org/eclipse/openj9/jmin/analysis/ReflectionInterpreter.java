@@ -34,9 +34,9 @@ public class ReflectionInterpreter extends BasicInterpreter {
     public ReflectionInterpreter() {
         super(ASM8);
     }
-    
+
     @Override
-    public BasicValue newOperation(AbstractInsnNode insn) throws AnalyzerException 
+    public BasicValue newOperation(AbstractInsnNode insn) throws AnalyzerException
     {
       if (insn instanceof LdcInsnNode) {
           LdcInsnNode ldc = (LdcInsnNode)insn;
@@ -56,7 +56,7 @@ public class ReflectionInterpreter extends BasicInterpreter {
       }
       return super.newOperation(insn);
     }
-    
+
     @Override
     public BasicValue naryOperation(AbstractInsnNode insn, List<? extends BasicValue> values) throws AnalyzerException {
         return this.naryOperation(insn, values, null);
@@ -134,7 +134,7 @@ public class ReflectionInterpreter extends BasicInterpreter {
         }
         return super.naryOperation(insn, values);
     }
-  
+
     @Override
     public BasicValue newParameterValue(final boolean isInstanceMethod, final int local, final Type type) {
         if (isInstanceMethod) {
@@ -146,7 +146,7 @@ public class ReflectionInterpreter extends BasicInterpreter {
 
     @Override
     public BasicValue merge(BasicValue v1, BasicValue v2) {
-        if (v1 instanceof StringValue 
+        if (v1 instanceof StringValue
             && v2 instanceof StringValue
             && v1.equals(v2)) {
             return new StringValue((StringValue)v1);
@@ -171,7 +171,7 @@ public class ReflectionInterpreter extends BasicInterpreter {
         }
         return super.merge(degradeValue(v1), degradeValue(v2));
     }
-  
+
     private BasicValue degradeValue(BasicValue v) {
         if (v instanceof StringValue || v instanceof ClassValue || v instanceof MethodValue || v instanceof StringBuilderValue) {
             return REFERENCE_VALUE;

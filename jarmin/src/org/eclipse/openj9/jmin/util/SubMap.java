@@ -28,9 +28,9 @@ import java.util.Map;
 
 /**
  * A simple Map wrapper used to track the sub-classes of a given class.
- * 
+ *
  * The sub-classes are not ordered in any way
- * 
+ *
  * @version 1.0
  * @since 1.0
  * @see java.util.HashMap

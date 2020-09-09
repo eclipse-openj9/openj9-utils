@@ -122,7 +122,7 @@ public class HibernatePreProcessor extends PreProcessor {
             for (MethodInfo mi : tsa.getMethodsByNameOnly("activate")) {
                 worklist.processVirtualMethod("org/hibernate/cfg/beanvalidation/TypeSafeActivator", "activate", mi.desc());
             }
-        
+
             for (MethodInfo mi : tsa.getMethodsByNameOnly("validateSuppliedFactory")) {
                 worklist.processVirtualMethod("org/hibernate/cfg/beanvalidation/TypeSafeActivator", "validateSuppliedFactory", mi.desc());
             }

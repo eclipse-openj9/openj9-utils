@@ -130,7 +130,7 @@ public class ReferenceAnalyzer {
                             }
                         }
                     }
-                    
+
                 }
                 super.visitEnd();
             }

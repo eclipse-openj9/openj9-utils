@@ -32,10 +32,10 @@ public class PersistenceAnnotationProcessor extends AnnotationProcessor {
         super(worklist, context, info, next);
         prefixes = new String[] { "Ljavax/persistence/" };
         classAnnotations = new String[] {
-          "Entity"  
+          "Entity"
         };
     }
-    
+
     @Override
     public void visit(
         final int version,

@@ -40,7 +40,7 @@ public class JBossLoggingAnnotationProcessor extends ClassVisitor {
         this.worklist = worklist;
         this.context = context;
     }
-    
+
     @Override
     public void visit(
         final int version,
@@ -53,9 +53,9 @@ public class JBossLoggingAnnotationProcessor extends ClassVisitor {
         if (cv != null) {
             cv.visit(version, access, name, signature, superName, interfaces);
         }
-        
+
     }
-    
+
     @Override
     public AnnotationVisitor visitAnnotation(final String desc, final boolean visible) {
         if (desc.startsWith("Lorg/jboss/logging/annotations/")) {
@@ -66,13 +66,13 @@ public class JBossLoggingAnnotationProcessor extends ClassVisitor {
                 }
             }
         }
-        
+
         if (cv != null) {
             return cv.visitAnnotation(desc, visible);
         }
         return null;
     }
-    
+
     @Override
     public MethodVisitor visitMethod(int maccess, java.lang.String mname, java.lang.String mdesc, java.lang.String msignature, java.lang.String[] mexceptions) {
         return new MethodVisitor(ASM8, cv != null ? cv.visitMethod(maccess, mname, mdesc, msignature, mexceptions) : null) {

@@ -71,7 +71,7 @@ public class MBeanProcessor extends ClassVisitor {
         if (cv != null) {
             cv.visit(version, access, name, signature, superName, interfaces);
         }
-        
+
     }
 
     @Override
@@ -89,7 +89,7 @@ public class MBeanProcessor extends ClassVisitor {
         }
         return null;
     }
-    
+
     @Override
     public void visitEnd() {
         if (matched && trace) {

@@ -1,5 +1,18 @@
 /* The port number is passed as an argument */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <iostream>
+#include <fstream>
 #include <server.hpp>
+int sockfd, newsockfd;
+
+using namespace std;
 
 void error(const char *msg)
 {
@@ -31,6 +44,8 @@ void startServer(int portNo) {
     char buffer[256], msg[256];
     struct sockaddr_in serv_addr, cli_addr;
     int n;
+
+    printf("Reached here.\n");
 
     // create a socket
     // socket(int domain, int type, int protocol)

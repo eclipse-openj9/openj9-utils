@@ -31,8 +31,8 @@ json perfProcess(pid_t processID) {
 	// Save into json format
 	json perfData;	
 
-	// Parse perf.data.txt to get data for each process
-	
+	// Parse perf.data.txt using regex to get data for each process
+	// Temp dummy variables
 	perfData["pid"] = pidStr;
 	perfData["overhead"] = "dummyOverhead";
 	perfData["command"] = "dummyCommand";

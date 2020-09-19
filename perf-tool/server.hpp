@@ -5,6 +5,7 @@
 
 // Handle sending message to all clients.
 void sendMessageToClients(std::string message);
+void sendPerfDataToClient(void);
 
 // Starts the server and sends a connection succeeded message.
 void startServer(int portNo);

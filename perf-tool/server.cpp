@@ -10,6 +10,8 @@
 #include <iostream>
 #include <fstream>
 #include <server.hpp>
+#include <perf.hpp>
+
 int sockfd, newsockfd;
 
 using namespace std;
@@ -103,9 +105,36 @@ void startServer(int portNo) {
     bzero(buffer,256);
 
     n = read(newsockfd,buffer,255);
+
+    if (strcmp(buffer, "perf\n") == 0) {
+	sendPerfDataToClient();
+    }
+	
     if (n < 0) error("ERROR reading from socket");
     printf("%s\n", buffer);
 
+}
+
+void sendPerfDataToClient(void) {
+    pid_t pid, currPid;
+    json perfData;
+
+    // Fork new process to handle perf data retrieval
+    if ((pid = fork()) < 0) {
+	error("Error on forking process"); 
+    }
+
+    currPid = getpid();
+    if (pid == 0) {
+	 // Let child process handle getting perf data
+	 perfData = perfProcess(currPid); 
+	 std::string perfStr = perfData.dump();
+	 
+	 printf("Server has obtained perf data:\n%s\n", perfStr.c_str()); // for debugging
+	 
+	 // Relay data to client 
+	 sendMessageToClients(perfStr);
+    } // else parent continues on 
 }
 
 void shutDownServer() {

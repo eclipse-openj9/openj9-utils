@@ -1,11 +1,14 @@
 #include <jvmti.h>
 #include "json.hpp"
 
+//how many times 
 using json = nlohmann::json;
 
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, jthread thread, jobject object) {
     json j;
-    printf("Contention entered\n");
+    static int numContentions = 0; // keep track of number of contentions
+
+    numContentions++;
 
     jclass cls = env->GetObjectClass(object);
     // First get the class object
@@ -24,8 +27,8 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
     // Now get the c string from the java jstring object
     const char* str = env->GetStringUTFChars(strObj, NULL);
 
-    // Print the class name
-    printf("\nCalling class is: %s\n", str);
+    // record calling class
+    j["Occurence"]["Class"] = str;
 
     // Release the memory pinned char array
     env->ReleaseStringUTFChars(strObj, str);
@@ -41,11 +44,15 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
         err = jvmtiEnv->GetMethodName(frames[0].method, 
                             &methodName, NULL, NULL);
         if (err == JVMTI_ERROR_NONE) {
-            printf("Executing method: %s", methodName);
+            j["Occurence"]["Method"] = methodName;
         }
     }
 
-    jint method_count;
+    j["Num Contentions"] = numContentions;
+
+    printf("%s\n", j.dump().c_str());
+
+    /*jint method_count;
     jmethodID *methodIDs;
 
     err = jvmtiEnv->GetClassMethods(cls, &method_count, &methodIDs);
@@ -60,22 +67,8 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
             }
         }
         
-    }
+    }*/
 }
 
 
-JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
-            JNIEnv* jni_env,
-            jthread thread,
-            jmethodID method) {
-    jvmtiError err;
-    json j;
-    char *methodName;
-    err = jvmtiEnv->GetMethodName(method, &methodName, NULL, NULL);
-    if (err == JVMTI_ERROR_NONE && strcmp(methodName, "doBatch") == 0) {
-        j["methodName"] = methodName;
-        std::string s = j.dump();
 
-        printf("\n%s\n", s.c_str());
-    }
-}

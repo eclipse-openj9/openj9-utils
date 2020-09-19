@@ -19,3 +19,5 @@ void sendMessageToClients(string message);
 
 // Starts the server and sends a connection succeeded message.
 void startServer(int portNo);
+
+void shutDownServer()

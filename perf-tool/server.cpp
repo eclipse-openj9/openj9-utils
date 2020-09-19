@@ -91,6 +91,9 @@ void startServer(int portNo) {
     if (n < 0) error("ERROR reading from socket");
     printf("%s\n", buffer);
 
+}
+
+void shutDownServer() {
     close(newsockfd);
     close(sockfd);
 }

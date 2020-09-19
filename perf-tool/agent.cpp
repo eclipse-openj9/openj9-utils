@@ -1,6 +1,7 @@
 #include <jvmti.h>
 #include <string.h>
-#include <json.hpp>
+#include "infra.h"
+#include "json.hpp"
 
 using json = nlohmann::json;
 
@@ -14,13 +15,7 @@ static void check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *st
     }
 }
 
-JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {
-    printf("VM starting up\n");
-}
 
-JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env) {
-    printf("VM shutting down\n");
-}
 
 
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, jthread thread, jobject object) {

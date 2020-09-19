@@ -1,5 +1,6 @@
 #include <jvmti.h>
 #include <string.h>
+
 #include "infra.h"
 #include "monitor.h"
 #include "json.hpp"
@@ -32,6 +33,54 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
     }*/
 }
 
+
+JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv, 
+                        JNIEnv* env, 
+                        jthread thread, 
+                        jobject object, 
+                        jclass object_klass, 
+                        jlong size) {
+    jvmtiError err;
+    // jobject cls = env->GetObjectClass(object);
+    // jobjectRefType clsType = env->GetObjectRefType(object_klass);
+    json j;
+
+    // err = jvmtiEnv->GetClassSignature(object_klass, &refType, NULL);
+    // if (err == JVMTI_ERROR_NONE) {
+    //     j["classType"] = refType;
+    //     std::string s = j.dump();
+    //     printf("\n%s\n", s.c_str());
+    // }
+
+    jint class_count;
+    jclass* classes;
+
+    err = jvmtiEnv->GetLoadedClasses(&class_count, &classes);
+    if (err == JVMTI_ERROR_NONE && class_count >= 1) {
+        for (int i = 0; i < class_count; i++) {
+            char * refType;
+            err = jvmtiEnv->GetClassSignature(classes[i], &refType, NULL);
+            if (err == JVMTI_ERROR_NONE) {
+                j["refNum"] = i;
+                j["refType"] = refType;
+            }
+        }
+    }
+
+    // jint * hcode;
+    // err = jvmtiEnv->GetObjectHashCode(object, &hcode);
+    // if (err == JVMTI_ERROR_NONE) {
+    //     j["address"] = hcode;
+    // }
+    
+    std::string s = j.dump();
+    printf("\n%s\n", s.c_str());
+
+
+}
+
+
+
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
     jvmtiEnv *jvmti;
     jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
@@ -62,12 +111,16 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     error = jvmti->SetEventNotificationMode(JVMTI_ENABLE,  JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
     check_jvmti_error(jvmti, error, "Unable to init Method Entry event.");
 
+    error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
+    check_jvmti_error(jvmti, error, "Unable to init VM Object Alloc event");
+
     jvmtiEventCallbacks callbacks;
     (void)memset(&callbacks, 0, sizeof(jvmtiEventCallbacks));
     callbacks.VMInit = &VMInit;
     callbacks.VMDeath = &VMDeath;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.MethodEntry = &MethodEntry;
+    callbacks.VMObjectAlloc = &VMObjectAlloc;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
 

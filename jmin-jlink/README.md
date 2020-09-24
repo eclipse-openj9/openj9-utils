@@ -23,47 +23,97 @@ SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-excepti
 # jmin-jlink
 
 Includes:
-- **hellomodule.HelloWorld**, a simple app that contains classes, methods and fields - some of which should be removed during minimization;
-- **MinimimizeClassesPlugin**, a jlink plugin that minimizes an image using jarmin/jmin (jarmin/jmin-related code is commented out)
-- **MinimizeClassesPluginAgent**, a java agent that allows a custom implementation of a plugin to be used with jlink
+- **hellomodule.HelloWorld**, a simple app that contains classes, methods and fields - some of which should be removed during minimization
+- **MinimimizeClassesPlugin**, a `jlink` plugin that can be used to minimize an image if [jarmin](../jarmin) is integrated
+- **MinimizeClassesPluginAgent**, a java agent that allows a custom implementation of a plugin to be used with `jlink`
 
 ---
 
 ## How to Run
-This command runs jlink with the custom plugin (jlink option `--minimize-classes`), enabled by the java agent, 
-on a simple app contained in `hellomodule`. The resulting image is generated in the `build` directory, and output 
-from the command is piped to `minimizeclasses.out`.
+Follow these instructions to run `jlink` with the custom plugin (`jlink` option `--minimize-classes`) enabled by the java agent, 
+on a simple app contained in `hellomodule`. The resulting image is generated in the `build/image` directory and output from 
+the `jlink` command is piped to `minimizeclasses.out`.
 
-As this code involves Java modularity, Java 11 or above is required.
+As this code involves Java modularity, **Java 11 or above is required**. 
+Take note of the path to your JDK `<PATH_TO_JDK>` as it is needed to run the below commands.
 
 From the `jmin-jlink` directory, run the following:
 
-#### Compile the hellomodule classes
+### **Build and Run with `make`**
+If you have `make` installed (GNU Make 3.81 and above recommended), either set environment variable `JAVA_HOME` to the path to 
+your JDK, or append `JAVA_HOME="<PATH_TO_JDK>"` to the commands as indicated below.
+
+Then, you can simply run:
+- `make all`: Compile `hellomodule`, plugin, agent and create agent JAR
+     - `make all JAVA_HOME="<PATH_TO_JDK>"`: Pass JAVA_HOME explicitly
+- `make test`: Run the custom `jlink` plugin with hellomodule
+     - `make test JAVA_HOME="<PATH_TO_JDK>"`: Pass JAVA_HOME explicitly
+- `make clean`: Delete the build output directory
+
+### **Build and Run Manually**
+Otherwise, to run the commands manually, prepend your JDK's `<PATH_TO_JDK>` to each command below.
+
+### Compile the hellomodule module
 ```
-javac -d out --module-path out src/module-info.java src/hellomodule/*.java
+mkdir -p build/modules/hellomodule
+
+<PATH_TO_JDK>/bin/javac \
+	-d build/modules/hellomodule \
+	src/module-info.java \
+	src/hellomodule/*.java
 ```
 
-#### Compile the custom jlink plugin
+### Compile the custom `jlink` plugin
+_MinimizeClassesPlugin custom plugin for jlink_
 ```
-javac --add-exports jdk.jlink/jdk.tools.jlink.plugin=jmin.jlink --add-exports jdk.jlink/jdk.tools.jlink.internal=jmin.jlink plugin/jmin.jlink/module-info.java plugin/jmin.jlink/jmin/jlink/plugin/*.java
-```
-
-#### Compile the java agent
-```
-javac --add-exports jdk.jlink/jdk.tools.jlink.internal=plugin.agent --add-exports jdk.jlink/jdk.tools.jlink.plugin=plugin.agent agent/plugin.agent/module-info.java agent/plugin.agent/jmin/jlink/agent/*.java
-cd agent/plugin.agent
-jar cfm jminjlinkagent.jar MANIFEST.mf jmin/jlink/agent/*.class *.class
-cd ../..
+<PATH_TO_JDK>/bin/javac \
+	-d build/plugin \
+	--add-exports jdk.jlink/jdk.tools.jlink.internal=jmin.jlink \
+	--add-exports jdk.jlink/jdk.tools.jlink.plugin=jmin.jlink \
+	plugin/jmin.jlink/module-info.java \
+	plugin/jmin.jlink/jmin/jlink/plugin/*.java
 ```
 
-#### Run the custom jlink plugin with hellomodule
-You may need to use the absolute path to `jlink` here. The `jlink` tool found in the `bin` directory of the JDK.
+### Compile the java agent
+_MinimizeClassesPluginAgent, Java Instrumentation Agent for the custom `jlink` plugin_
 ```
-jlink -J-javaagent:agent/plugin.agent/jminjlinkagent.jar -J--module-path=:plugin -J--add-modules=jmin.jlink --minimize-classes --module-path=out --add-modules hellomodule --output build > minimizeclasses.out
+<PATH_TO_JDK>/bin/javac \
+	-d build/agent \
+	--add-exports jdk.jlink/jdk.tools.jlink.internal=plugin.agent \
+	--add-exports jdk.jlink/jdk.tools.jlink.plugin=plugin.agent \
+	agent/plugin.agent/module-info.java \
+	agent/plugin.agent/jmin/jlink/agent/*.java
 ```
 
-#### View the output in minimizeclasses.out
-Here's a sample of what the first few lines of output looks like:
+### Create java agent JAR
+```
+<PATH_TO_JDK>/bin/jar \
+	--create \
+	--file=build/jminjlinkagent.jar \
+	--manifest=agent/plugin.agent/MANIFEST.MF \
+	-C build/agent module-info.class \
+	-C build/agent jmin
+```
+
+### Run the custom `jlink` plugin with hellomodule
+The resulting image will be generated in the `build/image` and (the thousands of lines of) output generated by the command/plugin will be in `minimizeclasses.out` as well as printed to standard output.
+
+```
+<PATH_TO_JDK>/bin/jlink \
+	-J-javaagent:build/jminjlinkagent.jar \
+	-J--module-path=:build/plugin \
+	-J--add-modules=jmin.jlink \
+	--minimize-classes \
+	--module-path=build/modules \
+	--add-modules hellomodule \
+	--output build/image \
+		2>&1 | tee minimizeclasses.out
+```
+
+_Note: If running on Windows, you may need to use `-J--module-path=';build/plugin'` and `-J--add-modules='jmin.jlink'` instead_
+
+### View the output in minimizeclasses.out
+Here's a sample of what the first few (of many thousand) lines of output look like:
 ```
 previsiting!!
 
@@ -82,22 +132,27 @@ CLASS_OR_RESOURCE
 
 ---
 
-## Build and run with your changes
-
 ### Simple Sample App
-#### Build the hellomodule sample app
+#### The hellomodule sample app
 
-**HelloWorld.java**: contains main method and classes/methods/fields, some of which should be removed via minimization\
-**ReferencedClass.java**: a class that is referenced in HelloWorld.java, so it should be included in the image\
-**UnusedClass.java**: a class that is not used in the sample app, so it should be removed from the image
+- **HelloWorld.java**: contains main method and classes/methods/fields, some of which should be removed via minimization
+- **ReferencedClass.java**: a class that is referenced in HelloWorld.java, so it should be included in the image
+- **UnusedClass.java**: a class that is not used in the sample app, so it should be removed from the image
 
+#### Compile the hellomodule module
 ```
-javac -d out --module-path out src/module-info.java src/hellomodule/*.java
+<PATH_TO_JDK>/bin/javac \
+	-d build/modules/hellomodule \
+	src/module-info.java \
+	src/hellomodule/*.java
 ```
 
 #### Run the hellomodule sample app
+After compiling, run:
 ```
-java --module-path out --module hellomodule/hellomodule.HelloWorld
+<PATH_TO_JDK>/bin/java \
+	--module-path build/modules/hellomodule \
+	--module hellomodule/hellomodule.HelloWorld
 ```
 
 EXAMPLE OUTPUT:
@@ -107,49 +162,26 @@ INFO: Hello World!
 ReferencedClass.aMethod()
 ```
 
-#### Create a hellomodule jar (to use with jarmin)
+#### Create a hellomodule jar (i.e. to use with [jarmin](../jarmin))
 ```
-cd out
-jar cf hellomodule.jar hellomodule module-info.class
-```
-
-### Plugin
-MinimizeClassesPlugin custom plugin for jlink
-
-#### Build plugin
-From the top-level `jmin-jlink` directory:
-
-```
-javac --add-exports jdk.jlink/jdk.tools.jlink.plugin=jmin.jlink --add-exports jdk.jlink/jdk.tools.jlink.internal=jmin.jlink plugin/jmin.jlink/module-info.java plugin/jmin.jlink/jmin/jlink/plugin/*.java
-```
-
-### Agent
-MinimizeClassesPluginAgent, Java Instrumentation Agent for the custom jlink plugin
-
-#### Build agent and create jar
-From the top-level `jmin-jlink` directory:
-
-```
-javac --add-exports jdk.jlink/jdk.tools.jlink.internal=plugin.agent --add-exports jdk.jlink/jdk.tools.jlink.plugin=plugin.agent agent/plugin.agent/module-info.java agent/plugin.agent/jmin/jlink/agent/*.java
-cd agent/plugin.agent
-jar cfm jminjlinkagent.jar MANIFEST.mf jmin/jlink/agent/*.class *.class
-```
-
-### Run plugin with jlink
-
-Go to the top-level `jmin-jlink` directory.
-The resulting image will be generated in the `build` directory and output generated by the command/plugin will be in `minimizeclasses.out`.
-
-```
-jlink -J-javaagent:agent/plugin.agent/jminjlinkagent.jar -J--module-path=:plugin -J--add-modules=jmin.jlink --minimize-classes --module-path=out --add-modules hellomodule --output build > minimizeclasses.out
+<PATH_TO_JDK>/bin/jar \
+	--create \
+	--file=build/hellomodule.jar \
+	--manifest=src/MANIFEST.MF \
+	-C build/modules/hellomodule module-info.class \
+	-C build/modules/hellomodule hellomodule
 ```
 
 ---
 
 ### Other Useful Commands
 
-From the top-level `jmin-jlink` directory:\
-`jdeps <JDEPS_OPTIONS> out/hellomodule.jar`
-- `<JDEPS_OPTIONS>`: --list-deps, --print-module-deps
+After creating the hellomodule jar, run :
+```
+<PATH_TO_JDK>/bin/jdeps \
+	<JDEPS_OPTIONS> \
+	build/hellomodule.jar
+```
+- `<JDEPS_OPTIONS>`: some examples are `--list-deps`, `--print-module-deps`
 
 Note that `jdeps` is a static analysis tool, so it doesn't identify modules that are dynamically required, such as those required in reflection or service providers.

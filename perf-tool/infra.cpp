@@ -1,5 +1,5 @@
 #include <jvmti.h>
-#include <server.hpp>
+#include "server.hpp"
 
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {
     startServer(9003);

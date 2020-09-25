@@ -1,8 +1,10 @@
 #include <jvmti.h>
 #include <string.h>
+
 #include "infra.h"
 #include "monitor.h"
 #include "json.hpp"
+#include "objectalloc.h"
 
 using json = nlohmann::json;
 
@@ -31,6 +33,8 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
         printf("\n%s\n", s.c_str());
     }*/
 }
+
+
 
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
     jvmtiEnv *jvmti;
@@ -62,12 +66,16 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     error = jvmti->SetEventNotificationMode(JVMTI_ENABLE,  JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
     check_jvmti_error(jvmti, error, "Unable to init Method Entry event.");
 
+    error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
+    check_jvmti_error(jvmti, error, "Unable to init VM Object Alloc event");
+
     jvmtiEventCallbacks callbacks;
     (void)memset(&callbacks, 0, sizeof(jvmtiEventCallbacks));
     callbacks.VMInit = &VMInit;
     callbacks.VMDeath = &VMDeath;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.MethodEntry = &MethodEntry;
+    callbacks.VMObjectAlloc = &VMObjectAlloc;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
 

@@ -1,6 +1,6 @@
 #include <jvmti.h>
 #include "json.hpp"
-#include <server.hpp>
+#include "server.hpp"
 
 //how many times 
 using json = nlohmann::json;
@@ -52,7 +52,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
     j["Num Contentions"] = numContentions;
 
     printf("%s\n", j.dump().c_str());
-    sendMessageToClients(j.dump());
+    // sendMessageToClients(j.dump());
 
     /*jint method_count;
     jmethodID *methodIDs;

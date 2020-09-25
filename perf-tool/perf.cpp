@@ -1,8 +1,9 @@
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <string>
 #include <perf.hpp>
-
+#include <signal.h>
 
 
 json perfProcess(pid_t processID) {
@@ -11,37 +12,53 @@ json perfProcess(pid_t processID) {
 	 * Outputs:	json	perf_data:	perf data collected from application.
 	 * */
 	char* pidStr = (char*)std::to_string(processID).c_str();
-	char *args[2] = {pidStr, NULL};
+	char *args[5] = {"/usr/bin/perf", "record", "-p", pidStr,  NULL};
 	char *envp[1] = {NULL};
+	
+	// Make local tmp folder
+	if (mkdir("./tmp", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1)
+		perror("mkdir");
 
 	// Change to /tmp folder to store the perf data
-	if (chdir("/tmp") == -1)
+	if (chdir("./tmp") == -1)
 		perror("chdir");
-
-	// Run perf record to collect process data into perf.data
-	if (execve("perf record -p", args, envp) == -1)
-		perror("execve");
 	
-	// Run perf script to get all data
-	char* cmdPerfScript = (char*) "perf script > perf.data.txt";
-	char* perfScriptArgs[2] = {cmdPerfScript, NULL};
-	if (execve(perfScriptArgs[0], perfScriptArgs, NULL) == -1)
-		perror("execve");
+	pid_t pid;
+
+	if ((pid = fork()) == -1) {
+		perror("fork");
+	}
+
+	if (pid == 0) {
+		// Run perf record to collect process data into perf.data
+		if (execve(args[0], args, envp) == -1)
+			perror("execve");
+	}
+	else {
+		sleep(2);
+		kill(pid, SIGTERM);
+		
+		// Run perf script to get all data
+		char* cmdPerfScript = (char*) "perf script > perf.data.txt";
+		char* perfScriptArgs[5] = {"/usr/bin/perf", "script", ">", "perf.data.txt", NULL};
+		//if (execve(perfScriptArgs[0], perfScriptArgs, envp) == -1)
+		//	perror("execve");
 	
-	// Save into json format
-	json perfData;	
+		// Save into json format
+		json perfData;	
 
-	// Parse perf.data.txt using regex to get data for each process
-	// Temp dummy variables
-	perfData["pid"] = pidStr;
-	perfData["overhead"] = "dummyOverhead";
-	perfData["command"] = "dummyCommand";
-	perfData["sharedObject"] = "dummySharedObject";
-	perfData["symbol"] = "dummySymbol";
+		// Parse perf.data.txt using regex to get data for each process
+		// Temp dummy variables
+		perfData["pid"] = pidStr;
+		perfData["overhead"] = "dummyOverhead";
+		perfData["command"] = "dummyCommand";
+		perfData["sharedObject"] = "dummySharedObject";
+		perfData["symbol"] = "dummySymbol";
 
-	printf("should be returned\n");
+		printf("Returning now\n");
 
-	return perfData;
+		return perfData;
+	}
 }
 
 /*int main(int argc, char* argv[]) {

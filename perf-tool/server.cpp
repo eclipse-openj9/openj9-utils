@@ -112,7 +112,12 @@ void handleServer(int portNo) {
     n = read(newsockfd,buffer,255);
 
     if (strcmp(buffer, "perf\n") == 0) {
-	sendPerfDataToClient();
+	pid_t pid = fork();
+	if (pid == -1)
+		perror("fork");
+	if (pid == 0) {
+		sendPerfDataToClient();
+	}
     }
 	
     if (n < 0) error("ERROR reading from socket");
@@ -138,7 +143,7 @@ void sendPerfDataToClient(void) {
 	 printf("Server has obtained perf data:\n%s\n", perfStr.c_str()); // for debugging
 	 
 	 // Relay data to client 
-	 sendMessageToClients(perfStr);
+	 sendMessageToClients("done");
     } // else parent continues on 
 }
 

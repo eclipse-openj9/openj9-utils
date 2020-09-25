@@ -7,9 +7,13 @@
 void sendMessageToClients(std::string message);
 void sendPerfDataToClient(void);
 
-// Starts the server and sends a connection succeeded message.
+// Starts the server thread.
 void startServer(int portNo);
 
+// Handles server functionality
+void handleServer(int portNo);
+
+// Join the server thread and closes server
 void shutDownServer();
 
 #endif /* SERVER_H_ */

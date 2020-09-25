@@ -9,64 +9,16 @@
 #include <arpa/inet.h>
 #include <iostream>
 #include <fstream>
-#include "server.hpp"
-int sockfd, newsockfd;
-
-using namespace std;
-
-void error(const char *msg)
-{
-    perror(msg);
-    exit(1);
-}
-
-int main(int argc, char *argv[])
-{
-    int portNo;
-    if (argc < 2) {
-        fprintf(stderr,"ERROR, no port provided\n");
-        exit(1);
-    }
-
-    portNo = atoi(argv[1]);
-    startServer(portNo);
-    
-    return 0; 
-}
-
-void sendMessageToClients(string message) {
-    const char *cstring = message.c_str();
-    send(newsockfd, cstring, strlen(cstring), 0);
-}
-
-void startServer(int portNo) {
-    socklen_t clilen;
-    char buffer[256], msg[256];
-    struct sockaddr_in serv_addr, cli_addr;
-    int n;
-
-    printf("Reached here.\n");
-
-    // create a socket
-    // socket(int domain, int type, int protocol)#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h> 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <iostream>
-#include <fstream>
 #include <server.hpp>
 #include <perf.hpp>
-
-int sockfd, newsockfd;
+#include <thread>
 
 using namespace std;
 
-void error(const char *msg)
-{
+int sockfd, newsockfd;
+thread mainServerThread;
+
+void error(const char *msg) {
     perror(msg);
     exit(1);
 }
@@ -91,6 +43,10 @@ void sendMessageToClients(string message) {
 }
 
 void startServer(int portNo) {
+    mainServerThread = thread(handleServer, portNo);
+}
+
+void handleServer(int portNo) {
     socklen_t clilen;
     char buffer[256], msg[256];
     struct sockaddr_in serv_addr, cli_addr;
@@ -189,4 +145,6 @@ void sendPerfDataToClient(void) {
 void shutDownServer() {
     close(newsockfd);
     close(sockfd);
+
+    mainServerThread.detach();
 }

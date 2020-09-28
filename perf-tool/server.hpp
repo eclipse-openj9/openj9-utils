@@ -3,6 +3,9 @@
 
 #include <string>
 
+#define NUM_CLIENTS 5
+#define BASE_POLLS 2
+
 // Handle sending message to all clients.
 void sendMessageToClients(std::string message);
 void sendPerfDataToClient(void);

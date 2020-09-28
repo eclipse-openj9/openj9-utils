@@ -12,11 +12,13 @@
 #include <server.hpp>
 #include <perf.hpp>
 #include <thread>
+#include <poll.h>
 
 using namespace std;
 
-int sockfd, newsockfd;
+int sockfd, socketFDs[NUM_CLIENTS], activeClients = 0;
 thread mainServerThread;
+struct pollfd pollfd[BASE_POLLS+NUM_CLIENTS];
 
 void error(const char *msg) {
     perror(msg);
@@ -31,6 +33,11 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    // Setup to handle stdin pollin for interactive mode 
+    pollfd[0].fd = STDIN_FILENO;
+    pollfd[0].events = POLLIN;
+    pollfd[0].revents = 0;
+
     portNo = atoi(argv[1]);
     startServer(portNo);
     
@@ -39,7 +46,9 @@ int main(int argc, char *argv[])
 
 void sendMessageToClients(string message) {
     const char *cstring = message.c_str();
-    send(newsockfd, cstring, strlen(cstring), 0);
+    for (int i=0; i<activeClients; i++) {
+        send(socketFDs[i+BASE_POLLS], cstring, strlen(cstring), 0);
+    }
 }
 
 void startServer(int portNo) {
@@ -87,36 +96,64 @@ void handleServer(int portNo) {
     // Here, we set the maximum size for the backlog queue to 5.
     listen(sockfd,5);
 
-    // The accept() call actually accepts an incoming connection
-    clilen = sizeof(cli_addr);
+    pollfd[1].fd = sockfd;
+    pollfd[1].events = POLLIN;
+    pollfd[1].revents = 0;
 
-    // This accept() function will write the connecting client's address info 
-    // into the the address structure and the size of that structure is clilen.
-    // The accept() returns a new socket file descriptor for the accepted connection.
-    // So, the original socket file descriptor can continue to be used 
-    // for accepting new connections while the new socker file descriptor is used for
-    // communicating with the connected client.
-    newsockfd = accept(sockfd, 
-                (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0) 
-        error("ERROR on accept");
+    // Use polling to keep track of clients and keyboard input
+    while (1) {
+        if (poll(pollfd, activeClients + 2, 0) == -1){
+            fprintf(stderr, "a3sdn: poll error\n");
+            exit(1);
+        }
 
-    printf("server: got connection from %s port %d\n",
-        inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
+        // Handle input from STDIN (interactive mode)
+        if (pollfd[0].revents && POLLIN) {
+            continue;
+        }
 
-    // This send() function sends the bytes of the string to the new socket
-    sendMessageToClients("Connection to server succeeded");
+        if (activeClients < NUM_CLIENTS && pollfd[1].revents && POLLIN) {
+            // The accept() call actually accepts an incoming connection
+            clilen = sizeof(cli_addr);
 
-    bzero(buffer,256);
+            // This accept() function will write the connecting client's address info 
+            // into the the address structure and the size of that structure is clilen.
+            // The accept() returns a new socket file descriptor for the accepted connection.
+            // So, the original socket file descriptor can continue to be used 
+            // for accepting new connections while the new socker file descriptor is used for
+            // communicating with the connected client.
+            socketFDs[BASE_POLLS+activeClients] = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+            if (socketFDs[BASE_POLLS+activeClients] < 0) { 
+                error("ERROR on accept");
+            }
 
-    n = read(newsockfd,buffer,255);
+            printf("server: got connection from %s port %d\n",
+                inet_ntoa(cli_addr.sin_addr), 
+                ntohs(cli_addr.sin_port)
+            );
 
-    if (strcmp(buffer, "perf\n") == 0) {
-	sendPerfDataToClient();
+            // Update number of active clients
+            activeClients++;
+
+            // Send a welcome message
+            sendMessageToClients("Connection to server succeeded");
+        }
+
+        // Receiving and sending messages from/to clients 
+        for (int i=0; i<activeClients; i++) {
+            bzero(buffer,256);
+            n = read(socketFDs[i+BASE_POLLS], buffer, 255);
+            
+            if (n < 0) { 
+                error("ERROR reading from socket");
+            } else if (n > 0) {
+                if (strcmp(buffer, "perf\n") == 0) {
+                    sendPerfDataToClient();
+                }
+                printf("Recieved: %s\n", buffer);
+            }
+        }
     }
-	
-    if (n < 0) error("ERROR reading from socket");
-    printf("%s\n", buffer);
 
 }
 
@@ -126,24 +163,26 @@ void sendPerfDataToClient(void) {
 
     // Fork new process to handle perf data retrieval
     if ((pid = fork()) < 0) {
-	error("Error on forking process"); 
+	    error("Error on forking process"); 
     }
 
     currPid = getpid();
     if (pid == 0) {
-	 // Let child process handle getting perf data
-	 perfData = perfProcess(currPid); 
-	 std::string perfStr = perfData.dump();
-	 
-	 printf("Server has obtained perf data:\n%s\n", perfStr.c_str()); // for debugging
-	 
-	 // Relay data to client 
-	 sendMessageToClients(perfStr);
+        // Let child process handle getting perf data
+        perfData = perfProcess(currPid); 
+        std::string perfStr = perfData.dump();
+        
+        printf("Server has obtained perf data:\n%s\n", perfStr.c_str()); // for debugging
+        
+        // Relay data to client 
+        sendMessageToClients(perfStr);
     } // else parent continues on 
 }
 
 void shutDownServer() {
-    close(newsockfd);
+    for (int i=0; i<activeClients; i++) {
+        close(socketFDs[i]);
+    }
     close(sockfd);
 
     mainServerThread.detach();

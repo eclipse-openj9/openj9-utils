@@ -6,7 +6,7 @@
 #include <signal.h>
 
 
-json perfProcess(pid_t processID) {
+json perfProcess(pid_t processID, int recordTime) {
 	/* Perf process runs perf tool to collect perf data of given process.
 	 * Inputs:	pid_t 	processID:	process ID of running application.
 	 * Outputs:	json	perf_data:	perf data collected from application.
@@ -35,7 +35,7 @@ json perfProcess(pid_t processID) {
 			perror("execve");
 	}
 	else {
-		sleep(2);
+		sleep(recordTime);
 		kill(pid, SIGTERM);
 		
 		// Run perf script to get all data
@@ -59,6 +59,7 @@ json perfProcess(pid_t processID) {
 
 		return perfData;
 	}
+
 }
 
 /*int main(int argc, char* argv[]) {

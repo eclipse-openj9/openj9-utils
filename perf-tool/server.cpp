@@ -129,22 +129,15 @@ void sendPerfDataToClient(void) {
     pid_t pid, currPid;
     json perfData;
 
-    // Fork new process to handle perf data retrieval
-    if ((pid = fork()) < 0) {
-	error("Error on forking process"); 
-    }
 
     currPid = getpid();
-    if (pid == 0) {
-	 // Let child process handle getting perf data
-	 perfData = perfProcess(currPid); 
-	 std::string perfStr = perfData.dump();
+    perfData = perfProcess(currPid, 3); 
+    //std::string perfStr = perfData.dump();
 	 
-	 printf("Server has obtained perf data:\n%s\n", perfStr.c_str()); // for debugging
+    // printf("Server has obtained perf data:\n%s\n", perfStr.c_str()); // for debugging
 	 
-	 // Relay data to client 
-	 sendMessageToClients("done");
-    } // else parent continues on 
+    // Relay data to client 
+    sendMessageToClients("done");
 }
 
 void shutDownServer() {

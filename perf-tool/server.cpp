@@ -16,9 +16,11 @@
 
 using namespace std;
 
-int sockfd, socketFDs[NUM_CLIENTS], activeClients = 0;
+int sockfd, clientFds[NUM_CLIENTS], activeClients = 0;
 thread mainServerThread;
-struct pollfd pollfd[BASE_POLLS+NUM_CLIENTS];
+struct pollfd pollFds[BASE_POLLS+NUM_CLIENTS];
+string logFileName;
+ofstream logFile;
 
 void error(const char *msg) {
     perror(msg);
@@ -33,26 +35,21 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    // Setup to handle stdin pollin for interactive mode 
-    pollfd[0].fd = STDIN_FILENO;
-    pollfd[0].events = POLLIN;
-    pollfd[0].revents = 0;
-
     portNo = atoi(argv[1]);
     startServer(portNo);
     
     return 0; 
 }
 
-void sendMessageToClients(string message) {
-    const char *cstring = message.c_str();
-    for (int i=0; i<activeClients; i++) {
-        send(socketFDs[i+BASE_POLLS], cstring, strlen(cstring), 0);
-    }
-}
-
-void startServer(int portNo) {
+void startServer(int portNo, string filename) {
     mainServerThread = thread(handleServer, portNo);
+    logFile.open("out.txt");
+    if (filename != "") {
+        logFile.open(filename);
+        if (!logFile.is_open()) {
+            error("ERROR opening logs file");
+        }
+    }
 }
 
 void handleServer(int portNo) {
@@ -60,8 +57,6 @@ void handleServer(int portNo) {
     char buffer[256], msg[256];
     struct sockaddr_in serv_addr, cli_addr;
     int n;
-
-    printf("Reached here.\n");
 
     // create a socket
     // socket(int domain, int type, int protocol)
@@ -86,33 +81,31 @@ void handleServer(int portNo) {
     // bind() passes file descriptor, the address structure, 
     // and the length of the address structure
     // This bind() call will bind  the socket to the current IP address on port, portNo
-    if (bind(sockfd, (struct sockaddr *) &serv_addr,
-            sizeof(serv_addr)) < 0) 
-            error("ERROR on binding");
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+        error("ERROR on binding");
+    }
 
     // This listen() call tells the socket to listen to the incoming connections.
     // The listen() function places all incoming connection into a backlog queue
     // until accept() call accepts the connection.
     // Here, we set the maximum size for the backlog queue to 5.
-    listen(sockfd,5);
+    listen(sockfd,NUM_CLIENTS);
 
-    pollfd[1].fd = sockfd;
-    pollfd[1].events = POLLIN;
-    pollfd[1].revents = 0;
+    pollFds[0].fd = sockfd;
+    pollFds[0].events = POLLIN;
+    pollFds[0].revents = 0;
+
+    printf("Server started.\n");
 
     // Use polling to keep track of clients and keyboard input
     while (1) {
-        if (poll(pollfd, activeClients + 2, 0) == -1){
-            fprintf(stderr, "a3sdn: poll error\n");
-            exit(1);
+        bzero(buffer,256);
+
+        if (poll(pollFds, activeClients + BASE_POLLS, 0) == -1){
+            error("ERROR on polling");
         }
 
-        // Handle input from STDIN (interactive mode)
-        if (pollfd[0].revents && POLLIN) {
-            continue;
-        }
-
-        if (activeClients < NUM_CLIENTS && pollfd[1].revents && POLLIN) {
+        if (activeClients < NUM_CLIENTS && pollFds[0].revents && POLLIN) {
             // The accept() call actually accepts an incoming connection
             clilen = sizeof(cli_addr);
 
@@ -122,8 +115,8 @@ void handleServer(int portNo) {
             // So, the original socket file descriptor can continue to be used 
             // for accepting new connections while the new socker file descriptor is used for
             // communicating with the connected client.
-            socketFDs[BASE_POLLS+activeClients] = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-            if (socketFDs[BASE_POLLS+activeClients] < 0) { 
+            clientFds[BASE_POLLS+activeClients] = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+            if (clientFds[BASE_POLLS+activeClients] < 0) { 
                 error("ERROR on accept");
             }
 
@@ -142,19 +135,44 @@ void handleServer(int portNo) {
         // Receiving and sending messages from/to clients 
         for (int i=0; i<activeClients; i++) {
             bzero(buffer,256);
-            n = read(socketFDs[i+BASE_POLLS], buffer, 255);
+            n = read(clientFds[i+BASE_POLLS], buffer, 255);
             
             if (n < 0) { 
                 error("ERROR reading from socket");
             } else if (n > 0) {
-                if (strcmp(buffer, "perf\n") == 0) {
-                    sendPerfDataToClient();
-                }
-                printf("Recieved: %s\n", buffer);
+                handleClientInput(buffer);
             }
         }
     }
 
+}
+
+void logData(string data) {
+    if (logFile.is_open()) {
+        logFile << data << endl;
+    }
+}
+
+void handleAgentData(const char *data) {
+    if (data == "perf\n") {
+        sendPerfDataToClient();
+    }
+    string s = string(data);
+    logData(s); 
+    printf("Recieved: %s\n", data);
+}
+
+void handleClientInput(char buffer[]) {
+    string s = string(buffer);
+    logData(s); 
+    printf("%s\n", buffer);
+}
+
+void sendMessageToClients(string message) {
+    const char *cstring = message.c_str();
+    for (int i=0; i<activeClients; i++) {
+        send(clientFds[i+BASE_POLLS], cstring, strlen(cstring), 0);
+    }
 }
 
 void sendPerfDataToClient(void) {
@@ -176,14 +194,18 @@ void sendPerfDataToClient(void) {
         
         // Relay data to client 
         sendMessageToClients(perfStr);
+        
+        // Log data to file
+        logData(perfStr);
+
     } // else parent continues on 
 }
 
 void shutDownServer() {
-    for (int i=0; i<activeClients; i++) {
-        close(socketFDs[i]);
-    }
     close(sockfd);
+    for (int i=0; i<activeClients; i++) {
+        close(clientFds[i]);
+    }
 
     mainServerThread.detach();
 }

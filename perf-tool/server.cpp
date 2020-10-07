@@ -1,14 +1,12 @@
 /* The port number is passed as an argument */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <iostream>
-#include <fstream>
 #include <server.hpp>
 #include <perf.hpp>
 #include <thread>
@@ -16,15 +14,32 @@
 
 using namespace std;
 
-int sockfd, clientFds[NUM_CLIENTS], activeClients = 0;
+int sockfd, activeNetworkClients = 0;
+NetworkClient *networkClients[NUM_CLIENTS];
+LoggingClient *loggingClient;
 thread mainServerThread;
 struct pollfd pollFds[BASE_POLLS+NUM_CLIENTS];
 string logFileName;
-ofstream logFile;
 
 void error(const char *msg) {
     perror(msg);
     exit(1);
+}
+
+void NetworkClient::sendMessage(std::string message) {
+    const char *cstring = message.c_str();
+    send(socketFd, cstring, strlen(cstring), 0);
+}
+
+void NetworkClient::handlePoll(char buffer[]) {
+    int n = read(socketFd, buffer, 255);
+    
+    if (n < 0) { 
+        error("ERROR reading from socket");
+    } else if (n > 0) {
+        // TODO handle client input
+        printf("Client message recieved: %s\n", buffer);
+    }
 }
 
 int main(int argc, char *argv[])
@@ -43,20 +58,14 @@ int main(int argc, char *argv[])
 
 void startServer(int portNo, string filename) {
     mainServerThread = thread(handleServer, portNo);
-    logFile.open("out.txt");
-    if (filename != "") {
-        logFile.open(filename);
-        if (!logFile.is_open()) {
-            error("ERROR opening logs file");
-        }
-    }
+    loggingClient = new LoggingClient();
 }
 
 void handleServer(int portNo) {
     socklen_t clilen;
     char buffer[256], msg[256];
     struct sockaddr_in serv_addr, cli_addr;
-    int n;
+    int n, newsocketFd;
 
     // create a socket
     // socket(int domain, int type, int protocol)
@@ -101,11 +110,11 @@ void handleServer(int portNo) {
     while (1) {
         bzero(buffer,256);
 
-        if (poll(pollFds, activeClients + BASE_POLLS, 0) == -1){
+        if (poll(pollFds, activeNetworkClients + BASE_POLLS, 100) == -1){
             error("ERROR on polling");
         }
 
-        if (activeClients < NUM_CLIENTS && pollFds[0].revents && POLLIN) {
+        if (activeNetworkClients < NUM_CLIENTS && pollFds[0].revents && POLLIN) {
             // The accept() call actually accepts an incoming connection
             clilen = sizeof(cli_addr);
 
@@ -115,9 +124,11 @@ void handleServer(int portNo) {
             // So, the original socket file descriptor can continue to be used 
             // for accepting new connections while the new socker file descriptor is used for
             // communicating with the connected client.
-            clientFds[BASE_POLLS+activeClients] = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-            if (clientFds[BASE_POLLS+activeClients] < 0) { 
+            newsocketFd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+            if (newsocketFd < 0) { 
                 error("ERROR on accept");
+            } else {
+                networkClients[activeNetworkClients] = new NetworkClient(newsocketFd);
             }
 
             printf("server: got connection from %s port %d\n",
@@ -126,32 +137,21 @@ void handleServer(int portNo) {
             );
 
             // Update number of active clients
-            activeClients++;
+            activeNetworkClients++;
 
             // Send a welcome message
-            sendMessageToClients("Connection to server succeeded");
+            networkClients[activeNetworkClients]->sendMessage("Connection to server succeeded");
         }
 
         // Receiving and sending messages from/to clients 
-        for (int i=0; i<activeClients; i++) {
+        for (int i=0; i<activeNetworkClients; i++) {
             bzero(buffer,256);
-            n = read(clientFds[i+BASE_POLLS], buffer, 255);
-            
-            if (n < 0) { 
-                error("ERROR reading from socket");
-            } else if (n > 0) {
-                handleClientInput(buffer);
-            }
+            networkClients[i]->handlePoll(buffer);
         }
     }
 
 }
 
-void logData(string data) {
-    if (logFile.is_open()) {
-        logFile << data << endl;
-    }
-}
 
 void handleAgentData(const char *data) {
     if (data == "perf\n") {
@@ -169,9 +169,8 @@ void handleClientInput(char buffer[]) {
 }
 
 void sendMessageToClients(string message) {
-    const char *cstring = message.c_str();
-    for (int i=0; i<activeClients; i++) {
-        send(clientFds[i+BASE_POLLS], cstring, strlen(cstring), 0);
+    for (int i=0; i<activeNetworkClients; i++) {
+        networkClients[i]->sendMessage(message);
     }
 }
 
@@ -203,8 +202,8 @@ void sendPerfDataToClient(void) {
 
 void shutDownServer() {
     close(sockfd);
-    for (int i=0; i<activeClients; i++) {
-        close(clientFds[i]);
+    for (int i=0; i<activeNetworkClients; i++) {
+        close(networkClients[i]->socketFd);
     }
 
     mainServerThread.detach();

@@ -2,9 +2,47 @@
 #define SERVER_H_
 
 #include <string>
+#include <fstream>
 
 #define NUM_CLIENTS 5
 #define BASE_POLLS 1
+
+class NetworkClient {
+public:
+    int socketFd;
+
+    NetworkClient(int fd) {
+        socketFd = fd;
+    }
+
+    void sendMessage(std::string message);
+    void handlePoll(char buffer[]);
+};
+
+class LoggingClient {
+public:
+    int socketFd;
+    std::ofstream logFile;
+
+    LoggingClient(std::string filename="logs.txt") {
+        logFile.open(filename);
+        if (!logFile.is_open()) {
+            perror("ERROR opening logs file");
+        }
+    }
+
+    void logData(std::string data);
+};
+
+class CommandClient {
+public:
+    int socketFd;
+
+    CommandClient(std::string filename="logs.txt") {
+    }
+
+    void logData(std::string data);
+};
 
 // Handle sending message to all clients.
 void sendMessageToClients(std::string message);

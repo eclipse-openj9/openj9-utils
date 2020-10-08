@@ -1,4 +1,4 @@
-CC = g++ -std=c++11
+CC = g++ -std=c++11 -I .
 J = $$JAVA_HOME
 
 all: libagent.so

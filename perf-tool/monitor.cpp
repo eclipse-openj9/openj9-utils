@@ -1,6 +1,7 @@
 #include <jvmti.h>
 #include "json.hpp"
 #include "server.hpp"
+#include "AgentOptions.hpp"
 
 //how many times 
 using json = nlohmann::json;

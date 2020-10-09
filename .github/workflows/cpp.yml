@@ -17,5 +17,10 @@ jobs:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
+        
+      - name: make clean
+        run: make clean
+        working-directory: ./perf-tool
       - name: make
         run: make
+        working-directory: ./perf-tool

@@ -1,0 +1,27 @@
+name: c++ CI
+
+# Run this workflow every time a new commit pushed to your repository
+on: 
+  push: 
+    branches: CANOSP
+  pull_request:
+    branches: CANOSP
+
+
+jobs:
+  build:
+    # Set the type of machine to run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: configure
+        run: ./configure
+      - name: make
+        run: make
+      - name: make check
+        run: make check
+      - name: make distcheck
+        run: make distcheck

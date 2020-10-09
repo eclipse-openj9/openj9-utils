@@ -7,6 +7,6 @@
 
 using json = nlohmann::json;
 
-json perfProcess(pid_t processID);
+json perfProcess(pid_t processID, int recordTime);
 
 #endif

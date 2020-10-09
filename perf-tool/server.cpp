@@ -17,6 +17,7 @@ using namespace std;
 int sockfd, activeNetworkClients = 0;
 NetworkClient *networkClients[NUM_CLIENTS];
 LoggingClient *loggingClient;
+CommandClient *commandClient;
 thread mainServerThread;
 struct pollfd pollFds[BASE_POLLS+NUM_CLIENTS];
 string logFileName;
@@ -42,6 +43,26 @@ void NetworkClient::handlePoll(char buffer[]) {
     }
 }
 
+void LoggingClient::logData(string message) {
+    if (logFile.is_open()) {
+        logFile << "Recieved: " << message << endl;
+    }
+}
+
+string CommandClient::handlePoll() {
+    if (commandInterval <= 0) {
+        getline(commandsFile, currentLine);
+        if (!commandsFile.eof()) {
+            loggingClient->logData(currentLine);
+            commandInterval = COMMAND_INTERVAL;
+        } 
+    } else {
+        commandInterval = commandInterval - POLL_INTERVAL;
+    }
+
+    return currentLine;
+}
+
 int main(int argc, char *argv[])
 {
     int portNo;
@@ -59,6 +80,7 @@ int main(int argc, char *argv[])
 void startServer(int portNo, string filename) {
     mainServerThread = thread(handleServer, portNo);
     loggingClient = new LoggingClient();
+    commandClient = new CommandClient();
 }
 
 void handleServer(int portNo) {
@@ -110,7 +132,7 @@ void handleServer(int portNo) {
     while (1) {
         bzero(buffer,256);
 
-        if (poll(pollFds, activeNetworkClients + BASE_POLLS, 100) == -1){
+        if (poll(pollFds, activeNetworkClients + BASE_POLLS, POLL_INTERVAL) == -1){
             error("ERROR on polling");
         }
 
@@ -136,16 +158,20 @@ void handleServer(int portNo) {
                 ntohs(cli_addr.sin_port)
             );
 
-            // Update number of active clients
-            activeNetworkClients++;
-
             // Send a welcome message
             networkClients[activeNetworkClients]->sendMessage("Connection to server succeeded");
+
+            // Update number of active clients
+            activeNetworkClients++;
         }
+
+        // Check for commands from commands file
+        commandClient->handlePoll();
 
         // Receiving and sending messages from/to clients 
         for (int i=0; i<activeNetworkClients; i++) {
             bzero(buffer,256);
+            loggingClient->logData(buffer);
             networkClients[i]->handlePoll(buffer);
         }
     }
@@ -205,6 +231,9 @@ void shutDownServer() {
     for (int i=0; i<activeNetworkClients; i++) {
         close(networkClients[i]->socketFd);
     }
+    
+    loggingClient->logFile.close();
+    commandClient->commandsFile.close();
 
     mainServerThread.detach();
 }

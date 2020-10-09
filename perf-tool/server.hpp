@@ -6,6 +6,8 @@
 
 #define NUM_CLIENTS 5
 #define BASE_POLLS 1
+#define POLL_INTERVAL 100
+#define COMMAND_INTERVAL 500
 
 class NetworkClient {
 public:
@@ -36,12 +38,18 @@ public:
 
 class CommandClient {
 public:
-    int socketFd;
+    int socketFd, commandInterval = 0;
+    std::ifstream commandsFile;
+    std::string currentLine;
 
-    CommandClient(std::string filename="logs.txt") {
+    CommandClient(std::string filename="commands.txt") {
+        commandsFile.open(filename);
+        if (!commandsFile.is_open()) {
+            perror("ERROR opening commands file");
+        }
     }
 
-    void logData(std::string data);
+    std::string handlePoll();
 };
 
 // Handle sending message to all clients.

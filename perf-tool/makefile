@@ -1,4 +1,4 @@
-CC = g++
+CC = g++ -std=c++11 -I .
 J = $$JAVA_HOME
 
 all: libagent.so
@@ -18,11 +18,14 @@ monitor.o: monitor.cpp
 objectalloc.o: objectalloc.cpp
 	$(CC) -Wall -I . -I $(J)/include -I $(J)/include/linux/ -c -shared -fPIC -o $@ $^
 
-AgentOptions.o: AgentOptions.cpp
+agentOptions.o: AgentOptions.cpp
 	$(CC) -Wall -I . -I $(J)/include -I $(J)/include/linux/ -c -shared -fPIC -o $@ $^
 
-libagent.so: agent.o infra.o monitor.o objectalloc.o server.o AgentOptions.o
-	$(CC) -Wall -I . -I $(J)/include -I $(J)/include/linux/ -shared -fPIC -o $@ $^
+perf.o: perf.cpp
+	$(CC) -I . -c -shared -fPIC -o $@ $^
+
+libagent.so: agent.o infra.o monitor.o objectalloc.o server.o perf.o agentOptions.o
+	$(CC) -I $(J)/include -I $(J)/include/linux/ -shared -fPIC -o $@ $^
 
 clean:
 	rm -f *.o

@@ -47,11 +47,13 @@ int main(int argc, char *argv[])
     n = write(sockfd, buffer, strlen(buffer));
     if (n < 0) 
         error("ERROR writing to socket");
+    for (int i = 0; i < 10; i++ ) {
     bzero(buffer,256);
     n = read(sockfd, buffer, 255);
     if (n < 0) 
         error("ERROR reading from socket");
     printf("%s\n", buffer);
+    }
     close(sockfd);
     return 0;
 }

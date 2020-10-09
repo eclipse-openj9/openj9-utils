@@ -33,7 +33,7 @@ public:
         }
     }
 
-    void logData(std::string data);
+    void logData(std::string data, std::string recievedFrom);
 };
 
 class CommandClient {

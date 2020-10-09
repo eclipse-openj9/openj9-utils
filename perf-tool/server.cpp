@@ -34,18 +34,21 @@ void NetworkClient::sendMessage(std::string message) {
 
 void NetworkClient::handlePoll(char buffer[]) {
     int n = read(socketFd, buffer, 255);
+    string s = string(buffer);
+    s.pop_back();
     
     if (n < 0) { 
         error("ERROR reading from socket");
     } else if (n > 0) {
         // TODO handle client input
-        printf("Client message recieved: %s\n", buffer);
+
+        loggingClient->logData(s, "Client");
     }
 }
 
-void LoggingClient::logData(string message) {
+void LoggingClient::logData(string message, string recievedFrom) {
     if (logFile.is_open()) {
-        logFile << "Recieved: " << message << endl;
+        logFile << "recieved: " << message << " | from: " << recievedFrom << endl;
     }
 }
 
@@ -53,7 +56,7 @@ string CommandClient::handlePoll() {
     if (commandInterval <= 0) {
         getline(commandsFile, currentLine);
         if (!commandsFile.eof()) {
-            loggingClient->logData(currentLine);
+            loggingClient->logData(currentLine, "Command File");
             commandInterval = COMMAND_INTERVAL;
         } 
     } else {
@@ -171,7 +174,6 @@ void handleServer(int portNo) {
         // Receiving and sending messages from/to clients 
         for (int i=0; i<activeNetworkClients; i++) {
             bzero(buffer,256);
-            loggingClient->logData(buffer);
             networkClients[i]->handlePoll(buffer);
         }
     }
@@ -231,7 +233,7 @@ void shutDownServer() {
     for (int i=0; i<activeNetworkClients; i++) {
         close(networkClients[i]->socketFd);
     }
-    
+
     loggingClient->logFile.close();
     commandClient->commandsFile.close();
 

@@ -13,93 +13,78 @@
 
 
 json perfProcess(pid_t processID, int recordTime) {
-	/* Perf process runs perf tool to collect perf data of given process.
-	 * Inputs:	pid_t 	processID:	process ID of running application.
-	 * Outputs:	json	perf_data:	perf data collected from application.
-	 * */
-	char* pidStr = (char*)std::to_string(processID).c_str();
-	char *args[3] = {"/usr/bin/perf", "record", NULL};
+    /* Perf process runs perf tool to collect perf data of given process.
+    * Inputs:	pid_t 	processID:	process ID of running application.
+    * Outputs:	json	perf_data:	perf data collected from application.
+    * */
+    char* pidStr = (char*)std::to_string(processID).c_str();
+    char *args[3] = {"/usr/bin/perf", "record", NULL};
 
-	// Make local tmp folder
-	if (mkdir("./tmp", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1)
-		perror("mkdir");
+    // Change to /tmp folder to store the perf data
+    if (chdir("/tmp") == -1) {
+        perror("chdir");
+        _exit(1);
+    }
 
-	// Change to /tmp folder to store the perf data
-	if (chdir("./tmp") == -1) {
-		perror("chdir");
-		_exit(1);
-	}
+    pid_t pid;
+    int fd, status;
 
-	pid_t pid;
-	int fd, status;
+    if ((pid = fork()) == -1) {
+        perror("fork");
+        _exit(1);
+    }
 
-	if ((pid = fork()) == -1) {
-		perror("fork");
-		_exit(1);
-	}
+    if (pid == 0) {
+        // Run perf record to collect process data into perf.data
+        if (execv(args[0], args) == -1) {
+            perror("execv");
+            _exit(1);
+        }
+    }
 
-	if (pid == 0) {
-		// Run perf record to collect process data into perf.data
-		if (execv(args[0], args) == -1) {
-			perror("execv");
-			_exit(1);
-		}
+    sleep(recordTime);
+    kill(pid, SIGTERM);
+    pid = wait(&status);
+    system("perf script > perf.data.txt");
 
-	}
-	sleep(recordTime);
-	kill(pid, SIGTERM);
-	pid = wait(&status);
-	system("perf script > perf.data.txt");
+    // Save into json format
+    json perfData;
 
-	// Save into json format
-	json perfData;
+    std::ifstream file("perf.data.txt");
+    std::string lineStr;
+    int idCount = 0;
+    while (std::getline(file, lineStr)) {
+        // Process str
+        // Parse perf.data.txt using regex to get data for each process
+        std::smatch matches;
 
-	std::ifstream file("perf.data.txt");
-  std::string lineStr;
-	int idCount = 0;
-  while (std::getline(file, lineStr)) {
-      // Process str
-			// Parse perf.data.txt using regex to get data for each process
-			std::string s ("this subject has a submarine as a subsequence");
-			std::smatch m;
-			std::regex e ("\\b(sub)([^ ]*)");
+        // To-do: make this into string array that is indexed by enum (enum containing options)
+        std::string progExpression ("\\s+([^\\s]+)");
+        std::string pidExpression ("\\s+([^\\s]+)");
+        std::string cpuExpression ("\\s+([^\\s]+)");
+        std::string timeExpression ("\\s+([^\\s]+):");
+        std::string cyclesExpression ("\\s+([^\\s]+\\s+)cycles:");
+        std::string addressExpression ("\\s+([^\\s]+)");
+        std::string instructionExpression ("\\s+([^\\s]+)");
+        std::string pathExpression ("\\s+([^\\s]+)");
 
-			std::cout << "Target sequence: " << s << std::endl;
-			std::cout << "Regular expression: /\\b(sub)([^ ]*)/" << std::endl;
-			std::cout << "The following matches and submatches were found:" << std::endl;
+        std::regex expression (progExpression + pidExpression + cpuExpression + timeExpression + cyclesExpression + addressExpression + instructionExpression + pathExpression);
 
-			while (std::regex_search (s,m,e)) {
-				s = m.suffix().str();
-			}
+        if (std::regex_search(lineStr, matches, expression)) {
+            // Put into JSON object
+            std::string idStr = std::to_string(idCount); // define unique id for each line
+            perfData[idStr]["prog"] = matches[1].str().c_str();
+            perfData[idStr]["pid"] = matches[2].str().c_str();
+            perfData[idStr]["cpu"] = matches[3].str().c_str();
+            perfData[idStr]["time"] = matches[4].str().c_str();
+            perfData[idStr]["cycles"] = matches[5].str().c_str();
+            perfData[idStr]["address"] = matches[6].str().c_str();
+            perfData[idStr]["instruction"] = matches[7].str().c_str();
+            perfData[idStr]["path"] = matches[8].str().c_str();
+            perfData[idStr]["record"] = lineStr.c_str();
+            idCount++;
+        }
 
-			// Put into JSON object
-			std::string idStr = std::to_string(idCount); // define unique id for each line
-
-			perfData[idStr]["prog"] = idStr.c_str();
-			perfData[idStr]["pid"] = idStr.c_str();
-			perfData[idStr]["time"] = idStr.c_str();
-			perfData[idStr]["cycles"] = idStr.c_str();
-			perfData[idStr]["address"] = idStr.c_str();
-			perfData[idStr]["instruction"] = idStr.c_str();
-			perfData[idStr]["path"] = idStr.c_str();
-
-			idCount++;
-
-
-			if (idCount > 5) { // for debugging
-				break;
-			}
-  }
-	return perfData;
+    }
+    return perfData;
 }
-
-/*int main(int argc, char* argv[]) {
-	json j;
-	pid_t pid;
-	pid = getpid();
-	j = perfProcess(pid, 3);
-	std::string str = j.dump();
-
-	printf("%s\n", str.c_str());
-	return 0;
-}*/

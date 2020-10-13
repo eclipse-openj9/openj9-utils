@@ -11,6 +11,7 @@
 #include <perf.hpp>
 #include <thread>
 #include <poll.h>
+#include "utils.hpp"
 
 using namespace std;
 
@@ -21,11 +22,6 @@ CommandClient *commandClient;
 thread mainServerThread;
 struct pollfd pollFds[BASE_POLLS+NUM_CLIENTS];
 string logFileName;
-
-void error(const char *msg) {
-    perror(msg);
-    exit(1);
-}
 
 void NetworkClient::sendMessage(std::string message) {
     const char *cstring = message.c_str();
@@ -64,20 +60,6 @@ string CommandClient::handlePoll() {
     }
 
     return currentLine;
-}
-
-int main(int argc, char *argv[])
-{
-    int portNo;
-    if (argc < 2) {
-        fprintf(stderr,"ERROR, no port provided\n");
-        exit(1);
-    }
-
-    portNo = atoi(argv[1]);
-    startServer(portNo);
-
-    return 0;
 }
 
 void startServer(int portNo, string filename) {
@@ -179,7 +161,6 @@ void handleServer(int portNo) {
     }
 
 }
-
 
 void handleAgentData(const char *data) {
     if (data == "perf\n") {

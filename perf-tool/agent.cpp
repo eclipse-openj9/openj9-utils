@@ -1,22 +1,17 @@
 #include <jvmti.h>
 #include <string.h>
-
+#include <iostream>
 #include "infra.h"
 #include "monitor.h"
 #include "json.hpp"
 #include "objectalloc.h"
+#include "AgentOptions.hpp"
+#include <stdio.h> 
+#include <sys/types.h> 
+#include <unistd.h> 
+#include <thread>
 
 using json = nlohmann::json;
-
-static void check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
-    if (errnum != JVMTI_ERROR_NONE) {
-        char *errnum_str;
-        errnum_str = NULL;
-        (void)jvmti->GetErrorName(errnum, &errnum_str);
-        printf("ERROR: JVMTI: [%d] %s - %s", errnum, (errnum_str == NULL ? "Unknown": errnum_str), (str == NULL ? "" : str));
-        throw "Oops!";
-    }
-}
 
 JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
             JNIEnv* jni_env,
@@ -36,8 +31,9 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
 
 
 
+jvmtiEnv *jvmti;
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
-    jvmtiEnv *jvmti;
+    
     jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
     if (rest != JNI_OK || jvmti == NULL) {
 

@@ -6,12 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-
-void error(const char *msg)
-{
-    perror(msg);
-    exit(0);
-}
+#include "utils.hpp"
 
 int main(int argc, char *argv[])
 {

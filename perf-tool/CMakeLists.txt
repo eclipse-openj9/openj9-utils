@@ -16,3 +16,6 @@ file(GLOB SOURCES "src/*.cpp")
 
 add_library(agent SHARED ${SOURCES})
 
+add_library(utils OBJECT src/utils.cpp)
+
+add_executable(client src/client.cpp $<TARGET_OBJECTS:utils>)

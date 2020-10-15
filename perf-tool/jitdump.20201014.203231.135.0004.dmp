@@ -1,0 +1,3 @@
+<?xml version="1.0" standalone="no"?>
+<jitDump>
+Some thread is holding exclusive VM access. No log created.

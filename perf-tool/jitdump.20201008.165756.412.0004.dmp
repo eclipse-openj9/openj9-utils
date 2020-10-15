@@ -1,0 +1,6 @@
+<?xml version="1.0" standalone="no"?>
+<jitDump>
+#INFO: Crashed in application thread 0000000000007700.
+#INFO: Found 0 JITed methods on Java stack.
+#INFO: DUMP FAILED: no methods to recompile
+</jitDump>

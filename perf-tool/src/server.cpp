@@ -16,6 +16,7 @@
 using namespace std;
 
 int sockfd, activeNetworkClients = 0;
+bool KEEP_POLLING = true;
 NetworkClient *networkClients[NUM_CLIENTS];
 LoggingClient *loggingClient;
 CommandClient *commandClient;
@@ -119,7 +120,7 @@ void handleServer(int portNo) {
     printf("Server started.\n");
 
     // Use polling to keep track of clients and keyboard input
-    while (1) {
+    while (KEEP_POLLING) {
         bzero(buffer,256);
 
         if (poll(pollFds, activeNetworkClients + BASE_POLLS, POLL_INTERVAL) == -1){
@@ -170,18 +171,9 @@ void handleServer(int portNo) {
 void handleAgentData(const char *data) {
     if (strcmp(data, "perf") == 0) {
         sendPerfDataToClient();
-    } else {
-        sendMessageToClients("done");
     }
     string s = data;
-    loggingClient->logData(s, "perf");
     printf("Recieved: %s\n", data);
-}
-
-void handleClientInput(char buffer[]) {
-    string s = string(buffer);
-    logData(s);
-    printf("%s\n", buffer);
 }
 
 void sendMessageToClients(string message) {
@@ -206,9 +198,6 @@ void sendPerfDataToClient(void) {
       perfStr = perfData.dump();
 
       sendMessageToClients(perfStr.c_str()); // for debugging
-
-      // Relay data to client
-      sendMessageToClients("done");
     } // else parent continues on
 
 }
@@ -216,14 +205,13 @@ void sendPerfDataToClient(void) {
 void shutDownServer() {
     close(sockfd);
     for (int i=0; i<activeNetworkClients; i++) {
+        networkClients[i]->sendMessage("done");
         close(networkClients[i]->socketFd);
     }
-
-    loggingClient->logFile.close();
-    commandClient->commandsFile.close();
 
     close(loggingClient->socketFd);
     close(commandClient->socketFd);
 
+    KEEP_POLLING = false;
     mainServerThread.detach();
 }

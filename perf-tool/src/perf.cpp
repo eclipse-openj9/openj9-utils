@@ -12,6 +12,19 @@
 #include <string>
 
 
+const perfFieldRegex mapRegex[PERF_FIELD_MAX] = {
+    {"unknown", "(.*)"},                        // PERF_FIELD_UNKNOWN
+    {"prog", "\\s+([^\\s]+)"},                  // PERF_FIELD_PROG
+    {"pid", "\\s+([^\\s]+)"},                   // PERF_FIELD_PID
+    {"cpu", "\\s+([^\\s]+)"},                   // PERF_FIELD_CPU
+    {"time", "\\s+([^\\s]+):"},                 // PERF_FIELD_TIME
+    {"cycles", "\\s+([^\\s]+\\s+)cycles:"},     // PERF_FIELD_CYCLES
+    {"address", "\\s+([^\\s]+)"},               // PERF_FIELD_ADDRESS
+    {"instruction", "\\s+([^\\s]+)"},           // PERF_FIELD_INSTRUCTION
+    {"path", "\\s+([^\\s]+)"},                  // PERF_FIELD_PATH
+};
+
+
 json perfProcess(pid_t processID, int recordTime) {
     /* Perf process runs perf tool to collect perf data of given process.
     * Inputs:	pid_t 	processID:	process ID of running application.
@@ -35,13 +48,14 @@ json perfProcess(pid_t processID, int recordTime) {
     }
 
     if (pid == 0) {
-        // Run perf record to collect process data into perf.data
+        // Child process: Run perf record to collect process data into perf.data
         if (execv(args[0], args) == -1) {
             perror("execv");
             _exit(1);
         }
     }
 
+    // Parent process sleeps for recordTime before sending terminate signal to child
     sleep(recordTime);
     kill(pid, SIGTERM);
     pid = wait(&status);

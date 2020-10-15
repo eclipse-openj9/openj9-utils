@@ -26,19 +26,24 @@ string logFileName;
 void NetworkClient::sendMessage(std::string message) {
     const char *cstring = message.c_str();
     send(socketFd, cstring, strlen(cstring), 0);
+    if (strcmp(cstring, "done") == 0) {
+        close(socketFd);
+        activeNetworkClients--;
+    }
 }
 
 void NetworkClient::handlePoll(char buffer[]) {
     int n = read(socketFd, buffer, 255);
     string s = string(buffer);
     s.pop_back();
-    
-    if (n < 0) { 
+
+    if (n < 0) {
         error("ERROR reading from socket");
     } else if (n > 0) {
         // TODO handle client input
-
+        handleAgentData(s.c_str());
         loggingClient->logData(s, "Client");
+
     }
 }
 
@@ -54,7 +59,7 @@ string CommandClient::handlePoll() {
         if (!commandsFile.eof()) {
             loggingClient->logData(currentLine, "Command File");
             commandInterval = COMMAND_INTERVAL;
-        } 
+        }
     } else {
         commandInterval = commandInterval - POLL_INTERVAL;
     }
@@ -125,21 +130,21 @@ void handleServer(int portNo) {
             // The accept() call actually accepts an incoming connection
             clilen = sizeof(cli_addr);
 
-            // This accept() function will write the connecting client's address info 
+            // This accept() function will write the connecting client's address info
             // into the the address structure and the size of that structure is clilen.
             // The accept() returns a new socket file descriptor for the accepted connection.
-            // So, the original socket file descriptor can continue to be used 
+            // So, the original socket file descriptor can continue to be used
             // for accepting new connections while the new socker file descriptor is used for
             // communicating with the connected client.
             newsocketFd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-            if (newsocketFd < 0) { 
+            if (newsocketFd < 0) {
                 error("ERROR on accept");
             } else {
                 networkClients[activeNetworkClients] = new NetworkClient(newsocketFd);
             }
 
             printf("server: got connection from %s port %d\n",
-                inet_ntoa(cli_addr.sin_addr), 
+                inet_ntoa(cli_addr.sin_addr),
                 ntohs(cli_addr.sin_port)
             );
 
@@ -153,7 +158,7 @@ void handleServer(int portNo) {
         // Check for commands from commands file
         commandClient->handlePoll();
 
-        // Receiving and sending messages from/to clients 
+        // Receiving and sending messages from/to clients
         for (int i=0; i<activeNetworkClients; i++) {
             bzero(buffer,256);
             networkClients[i]->handlePoll(buffer);
@@ -163,17 +168,19 @@ void handleServer(int portNo) {
 }
 
 void handleAgentData(const char *data) {
-    if (data == "perf\n") {
+    if (strcmp(data, "perf") == 0) {
         sendPerfDataToClient();
+    } else {
+        sendMessageToClients("done");
     }
-    string s = string(data);
-    logData(s); 
+    string s = data;
+    loggingClient->logData(s, "perf");
     printf("Recieved: %s\n", data);
 }
 
 void handleClientInput(char buffer[]) {
     string s = string(buffer);
-    logData(s); 
+    logData(s);
     printf("%s\n", buffer);
 }
 
@@ -214,6 +221,9 @@ void shutDownServer() {
 
     loggingClient->logFile.close();
     commandClient->commandsFile.close();
+
+    close(loggingClient->socketFd);
+    close(commandClient->socketFd);
 
     mainServerThread.detach();
 }

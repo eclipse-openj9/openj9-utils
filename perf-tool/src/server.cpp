@@ -187,6 +187,7 @@ void sendPerfDataToClient(void) {
     json perfData;
 
     currPid = getpid();
+    printf("pid: %d\n", currPid);
     // currPid = 44454;
     pid = fork();
     if (pid == -1)

@@ -30,8 +30,11 @@ json perfProcess(pid_t processID, int recordTime) {
     * Inputs:	pid_t 	processID:	process ID of running application.
     * Outputs:	json	perf_data:	perf data collected from application.
     * */
-    char* pidStr = (char*)std::to_string(processID).c_str();
-    char *args[3] = {"/usr/bin/perf", "record", NULL};
+    // char* pidStr = (char*)std::to_string(processID).c_str();
+    std::string pidStr = std::to_string(processID); // define unique id for each line
+    char* pidCharArr = (char*)pidStr.c_str();
+    char *args[5] = {"/usr/bin/perf", "record", "-p", pidCharArr, NULL};
+    printf("HELLOWORLD %s\n", pidCharArr);
 
     // Change to /tmp folder to store the perf data
     if (chdir("/tmp") == -1) {

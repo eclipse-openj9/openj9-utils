@@ -14,12 +14,6 @@
 
 using namespace std;
 
-void Server::sendMessage(int socketFd, std::string message)
-{
-    const char *cstring = message.c_str();
-    send(socketFd, cstring, strlen(cstring), 0);
-}
-
 Server::Server(int portNo, string commandFileName, string logFileName)
 {
     this->portNo = portNo;
@@ -44,7 +38,7 @@ void Server::handleServer()
 {
     socklen_t clilen;
     char buffer[256], msg[256];
-    string command;
+    string command, message;
     struct sockaddr_in serv_addr, cli_addr;
     int n, newsocketFd;
 
@@ -146,7 +140,14 @@ void Server::handleServer()
             command = networkClients[i]->handlePoll(buffer);
             handleClientCommand(command);
         }
+
+        handleMessagingClients();
     }
+}
+void Server::handleAgentData(string data)
+{
+    messageQueue.push(data);
+    loggingClient->logData(data, "Agent");
 }
 
 void Server::handleClientCommand(string command)
@@ -159,13 +160,29 @@ void Server::handleClientCommand(string command)
     loggingClient->logData(command, "Client");
 }
 
-void Server::sendMessageToClients(string message)
+void Server::sendMessage(int socketFd, std::string message)
 {
-    for (int i = 0; i < activeNetworkClients; i++)
-    {   
-        int clientSocketFd = networkClients[i]->getSocketFd();
-        sendMessage(clientSocketFd, message);
+    const char *cstring = message.c_str();
+    send(socketFd, cstring, strlen(cstring), 0);
+}
+
+void Server::handleMessagingClients()
+{
+    string message;
+
+    while (!messageQueue.empty())
+    {
+        message = messageQueue.front();
+        messageQueue.pop(); 
+        for (int i = 0; i < activeNetworkClients; i++)
+        {   
+            int clientSocketFd = networkClients[i]->getSocketFd();
+            sendMessage(clientSocketFd, message);
+        }
+
+        loggingClient->logData(message, "Server");
     }
+
 }
 
 void Server::sendPerfDataToClient(void)
@@ -185,19 +202,24 @@ void Server::sendPerfDataToClient(void)
         perfData = perfProcess(currPid, 3);
         std::string perfStr;
         perfStr = perfData.dump();
+        
+        loggingClient->logData(perfStr, "perf");
 
-        sendMessageToClients(perfStr.c_str()); // for debugging
     }// else parent continues on
 }
 
 void Server::shutDownServer()
 {
     KEEP_POLLING = false;
-    sendMessageToClients("Server shutting down");
+
+    messageQueue.push("Server shutting down");
+    messageQueue.push("done");   // keyword for clients to close their connection
+    
+    handleMessagingClients();
 
     close(serverSocketFd);
-    sendMessageToClients("done");   // keyword for clients to close their connection
-
+    
+    loggingClient->closeFile();
     for (int i = 0; i < activeNetworkClients; i++)
     {   
         networkClients[i]->closeFd();
@@ -205,7 +227,6 @@ void Server::shutDownServer()
     if (headlessMode) {
         commandClient->closeFile();
     }
-    loggingClient->closeFile();
 
     if (mainServerThread.joinable()) 
     {

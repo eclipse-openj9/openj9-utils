@@ -4,6 +4,7 @@
 #include "serverClients.hpp"
 
 #include <thread>
+#include <queue>
 #include <poll.h>
 
 class Server
@@ -16,6 +17,7 @@ public:
 private:
     int serverSocketFd, activeNetworkClients = 0, portNo;
     bool headlessMode = true, KEEP_POLLING = true;
+    std::queue<std::string> messageQueue;
     std::thread mainServerThread;
     struct pollfd pollFds[ServerConstants::BASE_POLLS + ServerConstants::NUM_CLIENTS];
     NetworkClient *networkClients[ServerConstants::NUM_CLIENTS];
@@ -32,8 +34,8 @@ public:
     /* Starts server thread */
     void startServer();
 
-    /* Handle sending message to all clients */
-    void sendMessageToClients(std::string message);
+    /* Handle the message queue, and sends to all clients */
+    void handleMessagingClients();
 
     /* Join the server thread and closes server's socket */
     void shutDownServer(void);
@@ -42,10 +44,11 @@ private:
     /* Handles server functionality and polling*/
     void handleServer();
 
-    /* Handles recieving data from agent
-     * Takes in the recieved data as char[] 
-     */
+    /* Handles recieving commands for the agent from clients */
     void handleClientCommand(std::string command);
+
+    /* Handles recieving data from agent */
+    void handleAgentData(std::string data);
 
     void sendMessage(int socketFd, std::string message);
 

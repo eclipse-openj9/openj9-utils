@@ -17,10 +17,14 @@ jobs:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
-        
+      - name: create build directory
+        run: cd ./perf-tool && mkdir build
+      - name: cmake build
+        run: cmake ..
+        working-directory: ./perf-tool/build
       - name: make clean
         run: make clean
-        working-directory: ./perf-tool
+        working-directory: ./perf-tool/build
       - name: make
         run: make
-        working-directory: ./perf-tool
+        working-directory: ./perf-tool/build

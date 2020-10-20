@@ -11,10 +11,12 @@
 #include <perf.hpp>
 #include <thread>
 #include <poll.h>
+#include "utils.hpp"
 
 using namespace std;
 
 int sockfd, activeNetworkClients = 0;
+bool KEEP_POLLING = true;
 NetworkClient *networkClients[NUM_CLIENTS];
 LoggingClient *loggingClient;
 CommandClient *commandClient;
@@ -22,27 +24,27 @@ thread mainServerThread;
 struct pollfd pollFds[BASE_POLLS+NUM_CLIENTS];
 string logFileName;
 
-void error(const char *msg) {
-    perror(msg);
-    exit(1);
-}
-
 void NetworkClient::sendMessage(std::string message) {
     const char *cstring = message.c_str();
     send(socketFd, cstring, strlen(cstring), 0);
+    if (strcmp(cstring, "done") == 0) {
+        close(socketFd);
+        activeNetworkClients--;
+    }
 }
 
 void NetworkClient::handlePoll(char buffer[]) {
     int n = read(socketFd, buffer, 255);
     string s = string(buffer);
     s.pop_back();
-    
-    if (n < 0) { 
+
+    if (n < 0) {
         error("ERROR reading from socket");
     } else if (n > 0) {
         // TODO handle client input
-
+        handleAgentData(s.c_str());
         loggingClient->logData(s, "Client");
+
     }
 }
 
@@ -58,26 +60,12 @@ string CommandClient::handlePoll() {
         if (!commandsFile.eof()) {
             loggingClient->logData(currentLine, "Command File");
             commandInterval = COMMAND_INTERVAL;
-        } 
+        }
     } else {
         commandInterval = commandInterval - POLL_INTERVAL;
     }
 
     return currentLine;
-}
-
-int main(int argc, char *argv[])
-{
-    int portNo;
-    if (argc < 2) {
-        fprintf(stderr,"ERROR, no port provided\n");
-        exit(1);
-    }
-
-    portNo = atoi(argv[1]);
-    startServer(portNo);
-
-    return 0;
 }
 
 void startServer(int portNo, string filename) {
@@ -132,7 +120,7 @@ void handleServer(int portNo) {
     printf("Server started.\n");
 
     // Use polling to keep track of clients and keyboard input
-    while (1) {
+    while (KEEP_POLLING) {
         bzero(buffer,256);
 
         if (poll(pollFds, activeNetworkClients + BASE_POLLS, POLL_INTERVAL) == -1){
@@ -143,21 +131,21 @@ void handleServer(int portNo) {
             // The accept() call actually accepts an incoming connection
             clilen = sizeof(cli_addr);
 
-            // This accept() function will write the connecting client's address info 
+            // This accept() function will write the connecting client's address info
             // into the the address structure and the size of that structure is clilen.
             // The accept() returns a new socket file descriptor for the accepted connection.
-            // So, the original socket file descriptor can continue to be used 
+            // So, the original socket file descriptor can continue to be used
             // for accepting new connections while the new socker file descriptor is used for
             // communicating with the connected client.
             newsocketFd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-            if (newsocketFd < 0) { 
+            if (newsocketFd < 0) {
                 error("ERROR on accept");
             } else {
                 networkClients[activeNetworkClients] = new NetworkClient(newsocketFd);
             }
 
             printf("server: got connection from %s port %d\n",
-                inet_ntoa(cli_addr.sin_addr), 
+                inet_ntoa(cli_addr.sin_addr),
                 ntohs(cli_addr.sin_port)
             );
 
@@ -171,7 +159,7 @@ void handleServer(int portNo) {
         // Check for commands from commands file
         commandClient->handlePoll();
 
-        // Receiving and sending messages from/to clients 
+        // Receiving and sending messages from/to clients
         for (int i=0; i<activeNetworkClients; i++) {
             bzero(buffer,256);
             networkClients[i]->handlePoll(buffer);
@@ -180,20 +168,12 @@ void handleServer(int portNo) {
 
 }
 
-
 void handleAgentData(const char *data) {
-    if (data == "perf\n") {
+    if (strcmp(data, "perf") == 0) {
         sendPerfDataToClient();
     }
-    string s = string(data);
-    logData(s); 
+    string s = data;
     printf("Recieved: %s\n", data);
-}
-
-void handleClientInput(char buffer[]) {
-    string s = string(buffer);
-    logData(s); 
-    printf("%s\n", buffer);
 }
 
 void sendMessageToClients(string message) {
@@ -207,6 +187,7 @@ void sendPerfDataToClient(void) {
     json perfData;
 
     currPid = getpid();
+    printf("pid: %d\n", currPid);
     // currPid = 44454;
     pid = fork();
     if (pid == -1)
@@ -218,9 +199,6 @@ void sendPerfDataToClient(void) {
       perfStr = perfData.dump();
 
       sendMessageToClients(perfStr.c_str()); // for debugging
-
-      // Relay data to client
-      sendMessageToClients("done");
     } // else parent continues on
 
 }
@@ -228,11 +206,13 @@ void sendPerfDataToClient(void) {
 void shutDownServer() {
     close(sockfd);
     for (int i=0; i<activeNetworkClients; i++) {
+        networkClients[i]->sendMessage("done");
         close(networkClients[i]->socketFd);
     }
 
-    loggingClient->logFile.close();
-    commandClient->commandsFile.close();
+    close(loggingClient->socketFd);
+    close(commandClient->socketFd);
 
+    KEEP_POLLING = false;
     mainServerThread.detach();
 }

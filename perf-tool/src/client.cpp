@@ -87,8 +87,8 @@ int main(int argc, char *argv[])
             printf("Recieved: %s\n", buffer);
 
             if (std::string(buffer).substr(strlen(buffer) - 4, 4) == "done") {
-                printf("done received");
                 close(sockfd);
+                printf("Closed connection with server.\n");
                 break;
             }
         }

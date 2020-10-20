@@ -1,35 +1,18 @@
 #include <jvmti.h>
-#include <string.h>
 #include <iostream>
+#include <stdio.h> 
+#include <string.h>
+#include <sys/types.h> 
+#include <thread>
+#include <unistd.h> 
+
+#include "AgentOptions.hpp"
 #include "infra.h"
 #include "monitor.h"
 #include "json.hpp"
 #include "objectalloc.h"
-#include "AgentOptions.hpp"
-#include <stdio.h> 
-#include <sys/types.h> 
-#include <unistd.h> 
-#include <thread>
 
 using json = nlohmann::json;
-
-JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
-            JNIEnv* jni_env,
-            jthread thread,
-            jmethodID method) {
-    /*jvmtiError err;
-    json j;
-    char *methodName;
-    err = jvmtiEnv->GetMethodName(method, &methodName, NULL, NULL);
-    if (err == JVMTI_ERROR_NONE && strcmp(methodName, "doBatch") == 0) {
-        j["methodName"] = methodName;
-        std::string s = j.dump();
-
-        printf("\n%s\n", s.c_str());
-    }*/
-}
-
-
 
 jvmtiEnv *jvmti;
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
@@ -70,7 +53,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     callbacks.VMInit = &VMInit;
     callbacks.VMDeath = &VMDeath;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
-    callbacks.MethodEntry = &MethodEntry;
     callbacks.VMObjectAlloc = &VMObjectAlloc;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");

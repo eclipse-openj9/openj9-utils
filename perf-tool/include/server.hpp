@@ -1,80 +1,55 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include <string>
-#include <fstream>
+#include "serverClients.hpp"
 
-#define NUM_CLIENTS 5
-#define BASE_POLLS 1
-#define POLL_INTERVAL 100
-#define COMMAND_INTERVAL 500
+#include <thread>
+#include <poll.h>
 
-class NetworkClient {
+class Server
+{
+    /*
+     * Data members
+     */
+protected:
 public:
-    int socketFd;
+private:
+    int serverSocketFd, activeNetworkClients = 0, portNo;
+    bool headlessMode = true, KEEP_POLLING = true;
+    std::thread mainServerThread;
+    struct pollfd pollFds[ServerConstants::BASE_POLLS + ServerConstants::NUM_CLIENTS];
+    NetworkClient *networkClients[ServerConstants::NUM_CLIENTS];
+    CommandClient *commandClient;
+    LoggingClient *loggingClient;
 
-    NetworkClient(int fd) {
-        socketFd = fd;
-    }
-
-    void sendMessage(std::string message);
-    void handlePoll(char buffer[]);
-};
-
-class LoggingClient {
+    /*
+     * Function members
+     */
+protected:
 public:
-    int socketFd;
-    std::ofstream logFile;
+    Server(int portNo = 9003, std::string commandFileName = "", std::string logFileName = "logs.txt");
 
-    LoggingClient(std::string filename="logs.txt") {
-        logFile.open(filename);
-        if (!logFile.is_open()) {
-            perror("ERROR opening logs file");
-        }
-    }
+    /* Starts server thread */
+    void startServer();
 
-    void logData(std::string data, std::string recievedFrom);
+    /* Handle sending message to all clients */
+    void sendMessageToClients(std::string message);
+
+    /* Join the server thread and closes server's socket */
+    void shutDownServer(void);
+
+private:
+    /* Handles server functionality and polling*/
+    void handleServer();
+
+    /* Handles recieving data from agent
+     * Takes in the recieved data as char[] 
+     */
+    void handleClientCommand(std::string command);
+
+    void sendMessage(int socketFd, std::string message);
+
+    void sendPerfDataToClient(void);
 };
-
-class CommandClient {
-public:
-    int socketFd, commandInterval = 0;
-    std::ifstream commandsFile;
-    std::string currentLine;
-
-    CommandClient(std::string filename="commands.txt") {
-        commandsFile.open(filename);
-        if (!commandsFile.is_open()) {
-            perror("ERROR opening commands file");
-        }
-    }
-
-    std::string handlePoll();
-};
-
-// Handle sending message to all clients.
-void sendMessageToClients(std::string message);
-void sendPerfDataToClient(void);
-
-// Starts the server thread.
-void startServer(int portNo, std::string filename = "");
-
-// Handles server functionality
-void handleServer(int portNo);
-
-// Write given data to log file
-// Only writes to file if a log file was specified on server start
-void logData(std::string data);
-
-// Handles recieving data from agent
-// Takes in the recieved data as char[]
-void handleAgentData(const char *data);
-
-// Handles client input for interactive mode
-// Takes in the read buffer as char[]
-void handleClientInput(char buffer[]);
-
-// Join the server thread and closes server
-void shutDownServer();
 
 #endif /* SERVER_H_ */

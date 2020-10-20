@@ -1,7 +1,10 @@
 #include <jvmti.h>
 #include <thread>
-#include "server.hpp"
+
 #include <infra.h>
+#include "server.hpp"
+
+Server *server;
 
 void check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
     if (errnum != JVMTI_ERROR_NONE) {
@@ -15,14 +18,12 @@ void check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
 
 
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {
-    startServer(9003);
-    sendMessageToClients("VM init");
+    server = new Server();
+    server->startServer();
     printf("VM starting up\n");
 }
 
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env) {
-    sendMessageToClients("VM shutting down");
-    shutDownServer();
-
+    server->shutDownServer();
     printf("VM shutting down\n");
 }

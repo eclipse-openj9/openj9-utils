@@ -15,7 +15,7 @@ void check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
 
 
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {
-    startServer(9003);
+    startServer(8081);
     sendMessageToClients("VM init");
     printf("VM starting up\n");
 }

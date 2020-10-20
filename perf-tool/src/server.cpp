@@ -85,8 +85,12 @@ void Server::handleServer()
     printf("Server started.\n");
 
     // Use polling to keep track of clients and keyboard input
-    while (KEEP_POLLING)
+    while (1)
     {
+        if (!keepPolling) {
+            break;
+        }
+
         bzero(buffer, 256);
 
         if (poll(pollFds, activeNetworkClients + ServerConstants::BASE_POLLS, ServerConstants::POLL_INTERVALS) == -1)
@@ -173,14 +177,15 @@ void Server::handleMessagingClients()
     while (!messageQueue.empty())
     {
         message = messageQueue.front();
-        messageQueue.pop(); 
+
         for (int i = 0; i < activeNetworkClients; i++)
         {   
             int clientSocketFd = networkClients[i]->getSocketFd();
             sendMessage(clientSocketFd, message);
         }
-
         loggingClient->logData(message, "Server");
+
+        messageQueue.pop(); 
     }
 
 }
@@ -199,18 +204,19 @@ void Server::sendPerfDataToClient(void)
 
     if (pid == 0)
     {
-        perfData = perfProcess(currPid, 3);
+        perfData = perfProcess(currPid, 1);
         std::string perfStr;
         perfStr = perfData.dump();
         
         loggingClient->logData(perfStr, "perf");
+        messageQueue.push(perfStr);
 
     }// else parent continues on
 }
 
 void Server::shutDownServer()
 {
-    KEEP_POLLING = false;
+    keepPolling = false;
 
     messageQueue.push("Server shutting down");
     messageQueue.push("done");   // keyword for clients to close their connection

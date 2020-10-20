@@ -16,7 +16,7 @@ protected:
 public:
 private:
     int serverSocketFd, activeNetworkClients = 0, portNo;
-    bool headlessMode = true, KEEP_POLLING = true;
+    bool headlessMode = true, keepPolling = true;
     std::queue<std::string> messageQueue;
     std::thread mainServerThread;
     struct pollfd pollFds[ServerConstants::BASE_POLLS + ServerConstants::NUM_CLIENTS];

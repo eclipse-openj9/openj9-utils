@@ -248,9 +248,6 @@ void shutDownServer() {
     close(loggingClient->socketFd);
     close(commandClient->socketFd);
 
-<<<<<<< HEAD
-=======
     KEEP_POLLING = false;
     mainServerThread.detach();
->>>>>>> 1ce57e27b503c2720dc4cb994465c72e6a86d363
 }

@@ -1,13 +1,17 @@
+
 #ifndef SERVER_H_
 #define SERVER_H_
 
 #include <string>
 #include <fstream>
+#include "json.hpp"
 
 #define NUM_CLIENTS 5
 #define BASE_POLLS 1
 #define POLL_INTERVAL 100
 #define COMMAND_INTERVAL 500
+
+using json = nlohmann::json; 
 
 class NetworkClient {
 public:
@@ -40,24 +44,30 @@ class CommandClient {
 public:
     int socketFd, commandInterval = 0;
     std::ifstream commandsFile;
-    std::string currentLine;
+    json commands;
 
     CommandClient(std::string filename="commands.txt") {
         commandsFile.open(filename);
         if (!commandsFile.is_open()) {
             perror("ERROR opening commands file");
         }
+
+        commands = json::parse(commandsFile);
     }
 
     std::string handlePoll();
 };
+
+void passPathToCommandFile(std::string path);
+
+void passPathToLogFile(std::string path);
 
 // Handle sending message to all clients.
 void sendMessageToClients(std::string message);
 void sendPerfDataToClient(void);
 
 // Starts the server thread.
-void startServer(int portNo, std::string filename = "");
+void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void* p);
 
 // Handles server functionality
 void handleServer(int portNo);

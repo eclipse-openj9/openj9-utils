@@ -9,8 +9,8 @@ using json = nlohmann::json;
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, jthread thread, jobject object) {
     json j;
     static int numContentions = 0; // keep track of number of contentions
-
     numContentions++;
+    jvmtiError error;
 
     jclass cls = env->GetObjectClass(object);
     // First get the class object
@@ -19,7 +19,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
 
     // Now get the class object's class descriptor
     cls = env->GetObjectClass(clsObj);
-
+    
     // Find the getName() method on the class object
     mid = env->GetMethodID(cls, "getName", "()Ljava/lang/String;");
 
@@ -28,6 +28,9 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
 
     // Now get the c string from the java jstring object
     const char* str = env->GetStringUTFChars(strObj, NULL);
+    /*char *str;    
+    error = jvmtiEnv->GetClassSignature(cls , &str, NULL);
+    if (str != NULL && error == JVMTI_ERROR_NONE) */
 
     // record calling class
     j["Occurence"]["Class"] = str;
@@ -53,6 +56,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
     j["Num Contentions"] = numContentions;
 
     printf("%s\n", j.dump().c_str());
+    
     // sendMessageToClients(j.dump());
 
     /*jint method_count;

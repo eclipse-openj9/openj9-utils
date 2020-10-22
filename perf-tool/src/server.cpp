@@ -1,5 +1,6 @@
 /* The port number is passed as an argument */
 #include <stdio.h>
+#include <jvmti.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -12,17 +13,21 @@
 #include <thread>
 #include <poll.h>
 #include "utils.hpp"
+#include <fstream>
+#include <sstream>
+#include "AgentOptions.hpp"
 
 using namespace std;
+using json = nlohmann::json;
 
 int sockfd, activeNetworkClients = 0;
 bool KEEP_POLLING = true;
 NetworkClient *networkClients[NUM_CLIENTS];
 LoggingClient *loggingClient;
 CommandClient *commandClient;
-thread mainServerThread;
 struct pollfd pollFds[BASE_POLLS+NUM_CLIENTS];
-string logFileName;
+string logFilePath;
+string commandsFilePath;
 
 void NetworkClient::sendMessage(std::string message) {
     const char *cstring = message.c_str();
@@ -45,6 +50,7 @@ void NetworkClient::handlePoll(char buffer[]) {
         handleAgentData(s.c_str());
         loggingClient->logData(s, "Client");
 
+
     }
 }
 
@@ -54,24 +60,58 @@ void LoggingClient::logData(string message, string recievedFrom) {
     }
 }
 
+void execCommand(json command){
+    sleep(stoi((std::string) command["delay"]));
+    if((command["functionality"].dump()).compare("perf")){
+        agentCommand(command["functionality"].dump(), command["command"].dump());
+    }
+}
+
 string CommandClient::handlePoll() {
+    static int commandNumber = 0;
+    static const int numCommands = commands.size();
     if (commandInterval <= 0) {
-        getline(commandsFile, currentLine);
-        if (!commandsFile.eof()) {
-            loggingClient->logData(currentLine, "Command File");
-            commandInterval = COMMAND_INTERVAL;
+        if(commandNumber < numCommands){
+            loggingClient -> logData(to_string(numCommands), "Command File");
+            execCommand(commands[commandNumber]);
+            loggingClient -> logData(commands[commandNumber].dump(), "Command File");
+            commandNumber++;
+        } else{
+            KEEP_POLLING = false;
         }
     } else {
         commandInterval = commandInterval - POLL_INTERVAL;
     }
 
-    return currentLine;
+    return commands[commandNumber].dump();
 }
 
-void startServer(int portNo, string filename) {
-    mainServerThread = thread(handleServer, portNo);
-    loggingClient = new LoggingClient();
-    commandClient = new CommandClient();
+
+void passPathToCommandFile(std::string path){
+    commandsFilePath = path;
+    return;
+}
+
+void passPathToLogFile(std::string path){
+    logFilePath = path;
+    return;
+}
+
+void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void* p) {
+    int * portNo = (int *) p;
+    if(!logFilePath.empty()){
+        loggingClient = new LoggingClient(logFilePath);
+    } else{
+        loggingClient = new LoggingClient();
+    }
+
+    if(!commandsFilePath.empty()){
+        commandClient = new CommandClient(commandsFilePath);
+    } else{
+        commandClient = new CommandClient();
+    }
+    printf("PORT: %d\n", *portNo);
+    handleServer(*portNo);
 }
 
 void handleServer(int portNo) {
@@ -214,5 +254,4 @@ void shutDownServer() {
     close(commandClient->socketFd);
 
     KEEP_POLLING = false;
-    mainServerThread.detach();
 }

@@ -6,6 +6,7 @@
 #include "json.hpp"
 #include "objectalloc.h"
 #include "AgentOptions.hpp"
+#include "server.hpp"
 #include <stdio.h> 
 #include <sys/types.h> 
 #include <unistd.h> 
@@ -29,10 +30,58 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
     }*/
 }
 
+void testFunc(){
+    printf("TESTING --------------------------------------------------------------------------------------------\n");
+}
+
 
 
 jvmtiEnv *jvmti;
+int portNo;
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
+    std::string commandsPath;
+    std::string logPath;
+    std::string token;
+    std::string optionsDelim = ",";
+    std::string pathDelim = ":";
+    std::string oIn = (std::string) options;
+    int pos1, pos2 = 0;
+    portNo = 9002;
+    if(!oIn.empty()){
+        // there is a max of two options the user can supply here
+        // "commands" is followed by a path to the commands file
+        // "log" is followed by the path to the location for the log file
+        // "portno" is followed by a number indicating the port to run the server on
+        for(int i = 0; i < 3; i++){
+            pos1 = oIn.find(optionsDelim);
+            if(pos1 != std::string::npos){
+                token = oIn.substr(0, pos1);
+                pos2 = token.find(pathDelim);
+                if(pos2 != std::string::npos){
+                    if(!token.substr(0, pos2).compare("commands")){
+                        token.erase(0, pos2 + pathDelim.length());
+                        commandsPath = token;
+                    }  else if(!token.substr(0, pos2).compare("log")){
+                        token.erase(0, pos2 + pathDelim.length());
+                        logPath = token;
+                    } else if(!token.substr(0, pos2).compare("portno")){
+                        token.erase(0, pos2 + pathDelim.length());
+                        portNo = stoi(token);
+                    }
+                } else{
+                    break;
+                }
+                oIn.erase(0, pos1 + optionsDelim.length());
+            }
+        }
+    }
+
+    std::cout << commandsPath << std::endl;
+    std::cout << logPath << std::endl;
+    std::cout<<portNo<<std::endl;
+
+    if(!commandsPath.empty()) passPathToCommandFile(commandsPath);
+    if(!logPath.empty()) passPathToLogFile(logPath);
     
     jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
     if (rest != JNI_OK || jvmti == NULL) {

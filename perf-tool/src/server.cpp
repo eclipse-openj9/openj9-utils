@@ -21,6 +21,7 @@ using namespace std;
 using json = nlohmann::json;
 
 int sockfd, activeNetworkClients = 0;
+bool HEADLESS_MODE = false;
 bool KEEP_POLLING = true;
 NetworkClient *networkClients[NUM_CLIENTS];
 LoggingClient *loggingClient;
@@ -72,23 +73,22 @@ string CommandClient::handlePoll() {
     static const int numCommands = commands.size();
     if (commandInterval <= 0) {
         if(commandNumber < numCommands){
-            loggingClient -> logData(to_string(numCommands), "Command File");
             execCommand(commands[commandNumber]);
             loggingClient -> logData(commands[commandNumber].dump(), "Command File");
             commandNumber++;
         } else{
-            KEEP_POLLING = false;
+            KEEP_POLLING = false; // stop polling when commands are finsihed
         }
     } else {
         commandInterval = commandInterval - POLL_INTERVAL;
     }
-
     return commands[commandNumber].dump();
 }
 
 
 void passPathToCommandFile(std::string path){
     commandsFilePath = path;
+    HEADLESS_MODE = true;
     return;
 }
 
@@ -197,7 +197,8 @@ void handleServer(int portNo) {
         }
 
         // Check for commands from commands file
-        commandClient->handlePoll();
+        if(HEADLESS_MODE)
+            commandClient->handlePoll();
 
         // Receiving and sending messages from/to clients
         for (int i=0; i<activeNetworkClients; i++) {

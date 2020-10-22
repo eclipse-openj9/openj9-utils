@@ -51,8 +51,6 @@ public:
         if (!commandsFile.is_open()) {
             perror("ERROR opening commands file");
         }
-
-        commands = json::parse(commandsFile);
     }
 
     std::string handlePoll();
@@ -61,6 +59,7 @@ public:
 void passPathToCommandFile(std::string path);
 
 void passPathToLogFile(std::string path);
+void setServerPort(int val);
 
 // Handle sending message to all clients.
 void sendMessageToClients(std::string message);

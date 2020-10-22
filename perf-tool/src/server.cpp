@@ -25,7 +25,6 @@ bool KEEP_POLLING = true;
 NetworkClient *networkClients[NUM_CLIENTS];
 LoggingClient *loggingClient;
 CommandClient *commandClient;
-thread mainServerThread;
 struct pollfd pollFds[BASE_POLLS+NUM_CLIENTS];
 string logFilePath;
 string commandsFilePath;
@@ -63,17 +62,23 @@ void LoggingClient::logData(string message, string recievedFrom) {
 
 void execCommand(json command){
     sleep(stoi((std::string) command["delay"]));
-    if((command["functionality"].get<std::string>()).compare("perf")){
-        agentCommand(command["functionality"].get<std::string>(), command["command"].get<std::string>());
+    if((command["functionality"].dump()).compare("perf")){
+        agentCommand(command["functionality"].dump(), command["command"].dump());
     }
 }
 
 string CommandClient::handlePoll() {
     static int commandNumber = 0;
+    static const int numCommands = commands.size();
     if (commandInterval <= 0) {
-        execCommand(commands[commandNumber]);
-        loggingClient -> logData(commands[commandNumber].dump(), "Command File");
-        commandNumber++;
+        if(commandNumber < numCommands){
+            loggingClient -> logData(to_string(numCommands), "Command File");
+            execCommand(commands[commandNumber]);
+            loggingClient -> logData(commands[commandNumber].dump(), "Command File");
+            commandNumber++;
+        } else{
+            KEEP_POLLING = false;
+        }
     } else {
         commandInterval = commandInterval - POLL_INTERVAL;
     }
@@ -249,5 +254,4 @@ void shutDownServer() {
     close(commandClient->socketFd);
 
     KEEP_POLLING = false;
-    mainServerThread.detach();
 }

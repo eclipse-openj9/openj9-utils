@@ -1,10 +1,8 @@
 #include <jvmti.h>
 #include <thread>
+#include <string.h>
 
-#include <infra.h>
-#include "server.hpp"
-
-Server *server;
+#include "infra.h"
 
 void check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
     if (errnum != JVMTI_ERROR_NONE) {
@@ -16,10 +14,31 @@ void check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
     }
 }
 
+jthread createNewThread(JNIEnv* jni_env){
+    // allocates a new java thread object using JNI
+    jclass threadClass;
+    jmethodID id;
+    jthread newThread;
+
+    threadClass = jni_env->FindClass("java/lang/Thread");
+    id = jni_env -> GetMethodID(threadClass, "<init>", "()V");
+    newThread = jni_env -> NewObject(threadClass, id);
+    return newThread;
+}
+
+void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void *p)
+{
+    server->handleServer();
+}
+
 
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {
-    server = new Server();
-    server->startServer();
+    jvmtiError error;
+    int* portPointer = portNo ? &portNo : NULL;
+
+    error = jvmtiEnv -> RunAgentThread( createNewThread(jni_env),&startServer, portPointer, JVMTI_THREAD_NORM_PRIORITY );
+    check_jvmti_error(jvmtiEnv, error, "Error starting agent thread\n");
+    server->messageQueue.push("VM init");
     printf("VM starting up\n");
 }
 

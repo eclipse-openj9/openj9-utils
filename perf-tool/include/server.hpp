@@ -1,11 +1,15 @@
+
 #ifndef SERVER_H_
 #define SERVER_H_
-
-#include "serverClients.hpp"
 
 #include <thread>
 #include <queue>
 #include <poll.h>
+
+#include "serverClients.hpp"
+#include "json.hpp"
+
+using json = nlohmann::json; 
 
 class Server
 {
@@ -14,10 +18,10 @@ class Server
      */
 protected:
 public:
+    std::queue<std::string> messageQueue;
 private:
     int serverSocketFd, activeNetworkClients = 0, portNo;
     bool headlessMode = true, keepPolling = true;
-    std::queue<std::string> messageQueue;
     std::thread mainServerThread;
     struct pollfd pollFds[ServerConstants::BASE_POLLS + ServerConstants::NUM_CLIENTS];
     NetworkClient *networkClients[ServerConstants::NUM_CLIENTS];
@@ -31,8 +35,8 @@ protected:
 public:
     Server(int portNo = 9003, std::string commandFileName = "", std::string logFileName = "logs.txt");
 
-    /* Starts server thread */
-    void startServer();
+    /* Handles server functionality and polling*/
+    void handleServer();
 
     /* Handle the message queue, and sends to all clients */
     void handleMessagingClients();
@@ -40,12 +44,16 @@ public:
     /* Join the server thread and closes server's socket */
     void shutDownServer(void);
 
+    void passPathToCommandFile(std::string path);
+
+    void passPathToLogFile(std::string path);
+
+    void execCommand(json command);
+
 private:
-    /* Handles server functionality and polling*/
-    void handleServer();
 
     /* Handles recieving commands for the agent from clients */
-    void handleClientCommand(std::string command);
+    void handleClientCommand(std::string command, std::string from);
 
     /* Handles recieving data from agent */
     void handleAgentData(std::string data);

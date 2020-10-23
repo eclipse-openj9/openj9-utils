@@ -4,6 +4,7 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <stdio.h>
+#include <jvmti.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -11,8 +12,11 @@
 
 #include "perf.hpp"
 #include "utils.hpp"
+#include <fstream>
+#include "AgentOptions.hpp"
 
 using namespace std;
+using json = nlohmann::json;
 
 Server::Server(int portNo, string commandFileName, string logFileName)
 {
@@ -29,16 +33,12 @@ Server::Server(int portNo, string commandFileName, string logFileName)
     }
 }
 
-void Server::startServer()
-{
-    mainServerThread = thread(&Server::handleServer, this);
-}
 
 void Server::handleServer()
 {
     socklen_t clilen;
     char buffer[256], msg[256];
-    string command, message;
+    string message;
     struct sockaddr_in serv_addr, cli_addr;
     int n, newsocketFd;
 
@@ -133,35 +133,46 @@ void Server::handleServer()
         // Check for commands from commands file if running in headless mode
         if (headlessMode)
         {
-            command = commandClient->handlePoll();
-            handleClientCommand(command);
+            json command = commandClient->handlePoll();
+            execCommand(command);
+            handleClientCommand(command.dump(), "Commands file");
         }
 
         // Receiving and sending messages from/to clients
         for (int i = 0; i < activeNetworkClients; i++)
         {
             bzero(buffer, 256);
-            command = networkClients[i]->handlePoll(buffer);
-            handleClientCommand(command);
+            string command = networkClients[i]->handlePoll(buffer);
+            handleClientCommand(command, "Client");
         }
 
         handleMessagingClients();
     }
 }
+
+
+void Server::execCommand(json command){
+    sleep(stoi((std::string) command["delay"]));
+    if((command["functionality"].dump()).compare("perf")){
+        agentCommand(command["functionality"].dump(), command["command"].dump());
+    }
+}
+
+
 void Server::handleAgentData(string data)
 {
     messageQueue.push(data);
     loggingClient->logData(data, "Agent");
 }
 
-void Server::handleClientCommand(string command)
+void Server::handleClientCommand(string command, string from)
 {
     if (command == "perf")
     {
         sendPerfDataToClient();
     }
 
-    loggingClient->logData(command, "Client");
+    loggingClient->logData(command, from);
 }
 
 void Server::sendMessage(int socketFd, std::string message)
@@ -234,14 +245,5 @@ void Server::shutDownServer()
         commandClient->closeFile();
     }
 
-    if (mainServerThread.joinable()) 
-    {
-        cout << "Server thread joined" << endl;
-        mainServerThread.join();
-    }
-    else 
-    {
-        cout << "Server thread detached" << endl;
-        mainServerThread.detach();
-    }
+    cout << "Server shutdown." << endl;
 }

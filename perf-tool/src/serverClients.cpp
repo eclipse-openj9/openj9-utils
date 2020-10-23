@@ -37,30 +37,45 @@ void LoggingClient::logData(string message, string recievedFrom)
     }
 }
 
-CommandClient::CommandClient(string filename)
-{
+CommandClient::CommandClient(std::string filename) {
     commandsFile.open(filename);
-    if (!commandsFile.is_open())
-    {
+    if (!commandsFile.is_open()) {
+        printf("filename: %s\n", filename);
         perror("ERROR opening commands file");
     }
+
+    commands = json::parse(commandsFile);
 }
 
-string CommandClient::handlePoll()
-{
-    if (currentInterval <= 0)
-    {
-        getline(commandsFile, prevCommand);
-        if (!commandsFile.eof())
-        {
-            currentInterval = ServerConstants::COMMAND_INTERVALS;
-            return prevCommand;
+// string CommandClient::handlePoll()
+// {
+//     if (currentInterval <= 0)
+//     {
+//         getline(commandsFile, prevCommand);
+//         if (!commandsFile.eof())
+//         {
+//             currentInterval = ServerConstants::COMMAND_INTERVALS;
+//             return prevCommand;
+//         }
+//     }
+//     else
+//     {
+//         currentInterval = currentInterval - ServerConstants::POLL_INTERVALS;
+//     }
+
+//     return "";
+// }
+json CommandClient::handlePoll() {
+    static int commandNumber = 0;
+    static const int numCommands = commands.size();
+    
+    if (currentInterval <= 0) {
+        if(commandNumber < numCommands){
+            commandNumber++;
         }
-    }
-    else
-    {
+    } else {
         currentInterval = currentInterval - ServerConstants::POLL_INTERVALS;
     }
 
-    return "";
+    return commands[commandNumber];
 }

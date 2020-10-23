@@ -5,6 +5,10 @@
 #include <fstream>
 #include <unistd.h>
 
+#include "json.hpp"
+
+using json = nlohmann::json; 
+
 class ServerConstants
 {
 public:
@@ -13,6 +17,7 @@ public:
     static constexpr int POLL_INTERVALS = 100;
     static constexpr int COMMAND_INTERVALS = 500;
 };
+
 
 class NetworkClient
 {
@@ -49,6 +54,7 @@ public:
     std::string handlePoll(char buffer[]);
 };
 
+
 class CommandClient
 {
     /*
@@ -59,13 +65,15 @@ public:
 private:
     int currentInterval = ServerConstants::COMMAND_INTERVALS;
     std::ifstream commandsFile;
-    std::string prevCommand;
+    json commands;
 
     /*
      * Function members
      */
 protected:
 private:
+    void execCommand(json command);
+
 public:
     CommandClient(std::string filename);
 
@@ -73,9 +81,9 @@ public:
     {
         commandsFile.close();
     }
-
-    std::string handlePoll(void);
+    json handlePoll(void);
 };
+
 
 class LoggingClient
 {

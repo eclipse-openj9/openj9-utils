@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "perf.hpp"
@@ -17,6 +18,8 @@
 
 using namespace std;
 using json = nlohmann::json;
+
+pid_t perfPid = -1;
 
 Server::Server(int portNo, string commandFileName, string logFileName)
 {
@@ -178,6 +181,7 @@ void Server::handleClientCommand(string command, string from)
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
+        std::cerr << "Improper command received from: " << from << '\n';
     }
 
     loggingClient->logData(command, from);
@@ -206,18 +210,18 @@ void Server::handleMessagingClients()
 
 void Server::sendPerfDataToClient(int time)
 {
-    pid_t pid, currPid;
+    pid_t currPid;
     json perfData;
 
     currPid = getpid();
     printf("pid: %d\n", currPid);
-    pid = fork();
-    if (pid == -1)
+    perfPid = fork();
+    if (perfPid == -1)
     {
         perror("fork");
     }
 
-    if (pid == 0)
+    if (perfPid == 0)
     {
         perfData = perfProcess(currPid, time);
         std::string perfStr;
@@ -235,11 +239,16 @@ void Server::shutDownServer()
 {
     keepPolling = false;
 
+    if (perfPid != -1) {
+        int status;
+        cout << "Waiting on perf data." << endl;
+        waitpid(perfPid, &status, WCONTINUED);
+    }
+
     messageQueue.push("Server shutting down");
     messageQueue.push("done"); // keyword for clients to close their connection
 
     handleMessagingClients();
-
     close(serverSocketFd);
 
     loggingClient->closeFile();

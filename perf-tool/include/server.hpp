@@ -69,7 +69,7 @@ void setServerPort(int val);
 
 // Handle sending message to all clients.
 void sendMessageToClients(std::string message);
-void sendPerfDataToClient(void);
+void sendPerfDataToClient(int time);
 
 // Starts the server thread.
 void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void* p);

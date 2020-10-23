@@ -32,9 +32,12 @@ string logFilePath;
 string commandsFilePath;
 
 void execCommand(json command){
-    sleep(stoi((std::string) command["delay"]));
-    if((command["functionality"].dump()).compare("perf")){
+    if(command["delay"] != NULL)
+        sleep(stoi((std::string) command["delay"]));
+    if((command["functionality"].get<string>()).compare("perf")){
         agentCommand(command["functionality"].get<string>(), command["command"].get<string>());
+    } else{
+        sendPerfDataToClient(stoi(command["time"].get<string>()));
     }
 }
 
@@ -49,7 +52,6 @@ void NetworkClient::sendMessage(std::string message) {
 
 void NetworkClient::handlePoll(char buffer[]) {
     int n = read(socketFd, buffer, 255);
-    json command;
     string s = string(buffer);
     s.pop_back();
 
@@ -57,14 +59,7 @@ void NetworkClient::handlePoll(char buffer[]) {
         error("ERROR reading from socket");
     } else if (n > 0) {
         // TODO handle client input
-        try{
-           command =  json::parse(s);
-           execCommand(command);
-        }
-        catch(...){
-           handleAgentData(s.c_str()); 
-        }
-        
+        handleAgentData(s.c_str()); 
         loggingClient->logData(s, "Client");
     }
 }
@@ -222,9 +217,14 @@ void handleServer() {
 }
 
 void handleAgentData(const char *data) {
-    if (strcmp(data, "perf") == 0) {
-        sendPerfDataToClient();
-    }
+    json command;
+    try{
+           command =  json::parse(data); // will throw an error
+           execCommand(command);
+        }
+        catch(...){
+            // TODO: implement error handling
+        }
     string s = data;
     printf("Recieved: %s\n", data);
 }
@@ -235,7 +235,7 @@ void sendMessageToClients(string message) {
     }
 }
 
-void sendPerfDataToClient(void) {
+void sendPerfDataToClient(int time) {
     pid_t pid, currPid;
     json perfData;
 
@@ -247,7 +247,7 @@ void sendPerfDataToClient(void) {
       perror("fork");
 
     if (pid == 0) {
-      perfData = perfProcess(currPid, 3);
+      perfData = perfProcess(currPid, time);
       std::string perfStr;
       perfStr = perfData.dump();
 

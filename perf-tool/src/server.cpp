@@ -239,6 +239,8 @@ void sendPerfDataToClient(void) {
       perfStr = perfData.dump();
 
       sendMessageToClients(perfStr.c_str()); // for debugging
+
+      exit(EXIT_SUCCESS);
     } // else parent continues on
 
 }

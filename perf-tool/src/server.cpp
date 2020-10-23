@@ -79,7 +79,7 @@ string CommandClient::handlePoll() {
             loggingClient -> logData(commands[commandNumber].dump(), "Command File");
             commandNumber++;
         } else{
-            KEEP_POLLING = false; // stop polling when commands are finsihed
+            HEADLESS_MODE = false; // stop executing headless commands when no more commands
         }
     } else {
         commandInterval = commandInterval - POLL_INTERVAL;

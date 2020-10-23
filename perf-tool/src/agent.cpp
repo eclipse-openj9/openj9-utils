@@ -34,8 +34,6 @@ void testFunc(){
     printf("TESTING --------------------------------------------------------------------------------------------\n");
 }
 
-
-
 jvmtiEnv *jvmti;
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
     std::string commandsPath;
@@ -43,15 +41,14 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     std::string token;
     std::string optionsDelim = ",";
     std::string pathDelim = ":";
-    std::string oIn = (std::string) options;
     int pos1, pos2 = 0;
     int portNo = 9002;
-    if(!oIn.empty()){
+
+    std::string oIn = (std::string) options;
         // there is a max of two options the user can supply here
         // "commands" is followed by a path to the commands file
         // "log" is followed by the path to the location for the log file
         // "portno" is followed by a number indicating the port to run the server on
-
         while((pos1 = oIn.find(optionsDelim)) != std::string::npos){
             if(pos1 != std::string::npos){
                 token = oIn.substr(0, pos1);
@@ -66,13 +63,26 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
                         token.erase(0, pos2 + pathDelim.length());
                         portNo = stoi(token);
                     }
-                } else{
-                    break;
                 }
                 oIn.erase(0, pos1 + optionsDelim.length());
             }
         }
-    } 
+        if(!oIn.empty()){
+            token = oIn;
+            if((pos2 = token.find(pathDelim)) != std::string::npos){
+                if(!token.substr(0, pos2).compare("commandFile")){
+                        token.erase(0, pos2 + pathDelim.length());
+                        commandsPath = token;
+                    }  else if(!token.substr(0, pos2).compare("logFile")){
+                        token.erase(0, pos2 + pathDelim.length());
+                        logPath = token;
+                    } else if(!token.substr(0, pos2).compare("portNo")){
+                        token.erase(0, pos2 + pathDelim.length());
+                        portNo = stoi(token);
+                    }
+            }
+
+        }
 
 
     if(!commandsPath.empty()) passPathToCommandFile(commandsPath);

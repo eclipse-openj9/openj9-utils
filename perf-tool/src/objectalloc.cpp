@@ -1,10 +1,10 @@
 #include <jvmti.h>
 #include <string.h>
-#include "objectalloc.h"
+
 #include "AgentOptions.hpp"
+#include "infra.hpp"
 #include "json.hpp"
-#include "server.hpp"
-#include "infra.h"
+#include "objectalloc.hpp"
 
 using json = nlohmann::json;
 
@@ -48,8 +48,8 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
     // }
     
     std::string s = j.dump();
-    printf("\n%s\n", s.c_str());
-    // sendMessageToClients(j.dump());
+    sendToServer(s);
+    // printf("\n%s\n", s.c_str());
                             
 
 }

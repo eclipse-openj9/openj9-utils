@@ -22,25 +22,25 @@ Server::Server(int portNo, string commandFileName, string logFileName)
 {
     this->portNo = portNo;
     loggingClient = new LoggingClient(logFileName);
-    
+
     if (commandFileName != "")
     {
         commandClient = new CommandClient(commandFileName);
-    } 
-    else 
+    }
+    else
     {
         headlessMode = false;
     }
 }
 
-
 void Server::handleServer()
 {
     socklen_t clilen;
     char buffer[256], msg[256];
-    string message;
+    string message, command;
     struct sockaddr_in serv_addr, cli_addr;
     int n, newsocketFd;
+    json jsonCommand;
 
     // create a socket
     // socket(int domain, int type, int protocol)
@@ -63,9 +63,6 @@ void Server::handleServer()
     // convert short integer value for port must be converted into network byte order
     serv_addr.sin_port = htons(portNo);
 
-    // bind(int fd, struct sockaddr *local_addr, socklen_t addr_length)
-    // bind() passes file descriptor, the address structure,
-    // and the length of the address structure
     // This bind() call will bind  the socket to the current IP address on port, portNo
     if (bind(serverSocketFd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
@@ -73,9 +70,6 @@ void Server::handleServer()
     }
 
     // This listen() call tells the socket to listen to the incoming connections.
-    // The listen() function places all incoming connection into a backlog queue
-    // until accept() call accepts the connection.
-    // Here, we set the maximum size for the backlog queue to 5.
     listen(serverSocketFd, ServerConstants::NUM_CLIENTS);
 
     pollFds[0].fd = serverSocketFd;
@@ -87,7 +81,8 @@ void Server::handleServer()
     // Use polling to keep track of clients and keyboard input
     while (1)
     {
-        if (!keepPolling) {
+        if (!keepPolling)
+        {
             break;
         }
 
@@ -105,10 +100,6 @@ void Server::handleServer()
 
             // This accept() function will write the connecting client's address info
             // into the the address structure and the size of that structure is clilen.
-            // The accept() returns a new socket file descriptor for the accepted connection.
-            // So, the original socket file descriptor can continue to be used
-            // for accepting new connections while the new socker file descriptor is used for
-            // communicating with the connected client.
             newsocketFd = accept(serverSocketFd, (struct sockaddr *)&cli_addr, &clilen);
             if (newsocketFd < 0)
             {
@@ -129,15 +120,15 @@ void Server::handleServer()
             // Update number of active clients
             activeNetworkClients++;
         }
-        
+
         // Check for commands from commands file if running in headless mode
         if (headlessMode)
         {
-            json command = commandClient->handlePoll();
-            if(!command.empty()){
-                printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n HERE \n\n\n\n\n");
-                execCommand(command);
-                handleClientCommand(command.get<std::string>(), "Commands file");
+            jsonCommand = commandClient->handlePoll();
+            if (!jsonCommand.empty())
+            {
+                command = jsonCommand.dump();
+                handleClientCommand(command, "Commands file");
             }
         }
 
@@ -145,25 +136,30 @@ void Server::handleServer()
         for (int i = 0; i < activeNetworkClients; i++)
         {
             bzero(buffer, 256);
-            string command = networkClients[i]->handlePoll(buffer);
-            handleClientCommand(command, "Client");
+            command = networkClients[i]->handlePoll(buffer);
+            if (!command.empty())
+            {
+                handleClientCommand(command, "Client");
+            }
         }
 
         handleMessagingClients();
     }
 }
 
-
-void Server::execCommand(json command){
-    if(!command["delay"].is_null())
-        sleep(stoi((string) command["delay"]));
-    if((command["functionality"].get<std::string>()).compare("perf")){
+void Server::execCommand(json command)
+{
+    if (!command["delay"].is_null())
+        sleep(command["delay"]);
+    if ((command["functionality"].get<std::string>()).compare("perf"))
+    {
         agentCommand(command["functionality"].get<std::string>(), command["command"].get<std::string>());
-    } else{
+    }
+    else
+    {
         sendPerfDataToClient(command["time"]);
     }
 }
-
 
 void Server::handleAgentData(string data)
 {
@@ -174,14 +170,14 @@ void Server::handleAgentData(string data)
 void Server::handleClientCommand(string command, string from)
 {
     json com;
-    try{
+    try
+    {
         com = json::parse(command);
         execCommand(com);
-    } catch( ... ){
-        if (command == "perf")
-        {
-            sendPerfDataToClient(3); // remove?
-        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
     }
 
     loggingClient->logData(command, from);
@@ -198,15 +194,14 @@ void Server::handleMessagingClients()
     while (!messageQueue.empty())
     {
         for (int i = 0; i < activeNetworkClients; i++)
-        {   
+        {
             int clientSocketFd = networkClients[i]->getSocketFd();
             sendMessage(clientSocketFd, messageQueue.front());
         }
         loggingClient->logData(messageQueue.front(), "Server");
 
-        messageQueue.pop(); 
+        messageQueue.pop();
     }
-
 }
 
 void Server::sendPerfDataToClient(int time)
@@ -216,7 +211,6 @@ void Server::sendPerfDataToClient(int time)
 
     currPid = getpid();
     printf("pid: %d\n", currPid);
-    // currPid = 44454;
     pid = fork();
     if (pid == -1)
     {
@@ -228,14 +222,13 @@ void Server::sendPerfDataToClient(int time)
         perfData = perfProcess(currPid, time);
         std::string perfStr;
         perfStr = perfData.dump();
-        
+
         loggingClient->logData(perfStr, "perf");
         messageQueue.push(perfStr);
-      
+
         exit(EXIT_SUCCESS);
 
-    }// else parent continues on
-
+    }
 }
 
 void Server::shutDownServer()
@@ -243,18 +236,19 @@ void Server::shutDownServer()
     keepPolling = false;
 
     messageQueue.push("Server shutting down");
-    messageQueue.push("done");   // keyword for clients to close their connection
-    
+    messageQueue.push("done"); // keyword for clients to close their connection
+
     handleMessagingClients();
 
     close(serverSocketFd);
-    
+
     loggingClient->closeFile();
     for (int i = 0; i < activeNetworkClients; i++)
-    {   
+    {
         networkClients[i]->closeFd();
     }
-    if (headlessMode) {
+    if (headlessMode)
+    {
         commandClient->closeFile();
     }
 

@@ -73,9 +73,14 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     jvmtiCapabilities capa;
     jvmtiError error;
     (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+    capa.can_signal_thread = 1;
+    capa.can_get_owned_monitor_info = 1;
     capa.can_generate_monitor_events = 1;
     capa.can_generate_vm_object_alloc_events = 1;
     capa.can_generate_method_entry_events = 1;
+    capa.can_tag_objects = 1;
+    capa.can_get_current_thread_cpu_time	= 1;
+    capa.can_get_line_numbers = 1;
     error = jvmti->AddCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Failed to set jvmtiCapabilities.");
 
@@ -98,8 +103,10 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     (void)memset(&callbacks, 0, sizeof(jvmtiEventCallbacks));
     callbacks.VMInit = &VMInit;
     callbacks.VMDeath = &VMDeath;
+    callbacks.VMObjectAlloc = &VMObjectAlloc;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.VMObjectAlloc = &VMObjectAlloc;
+    callbacks.MethodEntry = &MethodEntry;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
 

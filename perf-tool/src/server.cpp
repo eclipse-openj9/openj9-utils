@@ -211,18 +211,23 @@ void Server::sendPerfDataToClient(void)
     // currPid = 44454;
     pid = fork();
     if (pid == -1)
-        error("fork");
+    {
+        perror("fork");
+    }
 
     if (pid == 0)
     {
-        perfData = perfProcess(currPid, 1);
+        perfData = perfProcess(currPid, 3);
         std::string perfStr;
         perfStr = perfData.dump();
         
         loggingClient->logData(perfStr, "perf");
         messageQueue.push(perfStr);
+      
+        exit(EXIT_SUCCESS);
 
     }// else parent continues on
+
 }
 
 void Server::shutDownServer()

@@ -27,33 +27,44 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     std::string oIn = (std::string) options;
     int pos1, pos2 = 0;
     portNo = 9002;
-    if(!oIn.empty()){
-        // there is a max of two options the user can supply here
-        // "commands" is followed by a path to the commands file
-        // "log" is followed by the path to the location for the log file
-        // "portno" is followed by a number indicating the port to run the server on
-        for(int i = 0; i < 3; i++){
-            pos1 = oIn.find(optionsDelim);
-            if(pos1 != std::string::npos){
-                token = oIn.substr(0, pos1);
-                pos2 = token.find(pathDelim);
-                if(pos2 != std::string::npos){
-                    if(!token.substr(0, pos2).compare("commands")){
-                        token.erase(0, pos2 + pathDelim.length());
-                        commandsPath = token;
-                    }  else if(!token.substr(0, pos2).compare("log")){
-                        token.erase(0, pos2 + pathDelim.length());
-                        logPath = token;
-                    } else if(!token.substr(0, pos2).compare("portno")){
-                        token.erase(0, pos2 + pathDelim.length());
-                        portNo = stoi(token);
-                    }
-                } else{
-                    break;
+
+    // there is a max of two options the user can supply here
+    // "commands" is followed by a path to the commands file
+    // "log" is followed by the path to the location for the log file
+    // "portno" is followed by a number indicating the port to run the server on
+    while((pos1 = oIn.find(optionsDelim)) != std::string::npos){
+        if(pos1 != std::string::npos){
+            token = oIn.substr(0, pos1);
+            if((pos2 = token.find(pathDelim)) != std::string::npos){
+                if(!token.substr(0, pos2).compare("commandFile")){
+                    token.erase(0, pos2 + pathDelim.length());
+                    commandsPath = token;
+                }  else if(!token.substr(0, pos2).compare("logFile")){
+                    token.erase(0, pos2 + pathDelim.length());
+                    logPath = token;
+                } else if(!token.substr(0, pos2).compare("portNo")){
+                    token.erase(0, pos2 + pathDelim.length());
+                    portNo = stoi(token);
                 }
-                oIn.erase(0, pos1 + optionsDelim.length());
             }
+            oIn.erase(0, pos1 + optionsDelim.length());
         }
+    }
+    if(!oIn.empty()){
+        token = oIn;
+        if((pos2 = token.find(pathDelim)) != std::string::npos){
+            if(!token.substr(0, pos2).compare("commandFile")){
+                    token.erase(0, pos2 + pathDelim.length());
+                    commandsPath = token;
+                }  else if(!token.substr(0, pos2).compare("logFile")){
+                    token.erase(0, pos2 + pathDelim.length());
+                    logPath = token;
+                } else if(!token.substr(0, pos2).compare("portNo")){
+                    token.erase(0, pos2 + pathDelim.length());
+                    portNo = stoi(token);
+                }
+        }
+
     }
 
     std::cout << commandsPath << std::endl;
@@ -74,8 +85,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
     capa.can_signal_thread = 1;
     capa.can_get_owned_monitor_info = 1;
-    capa.can_generate_monitor_events = 1;
-    capa.can_generate_vm_object_alloc_events = 1;
     capa.can_generate_method_entry_events = 1;
     capa.can_tag_objects = 1;
     capa.can_get_current_thread_cpu_time	= 1;
@@ -88,15 +97,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
 
     error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_DEATH, (jthread)NULL);
     check_jvmti_error(jvmti, error, "Unable to init VM death event.");
-
-    error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
-    check_jvmti_error(jvmti, error, "Unable to init MonitorContendedEntered event.");
-
-    error = jvmti->SetEventNotificationMode(JVMTI_ENABLE,  JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
-    check_jvmti_error(jvmti, error, "Unable to init Method Entry event.");
-
-    error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
-    check_jvmti_error(jvmti, error, "Unable to init VM Object Alloc event");
 
     jvmtiEventCallbacks callbacks;
     (void)memset(&callbacks, 0, sizeof(jvmtiEventCallbacks));

@@ -40,7 +40,7 @@ void LoggingClient::logData(string message, string recievedFrom)
 CommandClient::CommandClient(std::string filename) {
     commandsFile.open(filename);
     if (!commandsFile.is_open()) {
-        printf("filename: %s\n", filename);
+        printf("filename: %s\n", filename.c_str());
         perror("ERROR opening commands file");
     }
 
@@ -68,14 +68,15 @@ CommandClient::CommandClient(std::string filename) {
 json CommandClient::handlePoll() {
     static int commandNumber = 0;
     static const int numCommands = commands.size();
+    json j;
     
     if (currentInterval <= 0) {
         if(commandNumber < numCommands){
-            commandNumber++;
+            return commands[commandNumber++];
         }
     } else {
         currentInterval = currentInterval - ServerConstants::POLL_INTERVALS;
     }
 
-    return commands[commandNumber];
+    return j;
 }

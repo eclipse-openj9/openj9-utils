@@ -4,7 +4,6 @@
 #include "AgentOptions.hpp"
 #include "json.hpp"
 #include "server.hpp"
-#include "infra.h"
 
 #include <iostream>
 #include <chrono>
@@ -13,6 +12,8 @@
 #include <iomanip>
 #include <ctime>
 #include <chrono>
+
+#include "infra.h"
 
 using json = nlohmann::json;
 using namespace std::chrono;
@@ -111,6 +112,5 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
     j["object"] = jObj; 
 
     std::string s = j.dump();
-    printf("\n%s\n", s.c_str());
-    sendMessageToClients(j.dump());
+    // sendToServer(s);
 }

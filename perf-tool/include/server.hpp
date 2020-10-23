@@ -33,7 +33,7 @@ private:
      */
 protected:
 public:
-    Server(int portNo = 9003, std::string commandFileName = "", std::string logFileName = "logs.txt");
+    Server(int portNo, std::string commandFileName = "", std::string logFileName = "logs.txt");
 
     /* Handles server functionality and polling*/
     void handleServer();

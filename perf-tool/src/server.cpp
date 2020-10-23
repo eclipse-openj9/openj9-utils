@@ -152,7 +152,7 @@ void Server::handleServer()
 
 
 void Server::execCommand(json command){
-    sleep(stoi((std::string) command["delay"]));
+    sleep(stoi((string) command["delay"]));
     if((command["functionality"].dump()).compare("perf")){
         agentCommand(command["functionality"].dump(), command["command"].dump());
     }
@@ -183,18 +183,14 @@ void Server::sendMessage(int socketFd, std::string message)
 
 void Server::handleMessagingClients()
 {
-    string message;
-
     while (!messageQueue.empty())
     {
-        message = messageQueue.front();
-
         for (int i = 0; i < activeNetworkClients; i++)
         {   
             int clientSocketFd = networkClients[i]->getSocketFd();
-            sendMessage(clientSocketFd, message);
+            sendMessage(clientSocketFd, messageQueue.front());
         }
-        loggingClient->logData(message, "Server");
+        loggingClient->logData(messageQueue.front(), "Server");
 
         messageQueue.pop(); 
     }

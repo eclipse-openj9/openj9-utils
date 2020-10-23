@@ -17,11 +17,10 @@ using json = nlohmann::json;
 
 jvmtiEnv *jvmti;
 int portNo;
-Server *server;
+std::string commandsPath = "";
+std::string logPath = "logs.txt";
 
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
-    std::string commandsPath = "";
-    std::string logPath = "logs.txt";
     std::string token;
     std::string optionsDelim = ",";
     std::string pathDelim = ":";
@@ -61,7 +60,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     std::cout << logPath << std::endl;
     std::cout << portNo << std::endl;
 
-    server = new Server(portNo, commandsPath, logPath);
+    // server = new Server(portNo, commandsPath, logPath);
     
     jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
     if (rest != JNI_OK || jvmti == NULL) {
@@ -106,7 +105,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     callbacks.VMObjectAlloc = &VMObjectAlloc;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.VMObjectAlloc = &VMObjectAlloc;
-    callbacks.MethodEntry = &MethodEntry;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
 

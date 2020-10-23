@@ -3,6 +3,9 @@
 #include <string.h>
 
 #include "infra.h"
+#include "server.hpp"
+
+Server *server;
 
 void check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
     if (errnum != JVMTI_ERROR_NONE) {
@@ -31,14 +34,20 @@ void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void *p)
     server->handleServer();
 }
 
+void sendToServer(std::string message)
+{
+    server->messageQueue.push(message);
+}
 
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {
     jvmtiError error;
     int* portPointer = portNo ? &portNo : NULL;
 
+    server = new Server(portNo, commandsPath, logPath);
+
     error = jvmtiEnv -> RunAgentThread( createNewThread(jni_env),&startServer, portPointer, JVMTI_THREAD_NORM_PRIORITY );
     check_jvmti_error(jvmtiEnv, error, "Error starting agent thread\n");
-    server->messageQueue.push("VM init");
+    sendToServer("VM init");
     printf("VM starting up\n");
 }
 

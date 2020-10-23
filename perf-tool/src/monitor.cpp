@@ -1,8 +1,9 @@
-#include <jvmti.h>
-#include "json.hpp"
-#include "server.hpp"
-#include "AgentOptions.hpp"
 #include <atomic>
+#include <jvmti.h>
+
+#include "AgentOptions.hpp"
+#include "infra.hpp"
+#include "json.hpp"
 
 //how many times 
 using json = nlohmann::json;
@@ -66,26 +67,9 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
 
     j["Contention Number"] = numContentions;
 
-    printf("%s\n", j.dump().c_str());
+    // printf("%s\n", j.dump().c_str());
     
-    // sendMessageToClients(j.dump());
-
-    /*jint method_count;
-    jmethodID *methodIDs;
-
-    err = jvmtiEnv->GetClassMethods(cls, &method_count, &methodIDs);
-    if (err == JVMTI_ERROR_NONE && method_count >= 1) {
-        for (int i = 0; i < method_count; i++)
-        {
-            char *methodName;
-            err = jvmtiEnv->GetMethodName(methodIDs[i], 
-                                &methodName, NULL, NULL);
-            if (err == JVMTI_ERROR_NONE) {
-                printf("\nMethod #%i: %s\n", i, methodName);
-            }
-        }
-        
-    }*/
+    sendToServer(j.dump());
 }
 
 

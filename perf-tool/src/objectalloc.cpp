@@ -3,8 +3,9 @@
 
 #include <jvmti.h>
 #include <string.h>
-#include "objectalloc.h"
+
 #include "AgentOptions.hpp"
+#include "infra.hpp"
 #include "json.hpp"
 #include "server.hpp"
 #include "infra.h"
@@ -19,7 +20,6 @@
 #include <atomic>
 
 using json = nlohmann::json;
-using namespace std::chrono;
 
 
 std::atomic<bool> objAllocBackTraceEnabled;

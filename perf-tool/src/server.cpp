@@ -21,6 +21,7 @@ using namespace std;
 using json = nlohmann::json;
 
 int sockfd, activeNetworkClients = 0;
+int portNo = 9002;
 bool HEADLESS_MODE = false;
 bool KEEP_POLLING = true;
 NetworkClient *networkClients[NUM_CLIENTS];
@@ -69,6 +70,7 @@ void execCommand(json command){
 }
 
 string CommandClient::handlePoll() {
+    
     static int commandNumber = 0;
     static const int numCommands = commands.size();
     if (commandInterval <= 0) {
@@ -97,8 +99,11 @@ void passPathToLogFile(std::string path){
     return;
 }
 
+void setServerPort(int val){
+    portNo = val;
+}
+
 void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void* p) {
-    int * portNo = (int *) p;
     if(!logFilePath.empty()){
         loggingClient = new LoggingClient(logFilePath);
     } else{
@@ -110,11 +115,10 @@ void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void* p) {
     } else{
         commandClient = new CommandClient();
     }
-    printf("PORT: %d\n", *portNo);
-    handleServer(*portNo);
+    handleServer();
 }
 
-void handleServer(int portNo) {
+void handleServer() {
     socklen_t clilen;
     char buffer[256], msg[256];
     struct sockaddr_in serv_addr, cli_addr;

@@ -56,13 +56,13 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
             if(pos1 != std::string::npos){
                 token = oIn.substr(0, pos1);
                 if((pos2 = token.find(pathDelim)) != std::string::npos){
-                    if(!token.substr(0, pos2).compare("commands")){
+                    if(!token.substr(0, pos2).compare("commandFile")){
                         token.erase(0, pos2 + pathDelim.length());
                         commandsPath = token;
-                    }  else if(!token.substr(0, pos2).compare("log")){
+                    }  else if(!token.substr(0, pos2).compare("logFile")){
                         token.erase(0, pos2 + pathDelim.length());
                         logPath = token;
-                    } else if(!token.substr(0, pos2).compare("portno")){
+                    } else if(!token.substr(0, pos2).compare("portNo")){
                         token.erase(0, pos2 + pathDelim.length());
                         portNo = stoi(token);
                     }

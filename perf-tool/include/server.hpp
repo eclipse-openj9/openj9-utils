@@ -51,6 +51,12 @@ public:
         if (!commandsFile.is_open()) {
             perror("ERROR opening commands file");
         }
+        try{
+            commands = json::parse(commandsFile);
+        }
+        catch (...){
+            // did not parse
+        }
     }
 
     std::string handlePoll();
@@ -69,7 +75,7 @@ void sendPerfDataToClient(void);
 void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void* p);
 
 // Handles server functionality
-void handleServer(int portNo);
+void handleServer();
 
 // Write given data to log file
 // Only writes to file if a log file was specified on server start

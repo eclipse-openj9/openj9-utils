@@ -134,8 +134,11 @@ void Server::handleServer()
         if (headlessMode)
         {
             json command = commandClient->handlePoll();
-            execCommand(command);
-            handleClientCommand(command.dump(), "Commands file");
+            if(!command.empty()){
+                printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n HERE \n\n\n\n\n");
+                execCommand(command);
+                handleClientCommand(command.get<std::string>(), "Commands file");
+            }
         }
 
         // Receiving and sending messages from/to clients
@@ -152,9 +155,12 @@ void Server::handleServer()
 
 
 void Server::execCommand(json command){
-    sleep(stoi((string) command["delay"]));
-    if((command["functionality"].dump()).compare("perf")){
-        agentCommand(command["functionality"].dump(), command["command"].dump());
+    if(!command["delay"].is_null())
+        sleep(stoi((string) command["delay"]));
+    if((command["functionality"].get<std::string>()).compare("perf")){
+        agentCommand(command["functionality"].get<std::string>(), command["command"].get<std::string>());
+    } else{
+        sendPerfDataToClient(command["time"]);
     }
 }
 
@@ -167,9 +173,15 @@ void Server::handleAgentData(string data)
 
 void Server::handleClientCommand(string command, string from)
 {
-    if (command == "perf")
-    {
-        sendPerfDataToClient();
+    json com;
+    try{
+        com = json::parse(command);
+        execCommand(com);
+    } catch( ... ){
+        if (command == "perf")
+        {
+            sendPerfDataToClient(3); // remove?
+        }
     }
 
     loggingClient->logData(command, from);
@@ -197,7 +209,7 @@ void Server::handleMessagingClients()
 
 }
 
-void Server::sendPerfDataToClient(void)
+void Server::sendPerfDataToClient(int time)
 {
     pid_t pid, currPid;
     json perfData;
@@ -213,7 +225,7 @@ void Server::sendPerfDataToClient(void)
 
     if (pid == 0)
     {
-        perfData = perfProcess(currPid, 3);
+        perfData = perfProcess(currPid, time);
         std::string perfStr;
         perfStr = perfData.dump();
         

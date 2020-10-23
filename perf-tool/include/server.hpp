@@ -60,7 +60,7 @@ private:
 
     void sendMessage(int socketFd, std::string message);
 
-    void sendPerfDataToClient(void);
+    void sendPerfDataToClient(int time);
 };
 
 #endif /* SERVER_H_ */

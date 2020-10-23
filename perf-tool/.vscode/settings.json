@@ -2,6 +2,7 @@
     "files.associations": {
         "ratio": "cpp",
         "xstring": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "xlocale": "cpp"
     }
 }

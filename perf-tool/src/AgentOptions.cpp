@@ -1,5 +1,6 @@
 #include <jvmti.h>
 #include "objectalloc.h"
+#include "methodentry.h"
 #include "infra.h"
 #include <string>
 #include <cstring>

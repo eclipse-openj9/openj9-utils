@@ -1,3 +1,6 @@
+// TODO: object count
+
+
 #include <jvmti.h>
 #include <string.h>
 #include "objectalloc.h"
@@ -13,9 +16,26 @@
 #include <iomanip>
 #include <ctime>
 #include <chrono>
+#include <atomic>
 
 using json = nlohmann::json;
 using namespace std::chrono;
+
+
+std::atomic<bool> objAllocBackTraceEnabled;
+std::atomic<bool> rateEnabled;
+
+// Enables or disables the back trace option
+void setObjAllocBackTrace(bool val){
+    objAllocBackTraceEnabled = val;
+    return;
+}
+
+// Enables or disables the rate option
+void setRate(bool val){
+    rateEnabled = val;
+    return;
+}
 
 JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv, 
                         JNIEnv* env, 
@@ -24,6 +44,7 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
                         jclass object_klass, 
                         jlong size) {
     jvmtiError err;
+
     json jObj;
     char *className;
     auto start = steady_clock::now();
@@ -42,6 +63,7 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
     // // Now get the c string from the java jstring object
     // const char* str = env->GetStringUTFChars(strObj, NULL);
     // // record calling class
+    // printf("objName: %s", str);
     // jObj["objName"] = str;
     // // Release the memory pinned char array
     // env->ReleaseStringUTFChars(strObj, str);
@@ -55,62 +77,66 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
         jObj["objSizeInBytes"] = (jint)size;
     }
 
-    char *methodName;
-    char *methodSignature;
-    char *declaringClassName;
-    jclass declaring_class;
-    jint entry_count_ptr;
-    jvmtiLineNumberEntry* table_ptr;
-    jlocation start_loc_ptr;
-    jlocation end_loc_ptr;
 
-    // print stack trace
-    int numFrames = 10;
-    jvmtiFrameInfo frames[numFrames];
-    jint count;
-    int i;
-    /*** get information about backtrace at object allocation sites ***/
-    // int sze = 0;
-    auto jMethods = json::array();
-    err = jvmtiEnv->GetStackTrace(NULL, 0, numFrames, frames, &count);
-    if (err == JVMTI_ERROR_NONE && count >= 1) {
-        for (i = 0; i < count; i++) {
-            json jMethod;
-            err = jvmtiEnv->GetMethodName(frames[i].method, &methodName, &methodSignature, NULL);
-            if (err == JVMTI_ERROR_NONE) {
-                err = jvmtiEnv->GetMethodDeclaringClass(frames[i].method, &declaring_class);
-                err = jvmtiEnv->GetMethodLocation(frames[i].method, &start_loc_ptr, &end_loc_ptr);
-                err = jvmtiEnv->GetClassSignature(declaring_class, &declaringClassName, NULL);
-                err = jvmtiEnv->GetLineNumberTable(frames[i].method, &entry_count_ptr, &table_ptr);
+    /*** get information about backtrace at object allocation sites if enabled***/
+    if (objAllocBackTraceEnabled) {
+        char *methodName;
+        char *methodSignature;
+        char *declaringClassName;
+        jclass declaring_class;
+        jint entry_count_ptr;
+        jvmtiLineNumberEntry* table_ptr;
+        jlocation start_loc_ptr;
+        jlocation end_loc_ptr;
+        int numFrames = 10;
+        jvmtiFrameInfo frames[numFrames];
+        jint count;
+        int i;
+        // int sze = 0;
+        auto jMethods = json::array();
+        err = jvmtiEnv->GetStackTrace(NULL, 0, numFrames, frames, &count);
+        if (err == JVMTI_ERROR_NONE && count >= 1) {
+            for (i = 0; i < count; i++) {
+                json jMethod;
+                err = jvmtiEnv->GetMethodName(frames[i].method, &methodName, &methodSignature, NULL);
                 if (err == JVMTI_ERROR_NONE) {
-                    jMethod["methodName"] = methodName;
-                    jMethod["methodSignature"] = methodSignature;
-                    jMethod["lineNum"] = table_ptr->line_number;
-                    jMethods.push_back(jMethod);
-                    // printf("at method %s in class %s\n", methodName, declaringClassName);
-                    // printf("method signature: %s\n", methodSignature);
-                    // printf("line number %i\n", table_ptr->line_number);
-                    // sze += sizeof(declaring_class);
+                    err = jvmtiEnv->GetMethodDeclaringClass(frames[i].method, &declaring_class);
+                    err = jvmtiEnv->GetMethodLocation(frames[i].method, &start_loc_ptr, &end_loc_ptr);
+                    err = jvmtiEnv->GetClassSignature(declaring_class, &declaringClassName, NULL);
+                    err = jvmtiEnv->GetLineNumberTable(frames[i].method, &entry_count_ptr, &table_ptr);
+                    if (err == JVMTI_ERROR_NONE) {
+                        jMethod["methodName"] = methodName;
+                        jMethod["methodSignature"] = methodSignature;
+                        jMethod["lineNum"] = table_ptr->line_number;
+                        jMethods.push_back(jMethod);
+                        // printf("at method %s in class %s\n", methodName, declaringClassName);
+                        // printf("method signature: %s\n", methodSignature);
+                        // printf("line number %i\n", table_ptr->line_number);
+                        // sze += sizeof(declaring_class);
+                    }
                 }
             }
-        }
-    } 
-    jObj["objBackTrace"] = jMethods;
-    // jObj["combinedDeclaredSize"] = sze;
+        } 
 
-    // err = jvmtiEnv->Deallocate((void*)className);
-    // err = jvmtiEnv->Deallocate((void*)methodName);
-    // err = jvmtiEnv->Deallocate((void*)declaringClassName);
-    
-    /*** calculate time taken in microseconds ***/
-    auto end = steady_clock::now();
-    auto duration = duration_cast<microseconds>(end - start).count();
-    float rate = (float)size/duration;
-    jObj["objAllocRateInBytesPerMicrosec"] = rate;
+        jObj["objBackTrace"] = jMethods;
+        // jObj["combinedDeclaredSize"] = sze;
+    }
+
+    /*** calculate time taken in microseconds and calculate rate if enabled ***/
+    if (rateEnabled) {
+        auto end = steady_clock::now();
+        auto duration = duration_cast<microseconds>(end - start).count();
+        float rate = (float)size/duration;
+        jObj["objAllocRateInBytesPerMicrosec"] = rate;
+    }
+
     json j;
     j["object"] = jObj; 
-
     std::string s = j.dump();
-    printf("\n%s\n", s.c_str());
-    sendMessageToClients(j.dump());
+    // printf("\n%s\n", s.c_str());
+    sendMessageToClients(s);
+
+    // err = jvmtiEnv->Deallocate((unsigned char*)methodSignature);
+    // err = jvmtiEnv->Deallocate((unsigned char*)methodName);
+    // err = jvmtiEnv->Deallocate((unsigned char*)declaringClassName);
 }

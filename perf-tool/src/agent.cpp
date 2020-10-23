@@ -5,6 +5,7 @@
 #include "monitor.h"
 #include "json.hpp"
 #include "objectalloc.h"
+#include "methodentry.h"
 #include "AgentOptions.hpp"
 #include "server.hpp"
 #include <stdio.h> 
@@ -13,22 +14,6 @@
 #include <thread>
 
 using json = nlohmann::json;
-
-JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
-            JNIEnv* jni_env,
-            jthread thread,
-            jmethodID method) {
-    /*jvmtiError err;
-    json j;
-    char *methodName;
-    err = jvmtiEnv->GetMethodName(method, &methodName, NULL, NULL);
-    if (err == JVMTI_ERROR_NONE && strcmp(methodName, "doBatch") == 0) {
-        j["methodName"] = methodName;
-        std::string s = j.dump();
-
-        printf("\n%s\n", s.c_str());
-    }*/
-}
 
 void testFunc(){
     printf("TESTING --------------------------------------------------------------------------------------------\n");
@@ -46,7 +31,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     std::string pathDelim = ":";
     std::string oIn = (std::string) options;
     int pos1, pos2 = 0;
-    portNo = 9002;
+    portNo = 9005;
     if(!oIn.empty()){
         // there is a max of two options the user can supply here
         // "commands" is followed by a path to the commands file

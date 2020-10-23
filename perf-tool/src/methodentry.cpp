@@ -1,10 +1,10 @@
 #include <jvmti.h>
 #include <string.h>
 #include "AgentOptions.hpp"
-#include "methodentry.h"
+#include "methodentry.hpp"
 #include "json.hpp"
 #include "server.hpp"
-#include "infra.h"
+#include "infra.hpp"
 
 #include <iostream>
 

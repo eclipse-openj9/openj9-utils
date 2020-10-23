@@ -1,6 +1,4 @@
 // TODO: object count
-
-
 #include <jvmti.h>
 #include <string.h>
 
@@ -8,7 +6,7 @@
 #include "infra.hpp"
 #include "json.hpp"
 #include "server.hpp"
-#include "infra.h"
+#include "infra.hpp"
 
 #include <iostream>
 #include <chrono>
@@ -20,7 +18,7 @@
 #include <atomic>
 
 using json = nlohmann::json;
-
+using namespace std::chrono;
 
 std::atomic<bool> objAllocBackTraceEnabled;
 std::atomic<bool> rateEnabled;
@@ -134,7 +132,7 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
     j["object"] = jObj; 
     std::string s = j.dump();
     // printf("\n%s\n", s.c_str());
-    sendMessageToClients(s);
+    sendToServer(s);
 
     // err = jvmtiEnv->Deallocate((unsigned char*)methodSignature);
     // err = jvmtiEnv->Deallocate((unsigned char*)methodName);

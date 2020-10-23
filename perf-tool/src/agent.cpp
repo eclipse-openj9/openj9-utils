@@ -1,36 +1,17 @@
 #include <jvmti.h>
 #include <iostream>
-<<<<<<< HEAD
-#include "infra.h"
-#include "monitor.h"
-#include "json.hpp"
-#include "objectalloc.h"
-#include "methodentry.h"
-#include "AgentOptions.hpp"
-#include "server.hpp"
-=======
->>>>>>> 8172911580f136666804d4b6a54866075c59cd23
 #include <stdio.h> 
 #include <string.h>
 #include <sys/types.h> 
 #include <thread>
 #include <unistd.h> 
 
-<<<<<<< HEAD
-using json = nlohmann::json;
-
-void testFunc(){
-    printf("TESTING --------------------------------------------------------------------------------------------\n");
-}
-
-=======
 #include "AgentOptions.hpp"
 #include "infra.hpp"
 #include "monitor.hpp"
 #include "json.hpp"
 #include "objectalloc.hpp"
 #include "server.hpp"
->>>>>>> 8172911580f136666804d4b6a54866075c59cd23
 
 using json = nlohmann::json;
 

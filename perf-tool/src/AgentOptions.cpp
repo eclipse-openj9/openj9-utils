@@ -1,7 +1,7 @@
 #include <jvmti.h>
-#include "objectalloc.h"
-#include "methodentry.h"
-#include "infra.h"
+#include "objectalloc.hpp"
+#include "methodentry.hpp"
+#include "infra.hpp"
 #include <string>
 #include <cstring>
 #include <jvmti.h>

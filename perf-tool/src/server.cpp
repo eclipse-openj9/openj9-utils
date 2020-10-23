@@ -31,6 +31,13 @@ struct pollfd pollFds[BASE_POLLS+NUM_CLIENTS];
 string logFilePath;
 string commandsFilePath;
 
+void execCommand(json command){
+    sleep(stoi((std::string) command["delay"]));
+    if((command["functionality"].dump()).compare("perf")){
+        agentCommand(command["functionality"].get<string>(), command["command"].get<string>());
+    }
+}
+
 void NetworkClient::sendMessage(std::string message) {
     const char *cstring = message.c_str();
     send(socketFd, cstring, strlen(cstring), 0);
@@ -42,6 +49,7 @@ void NetworkClient::sendMessage(std::string message) {
 
 void NetworkClient::handlePoll(char buffer[]) {
     int n = read(socketFd, buffer, 255);
+    json command;
     string s = string(buffer);
     s.pop_back();
 
@@ -49,10 +57,15 @@ void NetworkClient::handlePoll(char buffer[]) {
         error("ERROR reading from socket");
     } else if (n > 0) {
         // TODO handle client input
-        handleAgentData(s.c_str());
+        try{
+           command =  json::parse(s);
+           execCommand(command);
+        }
+        catch(...){
+           handleAgentData(s.c_str()); 
+        }
+        
         loggingClient->logData(s, "Client");
-
-
     }
 }
 
@@ -62,12 +75,7 @@ void LoggingClient::logData(string message, string recievedFrom) {
     }
 }
 
-void execCommand(json command){
-    sleep(stoi((std::string) command["delay"]));
-    if((command["functionality"].dump()).compare("perf")){
-        agentCommand(command["functionality"].dump(), command["command"].dump());
-    }
-}
+
 
 string CommandClient::handlePoll() {
     
@@ -78,9 +86,9 @@ string CommandClient::handlePoll() {
             execCommand(commands[commandNumber]);
             loggingClient -> logData(commands[commandNumber].dump(), "Command File");
             commandNumber++;
-        } else{
-            HEADLESS_MODE = false; // stop executing headless commands when no more commands
-        }
+        }// else{
+        //    HEADLESS_MODE = false; // stop executing headless commands when no more commands
+        //}
     } else {
         commandInterval = commandInterval - POLL_INTERVAL;
     }

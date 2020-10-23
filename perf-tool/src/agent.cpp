@@ -30,10 +30,6 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
     }*/
 }
 
-void testFunc(){
-    printf("TESTING --------------------------------------------------------------------------------------------\n");
-}
-
 jvmtiEnv *jvmti;
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
     std::string commandsPath;
@@ -84,6 +80,8 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
 
         }
 
+        std::cout << commandsPath << " HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE" << std::endl;
+        std::cout << logPath << " HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE" << std::endl;
 
     if(!commandsPath.empty()) passPathToCommandFile(commandsPath);
     if(!logPath.empty()) passPathToLogFile(logPath);

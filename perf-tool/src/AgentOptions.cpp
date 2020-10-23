@@ -14,12 +14,13 @@ void modifyMonitorEvents(std::string function, std::string command){
     jvmtiCapabilities capa;
     jvmtiError error;
 
+    (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
     error = jvmti -> GetCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Unable to get current capabilties");
     if(capa.can_generate_monitor_events){
         if( !command.compare("stop")){
             (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-            capa.can_generate_vm_object_alloc_events = 1;
+            capa.can_generate_monitor_events = 1;
 
             error = jvmti -> RelinquishCapabilities(&capa);
             check_jvmti_error(jvmti, error, "Unable to relinquish \n");
@@ -50,6 +51,7 @@ void modifyObjectAllocEvents(std::string function, std::string command){
     jvmtiCapabilities capa;
     jvmtiError error;
 
+    (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
     error = jvmti -> GetCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Unable to get current capabilties");
     if(capa.can_generate_vm_object_alloc_events){
@@ -92,12 +94,13 @@ void agentCommand(std::string function, std::string command){
     jvmti -> GetPhase(&phase);
     if(!(phase == JVMTI_PHASE_ONLOAD || phase == JVMTI_PHASE_LIVE)){
         check_jvmti_error(jvmti, JVMTI_ERROR_WRONG_PHASE, "AGENT CANNOT RECEIVE COMMANDS DURING THIS PHASE\n");
-    } else{        
+    } else{
+         error = jvmti -> GetCapabilities(&capa);
+        check_jvmti_error(jvmti, error, "Unable to get current capabilties");        
         if(!function.compare("monitorEvents")){
             modifyMonitorEvents(function, command);
         } else if(!function.compare("objectAllocEvents")){
-            modifyObjectAllocEvents(function, command);
-                
+            modifyObjectAllocEvents(function, command);    
         }
     }
     return;

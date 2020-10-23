@@ -1,1 +1,4 @@
-{"event":"monitors", "command":"start", delay:3}
+[{"functionality":"monitorEvents", "command":"start", "delay":"0"},
+{"functionality":"objectAllocEvents", "command":"start", "delay":"0"},
+{"functionality":"monitorEvents", "command":"stop", "delay":"4"},
+{"functionality":"objectAllocEvents", "command":"stop", "delay":"6"}]

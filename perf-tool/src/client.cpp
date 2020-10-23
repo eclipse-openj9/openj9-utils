@@ -84,12 +84,14 @@ int main(int argc, char *argv[])
                 error("ERROR reading from socket");
             }
 
-            printf("Recieved: %s\n", buffer);
+            if (n > 0) {
+                printf("Recieved: %s\n", buffer);
 
-            if (std::string(buffer).substr(strlen(buffer) - 4, 4) == "done") {
-                printf("done received");
-                close(sockfd);
-                break;
+                if (std::string(buffer).substr(strlen(buffer) - 4, 4) == "done") {
+                    close(sockfd);
+                    printf("Closed connection with server.\n");
+                    break;
+                }
             }
         }
     }

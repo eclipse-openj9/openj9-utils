@@ -2,7 +2,7 @@
 #include <thread>
 #include <string.h>
 
-#include "infra.h"
+#include "infra.hpp"
 #include "server.hpp"
 
 Server *server;

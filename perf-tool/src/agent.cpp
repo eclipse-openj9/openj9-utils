@@ -7,10 +7,10 @@
 #include <unistd.h> 
 
 #include "AgentOptions.hpp"
-#include "infra.h"
-#include "monitor.h"
+#include "infra.hpp"
+#include "monitor.hpp"
 #include "json.hpp"
-#include "objectalloc.h"
+#include "objectalloc.hpp"
 #include "server.hpp"
 
 using json = nlohmann::json;

@@ -47,24 +47,6 @@ CommandClient::CommandClient(std::string filename) {
     commands = json::parse(commandsFile);
 }
 
-// string CommandClient::handlePoll()
-// {
-//     if (currentInterval <= 0)
-//     {
-//         getline(commandsFile, prevCommand);
-//         if (!commandsFile.eof())
-//         {
-//             currentInterval = ServerConstants::COMMAND_INTERVALS;
-//             return prevCommand;
-//         }
-//     }
-//     else
-//     {
-//         currentInterval = currentInterval - ServerConstants::POLL_INTERVALS;
-//     }
-
-//     return "";
-// }
 json CommandClient::handlePoll() {
     static int commandNumber = 0;
     static const int numCommands = commands.size();
@@ -72,8 +54,11 @@ json CommandClient::handlePoll() {
     
     if (currentInterval <= 0) {
         if(commandNumber < numCommands){
-            return commands[commandNumber++];
+            commandNumber++;
+            auto s = std::to_string(commandNumber);
+            return commands[s];
         }
+        currentInterval = ServerConstants::COMMAND_INTERVALS;
     } else {
         currentInterval = currentInterval - ServerConstants::POLL_INTERVALS;
     }

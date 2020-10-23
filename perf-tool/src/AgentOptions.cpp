@@ -1,13 +1,14 @@
-#include <jvmti.h>
-#include "objectalloc.h"
-#include "infra.h"
-#include <string>
 #include <cstring>
-#include "AgentOptions.hpp"
-#include "monitor.h"
-#include <unistd.h>
+#include <jvmti.h>
 #include <stdio.h>
 #include <iostream>
+#include <string>
+#include <unistd.h>
+
+#include "AgentOptions.hpp"
+#include "infra.hpp"
+#include "monitor.hpp"
+#include "objectalloc.hpp"
 
 
 void modifyMonitorEvents(std::string function, std::string command){

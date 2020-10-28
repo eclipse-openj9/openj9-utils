@@ -14,8 +14,8 @@
 
 const perfFieldRegex mapRegex[PERF_FIELD_MAX] = {
     {"unknown", "(.*)"},                        // PERF_FIELD_UNKNOWN
-    {"prog", "\\s+([^\\s]+)"},                  // PERF_FIELD_PROG
-    {"pid", "\\s+([^\\s]+)"},                   // PERF_FIELD_PID
+    {"prog", "\\s+(.+)[\\s]{2,}"},              // PERF_FIELD_PROG
+    {"pid", "\\s*([0-9]+)"},                    // PERF_FIELD_PID
     {"cpu", "\\s+([^\\s]+)"},                   // PERF_FIELD_CPU
     {"time", "\\s+([^\\s]+):"},                 // PERF_FIELD_TIME
     {"cycles", "\\s+([^\\s]+\\s+)cycles:"},     // PERF_FIELD_CYCLES
@@ -30,20 +30,21 @@ json perfProcess(pid_t processID, int recordTime) {
     * Inputs:	pid_t 	processID:	process ID of running application.
     * Outputs:	json	perf_data:	perf data collected from application.
     * */
-    // char* pidStr = (char*)std::to_string(processID).c_str();
+
+    pid_t pid;
+    int fd, status;
     std::string pidStr = std::to_string(processID); // define unique id for each line
     char* pidCharArr = (char*)pidStr.c_str();
-    char *args[5] = {"/usr/bin/perf", "record", "-p", pidCharArr, NULL};
-    printf("HELLOWORLD %s\n", pidCharArr);
+    char* perfPath = (char*)"/usr/bin/perf";
+    char* perfRecord = (char*)"record";
+    char* perfPidFlag = (char*)"-p";
+    char *args[5] = {perfPath, perfRecord, perfPidFlag, pidCharArr, NULL};
 
     // Change to /tmp folder to store the perf data
     if (chdir("/tmp") == -1) {
         perror("chdir");
         _exit(1);
     }
-
-    pid_t pid;
-    int fd, status;
 
     if ((pid = fork()) == -1) {
         perror("fork");
@@ -76,28 +77,27 @@ json perfProcess(pid_t processID, int recordTime) {
         std::smatch matches;
 
         // To-do: make this into string array that is indexed by enum (enum containing options)
-        std::string progExpression ("\\s+([^\\s]+)");
-        std::string pidExpression ("\\s+([^\\s]+)");
+        std::string progExpression ("\\s+(.+)[\\s]{2,}");
+        std::string pidExpression ("\\s*([0-9]+)");
         std::string cpuExpression ("\\s+([^\\s]+)");
         std::string timeExpression ("\\s+([^\\s]+):");
-        std::string cyclesExpression ("\\s+([^\\s]+\\s+)cycles:");
+        std::string cyclesExpression ("\\s+([^\\s]+)\\s+cycles:");
         std::string addressExpression ("\\s+([^\\s]+)");
         std::string instructionExpression ("\\s+([^\\s]+)");
         std::string pathExpression ("\\s+([^\\s]+)");
 
-        std::regex expression (progExpression + pidExpression + cpuExpression + timeExpression + cyclesExpression + addressExpression + instructionExpression + pathExpression);
+        std::regex expression (progExpression + pidExpression + timeExpression + cyclesExpression + addressExpression + instructionExpression + pathExpression + "$");
 
         if (std::regex_search(lineStr, matches, expression)) {
             // Put into JSON object
             std::string idStr = std::to_string(idCount); // define unique id for each line
             perfData[idStr]["prog"] = matches[1].str().c_str();
             perfData[idStr]["pid"] = matches[2].str().c_str();
-            perfData[idStr]["cpu"] = matches[3].str().c_str();
-            perfData[idStr]["time"] = matches[4].str().c_str();
-            perfData[idStr]["cycles"] = matches[5].str().c_str();
-            perfData[idStr]["address"] = matches[6].str().c_str();
-            perfData[idStr]["instruction"] = matches[7].str().c_str();
-            perfData[idStr]["path"] = matches[8].str().c_str();
+            perfData[idStr]["time"] = matches[3].str().c_str();
+            perfData[idStr]["cycles"] = matches[4].str().c_str();
+            perfData[idStr]["address"] = matches[5].str().c_str();
+            perfData[idStr]["instruction"] = matches[6].str().c_str();
+            perfData[idStr]["path"] = matches[7].str().c_str();
             perfData[idStr]["record"] = lineStr.c_str();
             idCount++;
         }

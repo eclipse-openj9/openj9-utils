@@ -2,7 +2,7 @@
 #include <jvmti.h>
 #include <string.h>
 
-#include "AgentOptions.hpp"
+#include "agentOptions.hpp"
 #include "infra.hpp"
 #include "json.hpp"
 #include "server.hpp"
@@ -20,8 +20,8 @@
 using json = nlohmann::json;
 using namespace std::chrono;
 
-std::atomic<bool> objAllocBackTraceEnabled;
-std::atomic<bool> rateEnabled;
+std::atomic<bool> objAllocBackTraceEnabled {true};
+std::atomic<bool> rateEnabled {true};
 
 // Enables or disables the back trace option
 void setObjAllocBackTrace(bool val){

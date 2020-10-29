@@ -6,7 +6,7 @@
 #include <thread>
 #include <unistd.h> 
 
-#include "AgentOptions.hpp"
+#include "agentOptions.hpp"
 #include "infra.hpp"
 #include "monitor.hpp"
 #include "json.hpp"

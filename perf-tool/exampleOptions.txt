@@ -6,7 +6,7 @@
   },
   {
     "functionality": "perf",
-    "time": "1"
+    "time": 1
   },
   {
     "functionality": "objectAllocEvents",

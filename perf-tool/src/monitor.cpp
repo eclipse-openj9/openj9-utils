@@ -1,7 +1,7 @@
 #include <atomic>
 #include <jvmti.h>
 
-#include "AgentOptions.hpp"
+#include "agentOptions.hpp"
 #include "infra.hpp"
 #include "json.hpp"
 

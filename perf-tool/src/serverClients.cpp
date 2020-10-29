@@ -55,7 +55,11 @@ void LoggingClient::closeFile(void)
 {
     if (logFile.is_open())
     {
-        logFile << "]" << endl;
+        // Delete last comma to make a proper json array
+        long currentPos = logFile.tellp();
+        logFile.seekp(currentPos - 2);
+        logFile << '\n' << "]" << endl;
+        
         logFile.close();
     }
 }

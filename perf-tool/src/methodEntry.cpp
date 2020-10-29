@@ -1,7 +1,7 @@
 #include <jvmti.h>
 #include <string.h>
-#include "AgentOptions.hpp"
-#include "methodentry.hpp"
+#include "agentOptions.hpp"
+#include "methodEntry.hpp"
 #include "json.hpp"
 #include "server.hpp"
 #include "infra.hpp"

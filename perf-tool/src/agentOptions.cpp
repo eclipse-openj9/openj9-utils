@@ -1,6 +1,6 @@
 #include <jvmti.h>
 #include "objectalloc.hpp"
-#include "methodentry.hpp"
+#include "methodEntry.hpp"
 #include "infra.hpp"
 #include <string>
 #include <cstring>
@@ -10,7 +10,7 @@
 #include <string>
 #include <unistd.h>
 
-#include "AgentOptions.hpp"
+#include "agentOptions.hpp"
 #include "infra.hpp"
 #include "monitor.hpp"
 #include "objectalloc.hpp"
@@ -33,7 +33,7 @@ void modifyMonitorEvents(std::string function, std::string command){
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEntered event.");
         } else{ // c == start
-            printf("Monitor Events already enabled");
+            printf("Monitor Events already enabled\n");
         }
     } else{ // cannot generate monitor events
         if(!command.compare("start")){
@@ -46,7 +46,7 @@ void modifyMonitorEvents(std::string function, std::string command){
             error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to enable MonitorContendedEntered event notifications.");
         } else{ // c == stop
-            printf("Monitor Events already disabled");
+            printf("Monitor Events already disabled\n");
         }
     }
     return;

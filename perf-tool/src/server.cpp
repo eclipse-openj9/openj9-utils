@@ -14,7 +14,7 @@
 #include "perf.hpp"
 #include "utils.hpp"
 #include <fstream>
-#include "AgentOptions.hpp"
+#include "agentOptions.hpp"
 
 using namespace std;
 using json = nlohmann::json;
@@ -24,7 +24,6 @@ pid_t perfPid = -1;
 Server::Server(int portNo, string commandFileName, string logFileName)
 {
     this->portNo = portNo;
-    loggingClient = new LoggingClient(logFileName);
 
     if (commandFileName != "")
     {
@@ -34,6 +33,9 @@ Server::Server(int portNo, string commandFileName, string logFileName)
     {
         headlessMode = false;
     }
+
+    loggingClient = new LoggingClient(logFileName);
+    loggingClient->logData("Server started", "Server");
 }
 
 void Server::handleServer()
@@ -221,8 +223,8 @@ void Server::sendPerfDataToClient(int time)
         std::string perfStr;
         perfStr = perfData.dump();
 
-        loggingClient->logData(perfStr, "perf");
         messageQueue.push(perfStr);
+        loggingClient->logData(perfStr, "perf");
 
         exit(EXIT_SUCCESS);
     }

@@ -244,6 +244,54 @@ void modifyExceptionEvents(std::string function, std::string command){
     return;
 }
 
+void modifyExceptionBackTrace(std::string function, std::string command){
+    // enable stack trace
+    if (!command.compare("start")){
+        setExceptionBackTrace(true);
+    } else if (!command.compare("stop")){
+        setExceptionBackTrace(false);
+    } else{
+        invalidCommand(function, command);
+    }
+}
+
+void modifyExceptionEvents(std::string function, std::string command){
+    jvmtiCapabilities capa;
+    jvmtiError error;
+
+    (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+    error = jvmti->GetCapabilities(&capa);
+    check_jvmti_error(jvmti, error, "Unable to get current capabilties\n");
+    if(capa.can_generate_exception_events){
+        if( !command.compare("stop")){
+            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+            capa.can_generate_exception_events = 1;
+
+            error = jvmti->RelinquishCapabilities(&capa);
+            check_jvmti_error(jvmti, error, "Unable to relinquish\n");
+            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_EXCEPTION, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to disable Exception event.\n");
+        } else{ // currently started
+            printf("Exception events already enabled\n");
+        }
+    } else{ // cannot generate exception events
+        if(!command.compare("start")){
+            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+            capa.can_generate_exception_events = 1;
+            printf("start received\n");
+
+            error = jvmti->AddCapabilities(&capa);
+            check_jvmti_error(jvmti, error, "Unable to init exception events capability\n");
+
+            error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_EXCEPTION, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to enable Exception event notifications.\n");
+        } else{ // currently stopped
+            printf("Exception events already disabled\n");
+        }
+    }
+    return;
+}
+
 
 
 void agentCommand(json jCommand){
@@ -278,6 +326,10 @@ void agentCommand(json jCommand){
             modifyMonitorStackTrace(function, command);
         } else if(!function.compare("methodEntryEvents")){
             modifyMethodEntryEvents(function, command, sampleRate);
+        } else if(!function.compare("exceptionEvents")){
+            modifyExceptionEvents(function, command);
+        } else if(!function.compare("exceptionBackTrace")) {
+            modifyExceptionBackTrace(function, command);
         } else {
             invalidFunction(function, command);
         }

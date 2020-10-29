@@ -119,8 +119,7 @@ json CommandClient::handlePoll()
     {
         if (commandNumber < numCommands)
         {
-            commandNumber++;
-            return commands[commandNumber];
+            return commands[commandNumber++];
         }
         currentInterval = ServerConstants::COMMAND_INTERVALS;
     }

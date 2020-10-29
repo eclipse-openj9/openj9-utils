@@ -18,7 +18,7 @@ using json = nlohmann::json;
 jvmtiEnv *jvmti;
 int portNo;
 std::string commandsPath = "";
-std::string logPath = "logs.txt";
+std::string logPath = "logs.json";
 
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
     std::string token;

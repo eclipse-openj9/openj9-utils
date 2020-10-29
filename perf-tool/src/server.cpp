@@ -164,12 +164,6 @@ void Server::execCommand(json command)
     }
 }
 
-void Server::handleAgentData(string data)
-{
-    messageQueue.push(data);
-    loggingClient->logData(data, "Agent");
-}
-
 void Server::handleClientCommand(string command, string from)
 {
     json com;
@@ -202,7 +196,7 @@ void Server::handleMessagingClients()
             int clientSocketFd = networkClients[i]->getSocketFd();
             sendMessage(clientSocketFd, messageQueue.front());
         }
-        loggingClient->logData(messageQueue.front(), "Server");
+        loggingClient->logData(messageQueue.front(), "Agent");
 
         messageQueue.pop();
     }
@@ -231,7 +225,6 @@ void Server::sendPerfDataToClient(int time)
         messageQueue.push(perfStr);
 
         exit(EXIT_SUCCESS);
-
     }
 }
 
@@ -239,7 +232,8 @@ void Server::shutDownServer()
 {
     keepPolling = false;
 
-    if (perfPid != -1) {
+    if (perfPid != -1)
+    {
         int status;
         cout << "Waiting on perf data." << endl;
         waitpid(perfPid, &status, WCONTINUED);

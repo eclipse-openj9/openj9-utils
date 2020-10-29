@@ -47,7 +47,6 @@ JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread threa
 
     error = jvmtiEnv -> RunAgentThread( createNewThread(jni_env),&startServer, portPointer, JVMTI_THREAD_NORM_PRIORITY );
     check_jvmti_error(jvmtiEnv, error, "Error starting agent thread\n");
-    sendToServer("VM init");
     printf("VM starting up\n");
 }
 

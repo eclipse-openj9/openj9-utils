@@ -20,7 +20,7 @@ void setStackTrace(bool val){
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, jthread thread, jobject object) {
     json j;
     jvmtiError error;
-    static std::map<const char*, std::atomic<int>> numContentions;
+    static std::map<const char*, ClassCycleInfo> numContentions;
     jclass cls = env->GetObjectClass(object);
     // First get the class object
     jmethodID mid = env->GetMethodID(cls, "getClass", "()Ljava/lang/Class;");
@@ -40,9 +40,9 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
     j["Class"] = str;
     printf("%s\n", j.dump().c_str());
 
-    numContentions[str]++;
+    numContentions[str].numFirstTier++;
 
-    int num = numContentions[str].load();
+    int num = numContentions[str].numFirstTier.load();
     j["numTypeContentions"] = num;
     // Release the memory pinned char array
     env->ReleaseStringUTFChars(strObj, str);

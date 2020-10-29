@@ -1,6 +1,7 @@
 #include <jvmti.h>
 #include "objectalloc.hpp"
 #include "methodEntry.hpp"
+#include "exception.hpp"
 #include "infra.hpp"
 #include <string>
 #include <cstring>
@@ -46,7 +47,7 @@ void modifyMonitorEvents(std::string function, std::string command){
         if(!command.compare("start")){
             (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
             capa.can_generate_monitor_events = 1;
-            
+
             error = jvmti -> AddCapabilities(&capa);
             check_jvmti_error(jvmti, error, "Unable to init monitor events capability");
 
@@ -60,7 +61,7 @@ void modifyMonitorEvents(std::string function, std::string command){
 }
 
 void modifyObjAllocBackTrace(std::string function, std::string command){
-    // enable back trace 
+    // enable back trace
     if (!command.compare("start")){
         setObjAllocBackTrace(true);
     } else if (!command.compare("stop")){
@@ -94,7 +95,7 @@ void modifyObjectAllocEvents(std::string function, std::string command){
         if(!command.compare("start")){
             (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
             capa.can_generate_vm_object_alloc_events = 1;
-            
+
             error = jvmti -> AddCapabilities(&capa);
             check_jvmti_error(jvmti, error, "Unable to init object alloc events capability");
 
@@ -108,7 +109,7 @@ void modifyObjectAllocEvents(std::string function, std::string command){
 }
 
 void modifyMonitorStackTrace(std::string function, std::string command){
-    // enable stack trace 
+    // enable stack trace
     if (!command.compare("start")){
         setMonitorStackTrace(true);
     } else if (!command.compare("stop")){
@@ -127,7 +128,8 @@ void modifyMethodEntryEvents(std::string function, std::string command){
     if(capa.can_generate_method_entry_events){
         if(!command.compare("stop")){
             (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-            
+            capa.can_generate_method_entry_events = 1;
+
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable MethodEntry event.\n");
         } else{ // c == start
@@ -136,6 +138,7 @@ void modifyMethodEntryEvents(std::string function, std::string command){
     }else{ // cannot generate method entry events
         if(!command.compare("start")){
             (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+            capa.can_generate_method_entry_events = 1;
 
             error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to enable MethodEntry event notifications.\n");
@@ -144,6 +147,54 @@ void modifyMethodEntryEvents(std::string function, std::string command){
         }
     }
 
+}
+
+void modifyExceptionBackTrace(std::string function, std::string command){
+    // enable stack trace
+    if (!command.compare("start")){
+        setExceptionBackTrace(true);
+    } else if (!command.compare("stop")){
+        setExceptionBackTrace(false);
+    } else{
+        invalidCommand(function, command);
+    }
+}
+
+void modifyExceptionEvents(std::string function, std::string command){
+    jvmtiCapabilities capa;
+    jvmtiError error;
+
+    (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+    error = jvmti->GetCapabilities(&capa);
+    check_jvmti_error(jvmti, error, "Unable to get current capabilties\n");
+    if(capa.can_generate_exception_events){
+        if( !command.compare("stop")){
+            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+            capa.can_generate_exception_events = 1;
+
+            error = jvmti->RelinquishCapabilities(&capa);
+            check_jvmti_error(jvmti, error, "Unable to relinquish\n");
+            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_EXCEPTION, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to disable Exception event.\n");
+        } else{ // currently started
+            printf("Exception events already enabled\n");
+        }
+    } else{ // cannot generate exception events
+        if(!command.compare("start")){
+            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+            capa.can_generate_exception_events = 1;
+            printf("start received\n");
+
+            error = jvmti->AddCapabilities(&capa);
+            check_jvmti_error(jvmti, error, "Unable to init exception events capability\n");
+
+            error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_EXCEPTION, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to enable Exception event notifications.\n");
+        } else{ // currently stopped
+            printf("Exception events already disabled\n");
+        }
+    }
+    return;
 }
 
 
@@ -158,17 +209,21 @@ void agentCommand(std::string function, std::string command){
         check_jvmti_error(jvmti, JVMTI_ERROR_WRONG_PHASE, "AGENT CANNOT RECEIVE COMMANDS DURING THIS PHASE\n");
     } else{
          error = jvmti -> GetCapabilities(&capa);
-        check_jvmti_error(jvmti, error, "Unable to get current capabilties");        
+        check_jvmti_error(jvmti, error, "Unable to get current capabilties");
         if(!function.compare("monitorEvents")){
             modifyMonitorEvents(function, command);
         } else if(!function.compare("objectAllocEvents")){
-            modifyObjectAllocEvents(function, command);    
+            modifyObjectAllocEvents(function, command);
         } else if(!function.compare("objAllocBackTrace")){
             modifyObjAllocBackTrace(function, command);
         } else if(!function.compare("monitorStackTrace")){
             modifyMonitorStackTrace(function, command);
         } else if(!function.compare("methodEntryEvents")){
             modifyMethodEntryEvents(function, command);
+        } else if(!function.compare("exceptionEvents")){
+            modifyExceptionEvents(function, command);
+        } else if(!function.compare("exceptionBackTrace")) {
+            modifyExceptionBackTrace(function, command);
         } else {
             invalidFunction(function, command);
         }

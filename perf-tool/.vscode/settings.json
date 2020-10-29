@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "ratio": "cpp",
-        "xstring": "cpp",
-        "chrono": "cpp",
-        "xlocale": "cpp"
-    }
-}

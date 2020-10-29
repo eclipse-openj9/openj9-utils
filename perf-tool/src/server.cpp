@@ -14,7 +14,7 @@
 #include "perf.hpp"
 #include "utils.hpp"
 #include <fstream>
-#include "AgentOptions.hpp"
+#include "agentOptions.hpp"
 
 using namespace std;
 using json = nlohmann::json;
@@ -24,7 +24,6 @@ pid_t perfPid = -1;
 Server::Server(int portNo, string commandFileName, string logFileName)
 {
     this->portNo = portNo;
-    loggingClient = new LoggingClient(logFileName);
 
     if (commandFileName != "")
     {
@@ -34,6 +33,9 @@ Server::Server(int portNo, string commandFileName, string logFileName)
     {
         headlessMode = false;
     }
+
+    loggingClient = new LoggingClient(logFileName);
+    loggingClient->logData("Server started", "Server");
 }
 
 void Server::handleServer()
@@ -164,12 +166,6 @@ void Server::execCommand(json command)
     }
 }
 
-void Server::handleAgentData(string data)
-{
-    messageQueue.push(data);
-    loggingClient->logData(data, "Agent");
-}
-
 void Server::handleClientCommand(string command, string from)
 {
     json com;
@@ -202,7 +198,7 @@ void Server::handleMessagingClients()
             int clientSocketFd = networkClients[i]->getSocketFd();
             sendMessage(clientSocketFd, messageQueue.front());
         }
-        loggingClient->logData(messageQueue.front(), "Server");
+        loggingClient->logData(messageQueue.front(), "Agent");
 
         messageQueue.pop();
     }
@@ -227,11 +223,10 @@ void Server::sendPerfDataToClient(int time)
         std::string perfStr;
         perfStr = perfData.dump();
 
-        loggingClient->logData(perfStr, "perf");
         messageQueue.push(perfStr);
+        loggingClient->logData(perfStr, "perf");
 
         exit(EXIT_SUCCESS);
-
     }
 }
 
@@ -239,7 +234,8 @@ void Server::shutDownServer()
 {
     keepPolling = false;
 
-    if (perfPid != -1) {
+    if (perfPid != -1)
+    {
         int status;
         cout << "Waiting on perf data." << endl;
         waitpid(perfPid, &status, WCONTINUED);

@@ -7,7 +7,7 @@
 
 #include "json.hpp"
 
-using json = nlohmann::json; 
+using json = nlohmann::json;
 
 class ServerConstants
 {
@@ -17,7 +17,6 @@ public:
     static constexpr int POLL_INTERVALS = 100;
     static constexpr int COMMAND_INTERVALS = 500;
 };
-
 
 class NetworkClient
 {
@@ -35,25 +34,13 @@ private:
 protected:
 private:
 public:
-    NetworkClient(int fd)
-    {
-        socketFd = fd;
-    }
+    NetworkClient(int fd);
 
-    int getSocketFd(void)
-    {
-        return socketFd;
-    }
-
-    void closeFd(void)
-    {
-        close(socketFd);
-    }
-
+    int getSocketFd(void);
+    void closeFd(void);
     void sendMessage(std::string message);
     std::string handlePoll(char buffer[]);
 };
-
 
 class CommandClient
 {
@@ -77,13 +64,9 @@ private:
 public:
     CommandClient(std::string filename);
 
-    void closeFile(void)
-    {
-        commandsFile.close();
-    }
+    void closeFile(void);
     json handlePoll(void);
 };
-
 
 class LoggingClient
 {
@@ -103,11 +86,7 @@ private:
 public:
     LoggingClient(std::string filename);
 
-    void closeFile(void)
-    {
-        logFile.close();
-    }
-
+    void closeFile(void);
     void logData(std::string data, std::string recievedFrom);
 };
 

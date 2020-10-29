@@ -54,9 +54,7 @@ json CommandClient::handlePoll() {
     
     if (currentInterval <= 0) {
         if(commandNumber < numCommands){
-            commandNumber++;
-            auto s = std::to_string(commandNumber);
-            return commands[s];
+            return commands[commandNumber++];
         }
         currentInterval = ServerConstants::COMMAND_INTERVALS;
     } else {

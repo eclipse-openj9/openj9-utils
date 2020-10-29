@@ -77,8 +77,8 @@ json perfProcess(pid_t processID, int recordTime) {
         std::smatch matches;
 
         // To-do: make this into string array that is indexed by enum (enum containing options)
-        std::string progExpression ("\\s+(.+)[\\s]{2,}");
-        std::string pidExpression ("\\s*([0-9]+)");
+        std::string progExpression ("\\s+(.+)");
+        std::string pidExpression ("\\s+([0-9]+)");
         std::string cpuExpression ("\\s+([^\\s]+)");
         std::string timeExpression ("\\s+([^\\s]+):");
         std::string cyclesExpression ("\\s+([^\\s]+)\\s+cycles:");

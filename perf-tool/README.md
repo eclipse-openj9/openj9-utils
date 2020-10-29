@@ -27,8 +27,31 @@ Additionaly, each input should contain a delay field that indicates how long the
 
 All commands are provided in JSON format, where multiple commands are provided as a list. A sample command file might look like:
 ```
-[{"functionality":"monitorEvents", "command":"start", "delay":"0"},
-{"functionality":"objectAllocEvents", "command":"start", "delay":"0"},
-{"functionality":"monitorEvents", "command":"stop", "delay":"4"},
-{"functionality":"objectAllocEvents", "command":"stop", "delay":"6"}]
+[
+  {
+    "functionality": "monitorEvents",
+    "command": "start",
+    "delay": 0
+  },
+  {
+    "functionality": "perf",
+    "time": "1"
+  },
+  {
+    "functionality": "objectAllocEvents",
+    "command": "start",
+    "delay": 0
+  },
+  {
+    "functionality": "monitorEvents",
+    "command": "stop",
+    "delay": 4
+  },
+  {
+    "functionality": "objectAllocEvents",
+    "command": "stop",
+    "delay": 6
+  }
+]
+
 ```

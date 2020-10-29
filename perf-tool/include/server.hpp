@@ -9,7 +9,7 @@
 #include "serverClients.hpp"
 #include "json.hpp"
 
-using json = nlohmann::json; 
+using json = nlohmann::json;
 
 class Server
 {
@@ -19,6 +19,7 @@ class Server
 protected:
 public:
     std::queue<std::string> messageQueue;
+
 private:
     int serverSocketFd, activeNetworkClients = 0, portNo;
     bool headlessMode = true, keepPolling = true;
@@ -51,12 +52,8 @@ public:
     void execCommand(json command);
 
 private:
-
     /* Handles recieving commands for the agent from clients */
     void handleClientCommand(std::string command, std::string from);
-
-    /* Handles recieving data from agent */
-    void handleAgentData(std::string data);
 
     void sendMessage(int socketFd, std::string message);
 

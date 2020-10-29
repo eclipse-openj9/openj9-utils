@@ -84,7 +84,7 @@ void LoggingClient::logData(string message, string recievedFrom)
         }
         
         log["from"] = recievedFrom;
-        log["timestamp"] = std::ctime(&currentTime);
+        log["timestamp"] = currentTime;
         logFile << log.dump(2, ' ', true) << ',' << endl;
     }
 }

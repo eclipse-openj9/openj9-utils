@@ -69,7 +69,7 @@ void modifyObjectAllocEvents(std::string function, std::string command){
             check_jvmti_error(jvmti, error, "Unable to relinquish \n");
 
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEntered event.");
+            check_jvmti_error(jvmti, error, "Unable to disable ObjectAlloc event.");
         } else{ // c == start
         printf("Object Alloc Events already enabled");
         }
@@ -82,9 +82,38 @@ void modifyObjectAllocEvents(std::string function, std::string command){
             check_jvmti_error(jvmti, error, "Unable to init object alloc events capability");
 
             error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to enable ObjectAlloc event notifications.");
+            check_jvmti_error(jvmti, error, "Unable to enable VM ObjectAlloc event notifications.");
         } else{ // c == stop
             printf("Obect Alloc Events already disabled");
+        }
+    }
+
+}
+
+void modifyMethodEntryEvents(std::string function, std::string command){
+    jvmtiCapabilities capa;
+    jvmtiError error;
+
+    (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+    error = jvmti -> GetCapabilities(&capa);
+    check_jvmti_error(jvmti, error, "Unable to get current capabilties\n");
+    if(capa.can_generate_method_entry_events){
+        if(!command.compare("stop")){
+            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+            
+            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to disable MethodEntry event.\n");
+        } else{ // c == start
+        printf("Method Entry Events already enabled\n");
+        }
+    }else{ // cannot generate method entry events
+        if(!command.compare("start")){
+            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
+
+            error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to enable MethodEntry event notifications.\n");
+        } else{ // c == stop
+            printf("Method Entry Events already disabled\n");
         }
     }
 
@@ -107,6 +136,8 @@ void agentCommand(std::string function, std::string command){
             modifyMonitorEvents(function, command);
         } else if(!function.compare("objectAllocEvents")){
             modifyObjectAllocEvents(function, command);    
+        } else if(!function.compare("methodEntryEvents")){
+            modifyMethodEntryEvents(function, command);
         }
     }
     return;

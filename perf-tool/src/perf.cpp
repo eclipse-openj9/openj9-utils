@@ -95,9 +95,9 @@ json perfProcess(pid_t processID, int recordTime) {
             perfData[idStr]["pid"] = matches[2].str().c_str();
             perfData[idStr]["time"] = matches[3].str().c_str();
             perfData[idStr]["cycles"] = matches[4].str().c_str();
-            perfData[idStr]["address"] = matches[5].str().c_str();
-            perfData[idStr]["instruction"] = matches[6].str().c_str();
-            perfData[idStr]["path"] = matches[7].str().c_str();
+            perfData[idStr]["ip"] = matches[5].str().c_str();
+            perfData[idStr]["symbol+offset"] = matches[6].str().c_str();
+            perfData[idStr]["dso"] = matches[7].str().c_str();
             perfData[idStr]["record"] = lineStr.c_str();
             idCount++;
         }

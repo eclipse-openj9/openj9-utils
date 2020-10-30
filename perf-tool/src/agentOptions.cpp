@@ -15,6 +15,10 @@
 #include "monitor.hpp"
 #include "objectalloc.hpp"
 
+void invalidCommand(std::string function, std::string command){
+    printf("Invalid command with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str() );
+}
+
 
 void modifyMonitorEvents(std::string function, std::string command){
     jvmtiCapabilities capa;
@@ -90,6 +94,16 @@ void modifyObjectAllocEvents(std::string function, std::string command){
 
 }
 
+void modifyMonitorStackTrace(std::string function, std::string command){
+    // enable stack trace 
+    if (!command.compare("start")){
+        setMonitorStackTrace(true);
+    } else if (!command.compare("stop")){
+        setMonitorStackTrace(false);
+    } else{
+        invalidCommand(function, command);
+    }
+}
 void modifyMethodEntryEvents(std::string function, std::string command){
     jvmtiCapabilities capa;
     jvmtiError error;
@@ -136,6 +150,8 @@ void agentCommand(std::string function, std::string command){
             modifyMonitorEvents(function, command);
         } else if(!function.compare("objectAllocEvents")){
             modifyObjectAllocEvents(function, command);    
+        } else if(!function.compare("monitorStackTrace")){
+            modifyMonitorStackTrace(function, command);
         } else if(!function.compare("methodEntryEvents")){
             modifyMethodEntryEvents(function, command);
         }

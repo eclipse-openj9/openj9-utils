@@ -11,7 +11,7 @@
 #include "monitor.hpp"
 #include "json.hpp"
 #include "objectalloc.hpp"
-#include "methodentry.hpp"
+#include "methodEntry.hpp"
 #include "server.hpp"
 
 using json = nlohmann::json;

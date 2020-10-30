@@ -11,6 +11,7 @@
 #include "monitor.hpp"
 #include "json.hpp"
 #include "objectalloc.hpp"
+#include "methodEntry.hpp"
 #include "server.hpp"
 
 using json = nlohmann::json;
@@ -104,7 +105,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     callbacks.VMDeath = &VMDeath;
     callbacks.VMObjectAlloc = &VMObjectAlloc;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
-    callbacks.VMObjectAlloc = &VMObjectAlloc;
+    callbacks.MethodEntry = &MethodEntry;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
 

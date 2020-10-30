@@ -44,16 +44,34 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
     jvmtiError err;
 
     json jObj;
-    char *className;
+    char *classType;
     auto start = steady_clock::now();
 
+    // TODO:
+    objAllocBackTraceEnabled = 1;
+    rateEnabled = 1;
+
 /****************************************************************/
-    // jclass cls = env->GetObjectClass(object);
+    // // jclass cls = env->GetObjectClass(object);
     // // First get the class object
-    // jmethodID mid = env->GetMethodID(cls, "getClass", "()Ljava/lang/Class;");
+    // jmethodID mid = env->GetMethodID(object_klass, "getClass", "()Ljava/lang/Class;");
     // jobject clsObj = env->CallObjectMethod(object, mid);
+    // std::cout << clsObj << "\n";
+    // jboolean flag = env->ExceptionCheck();
+    // if (flag) {
+    //     // env->ExceptionDescribe();
+    //     // env->ExceptionClear();
+    //     jboolean isCopy = false;
+    //     jmethodID toString = env->GetMethodID(env->FindClass("java/lang/Object"), "toString", "()Ljava/lang/String;");
+    //     jthrowable exc = env->ExceptionOccurred();
+    //     jstring s = (jstring)env->CallObjectMethod(exc, toString);
+    //     const char* utf = env->GetStringUTFChars(s, &isCopy);
+    //     printf("error: %s", utf);
+    //     /* code to handle exception */
+    // }
+
     // // Now get the class object's class descriptor
-    // cls = env->GetObjectClass(clsObj);
+    // jclass cls = env->GetObjectClass(clsObj);
     // // Find the getName() method on the class object
     // mid = env->GetMethodID(cls, "getName", "()Ljava/lang/String;");
     // // Call the getName() to get a jstring object back
@@ -61,18 +79,18 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
     // // Now get the c string from the java jstring object
     // const char* str = env->GetStringUTFChars(strObj, NULL);
     // // record calling class
-    // printf("objName: %s", str);
-    // jObj["objName"] = str;
+    // printf("objType: %s", str);
+    // jObj["objType"] = str;
     // // Release the memory pinned char array
     // env->ReleaseStringUTFChars(strObj, str);
     // jObj["objSizeInBytes"] = (jint)size;
 /****************************************************************/
 
     /*** get information about object ***/
-    err = jvmtiEnv->GetClassSignature(object_klass, &className, NULL);
-    if (className != NULL && err == JVMTI_ERROR_NONE) {
-        jObj["objName"] = className;
-        jObj["objSizeInBytes"] = (jint)size;
+    err = jvmtiEnv->GetClassSignature(object_klass, &classType, NULL);
+    if (classType != NULL && err == JVMTI_ERROR_NONE) {
+        jObj["objType"] = classType;
+        jObj["size"] = (jint)size;
     }
 
 

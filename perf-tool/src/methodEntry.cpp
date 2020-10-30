@@ -15,16 +15,6 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
             jthread thread,
             jmethodID method) {
 
-    /*jvmtiError err;
-    json j;
-    char *methodName;
-    err = jvmtiEnv->GetMethodName(method, &methodName, NULL, NULL);
-    if (err == JVMTI_ERROR_NONE && strcmp(methodName, "doBatch") == 0) {
-        j["methodName"] = methodName;
-        std::string s = j.dump();
-
-        printf("\n%s\n", s.c_str());
-    }*/
 
     json j;
     jvmtiError err;
@@ -34,13 +24,14 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
 
     err = jvmtiEnv->GetMethodName(method, &name_ptr, &signature_ptr, &generic_ptr);
 
-    check_jvmti_error(jvmtiEnv, err, "Unable to get the method name");
+    check_jvmti_error(jvmtiEnv, err, "Unable to get the method name\n");
 
     if (err == JVMTI_ERROR_NONE) {
-        printf("Entered method %s\n", name_ptr);
+        j["methodName"] = name_ptr;
+        j["methodSig"] = signature_ptr;
     }
 
-    // std::string s = j.dump();
-    // printf("\n%s\n", s.c_str());
-    // sendMessageToClients(s);
+    std::string s = j.dump();
+    printf("\n%s\n", s.c_str());
+    sendToServer(s);
 }

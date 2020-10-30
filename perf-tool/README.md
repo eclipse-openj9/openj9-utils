@@ -17,13 +17,12 @@ These commands are passed to the agent on start up. The format of the commands s
 # Function Commands
 These commands are provided by either a commands file (see [Agent Start-Up Commands](#agent-start-up-commands)), or by a live client during runtime. These commands dictate what information the agent collects by either stopping or starting certain capabilities. 
 
-| Functionality | Command | Other Fields | Description |
-| --- | --- | --- | --- | 
-| monitorEvents | start, stop | delay | Enable/Disable collection of contended monitor events. Delay denotes how many seconds the agent will wait to execute the command. |
-| objectAllocEvents | start, stop | delay | Enable/Disable collection of VM object allocation events. Delay denotes how many seconds the agent will wait to execute the command. |
-| perf | (time) | delay | Enable perf collection for (time) seconds. Delay denotes how many seconds the agent will wait to execute the command. |
-
-Additionaly, each input should contain a delay field that indicates how long the agent should wait before executing the command.
+| Command | Associated Events | Expected Value | Description |
+| --- | --- | --- | ---- |
+| start | monitorEvents, objectAllocEvents | Event Name | Start recording an event |
+| stop | monitorEvents, objectAllocEvents| Event Name | Stop recording an event |
+| delay | All Functionalities | Integer | Time to wait before running the command after it is received (in seconds) |
+| time | perf | Integer | Time to run the command for |
 
 All commands are provided in JSON format, where multiple commands are provided as a list. A sample command file might look like:
 ```

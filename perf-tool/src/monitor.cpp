@@ -11,12 +11,14 @@ struct ClassCycleInfo{
     std::atomic<int> numSecondTier;
     std::atomic<int> numThirdTier;
 };
-std::atomic<bool> backTraceEnabled;
-void setStackTrace(bool val){
+std::atomic<bool> stackTraceEnabled;
+
+void setMonitorStackTrace(bool val){
     // Enables or disables the stack trace option
-    backTraceEnabled = val;
+    stackTraceEnabled = val;
     return;
 }
+
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, jthread thread, jobject object) {
     json j;
     jvmtiError error;
@@ -46,7 +48,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
     j["numTypeContentions"] = num;
     // Release the memory pinned char array
     env->ReleaseStringUTFChars(strObj, str);
-    if(backTraceEnabled){ // only run if the backtrace is enabled
+    if(stackTraceEnabled){ // only run if the backtrace is enabled
         jvmtiFrameInfo frames[5];
         jint count;
         jvmtiError err;

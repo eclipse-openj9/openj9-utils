@@ -6,6 +6,8 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv,
             jthread thread, 
             jobject object);
 
+void setMonitorStackTrace(bool val);
+
 
 
 #endif /* MONITOR_H_ */ 

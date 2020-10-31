@@ -38,7 +38,7 @@ void NetworkClient::closeFd(void)
     close(socketFd);
 }
 
-LoggingClient::LoggingClient(string filename)
+LoggingClient::LoggingClient(const string filename)
 {
     logFile.open(filename);
     if (!logFile.is_open())
@@ -64,7 +64,7 @@ void LoggingClient::closeFile(void)
     }
 }
 
-void LoggingClient::logData(string message, string recievedFrom)
+void LoggingClient::logData(const string message, const std::string recievedFrom)
 {
     if (logFile.is_open())
     {
@@ -89,7 +89,7 @@ void LoggingClient::logData(string message, string recievedFrom)
     }
 }
 
-CommandClient::CommandClient(std::string filename)
+CommandClient::CommandClient(const string filename)
 {
     commandsFile.open(filename);
     if (!commandsFile.is_open())

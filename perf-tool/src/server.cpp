@@ -21,7 +21,7 @@ using json = nlohmann::json;
 
 pid_t perfPid = -1;
 
-Server::Server(int portNo, string commandFileName, string logFileName)
+Server::Server(int portNo, const string commandFileName, const string logFileName)
 {
     this->portNo = portNo;
 
@@ -41,7 +41,7 @@ Server::Server(int portNo, string commandFileName, string logFileName)
 void Server::handleServer()
 {
     socklen_t clilen;
-    char buffer[256], msg[256];
+    char buffer[512];
     string message, command;
     struct sockaddr_in serv_addr, cli_addr;
     int n, newsocketFd;
@@ -91,7 +91,7 @@ void Server::handleServer()
             break;
         }
 
-        bzero(buffer, 256);
+        bzero(buffer, 512);
 
         if (poll(pollFds, activeNetworkClients + ServerConstants::BASE_POLLS, ServerConstants::POLL_INTERVALS) == -1)
         {
@@ -140,7 +140,7 @@ void Server::handleServer()
         // Receiving and sending messages from/to clients
         for (int i = 0; i < activeNetworkClients; i++)
         {
-            bzero(buffer, 256);
+            bzero(buffer, 512);
             command = networkClients[i]->handlePoll(buffer);
             if (!command.empty())
             {
@@ -183,10 +183,19 @@ void Server::handleClientCommand(string command, string from)
     loggingClient->logData(command, from);
 }
 
-void Server::sendMessage(int socketFd, std::string message)
+void Server::sendMessage(const int socketFd, const std::string message)
 {
-    const char *cstring = message.c_str();
-    send(socketFd, cstring, strlen(cstring), 0);
+    int n;
+    const char *buffer = message.data();
+
+    n = send(socketFd, buffer, message.size(), 0);
+    if (n == -1) 
+    { 
+        error("ERROR sending message to clients failed"); 
+    }
+
+    // const char *cstring = message.c_str();
+    // send(socketFd, cstring, strlen(cstring), 0);
 }
 
 void Server::handleMessagingClients()
@@ -198,7 +207,7 @@ void Server::handleMessagingClients()
             int clientSocketFd = networkClients[i]->getSocketFd();
             sendMessage(clientSocketFd, messageQueue.front());
         }
-        loggingClient->logData(messageQueue.front(), "Agent");
+        loggingClient->logData(messageQueue.front(), "Server");
 
         messageQueue.pop();
     }
@@ -223,7 +232,13 @@ void Server::sendPerfDataToClient(int time)
         std::string perfStr;
         perfStr = perfData.dump();
 
-        messageQueue.push(perfStr);
+        
+        for (int i = 0; i < activeNetworkClients; i++)
+        {
+            int clientSocketFd = networkClients[i]->getSocketFd();
+            sendMessage(clientSocketFd, perfStr);
+        }
+
         loggingClient->logData(perfStr, "perf");
 
         exit(EXIT_SUCCESS);

@@ -38,7 +38,6 @@ public:
 
     int getSocketFd(void);
     void closeFd(void);
-    void sendMessage(std::string message);
     std::string handlePoll(char buffer[]);
 };
 
@@ -62,7 +61,7 @@ private:
     void execCommand(json command);
 
 public:
-    CommandClient(std::string filename);
+    CommandClient(const std::string filename);
 
     void closeFile(void);
     json handlePoll(void);
@@ -84,10 +83,10 @@ private:
 protected:
 private:
 public:
-    LoggingClient(std::string filename);
+    LoggingClient(const std::string filename);
 
     void closeFile(void);
-    void logData(std::string data, std::string recievedFrom);
+    void logData(const std::string data, const std::string recievedFrom);
 };
 
 #endif

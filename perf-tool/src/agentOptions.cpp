@@ -56,6 +56,16 @@ void modifyMonitorEvents(std::string function, std::string command){
     return;
 }
 
+void modifyObjAllocBackTrace(std::string function, std::string command){
+    // enable back trace 
+    if (!command.compare("start")){
+        setObjAllocBackTrace(true);
+    } else if (!command.compare("stop")){
+        setObjAllocBackTrace(false);
+    } else{
+        invalidCommand(function, command);
+    }
+}
 
 void modifyObjectAllocEvents(std::string function, std::string command){
     jvmtiCapabilities capa;
@@ -150,6 +160,8 @@ void agentCommand(std::string function, std::string command){
             modifyMonitorEvents(function, command);
         } else if(!function.compare("objectAllocEvents")){
             modifyObjectAllocEvents(function, command);    
+        } else if(!function.compare("objAllocBackTrace")){
+            modifyObjAllocBackTrace(function, command);
         } else if(!function.compare("monitorStackTrace")){
             modifyMonitorStackTrace(function, command);
         } else if(!function.compare("methodEntryEvents")){

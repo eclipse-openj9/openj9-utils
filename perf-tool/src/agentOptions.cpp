@@ -19,6 +19,9 @@ void invalidCommand(std::string function, std::string command){
     printf("Invalid command with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str() );
 }
 
+void invalidFunction(std::string function, std::string command){
+    printf("Invalid function with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str() );
+}
 
 void modifyMonitorEvents(std::string function, std::string command){
     jvmtiCapabilities capa;
@@ -166,6 +169,8 @@ void agentCommand(std::string function, std::string command){
             modifyMonitorStackTrace(function, command);
         } else if(!function.compare("methodEntryEvents")){
             modifyMethodEntryEvents(function, command);
+        } else {
+            invalidFunction(function, command);
         }
     }
     return;

@@ -96,7 +96,7 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
     auto end = steady_clock::now();
     auto duration = duration_cast<microseconds>(end - start).count();
     float rate = (float)size/duration;
-    jObj["objAllocRateInBytesPerMicrosec"] = rate;
+    jObj["objAllocRate"] = rate;
 
     json j;
     j["object"] = jObj; 

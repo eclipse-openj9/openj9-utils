@@ -148,7 +148,7 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
 
     json j;
     j["object"] = jObj; 
-    std::string s = j.dump();
+    std::string s = j.dump(2, ' ', true);
     // printf("\n%s\n", s.c_str());
     sendToServer(s);
 

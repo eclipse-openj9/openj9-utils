@@ -14,7 +14,7 @@ class ServerConstants
 public:
     static constexpr int NUM_CLIENTS = 5;
     static constexpr int BASE_POLLS = 1;
-    static constexpr int POLL_INTERVALS = 100;
+    static constexpr int POLL_INTERVALS = 250;
     static constexpr int COMMAND_INTERVALS = 500;
 };
 

@@ -15,6 +15,7 @@
 int main(int argc, char *argv[])
 {
     int sockfd, portno, n;
+    bool done = false;
     struct sockaddr_in serv_addr;
     struct hostent *server;
     struct pollfd pollFds[2];
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
 
     printf("Enter message to send to server: \n");
 
-    while (true) {
+    while (!done) {
         bzero(buffer, 4096);
 
         if (poll(pollFds, 2, POLL_INTERVAL) == -1){
@@ -88,13 +89,14 @@ int main(int argc, char *argv[])
                 printf("Recieved: %s\n", buffer);
 
                 if (std::string(buffer).substr(strlen(buffer) - 4, 4) == "done") {
-                    close(sockfd);
-                    printf("Closed connection with server.\n");
-                    break;
+                    done = true;
                 }
             }
         }
     }
+    
+    close(sockfd);
+    printf("Closed connection with server.\n");
 
     return 0;
 }

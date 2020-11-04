@@ -86,6 +86,7 @@ void Server::handleServer()
     // Use polling to keep track of clients and keyboard input
     while (1)
     {
+        handleMessagingClients();
         if (!keepPolling)
         {
             break;
@@ -148,7 +149,6 @@ void Server::handleServer()
             }
         }
 
-        handleMessagingClients();
     }
 }
 
@@ -185,13 +185,20 @@ void Server::handleClientCommand(string command, string from)
 
 void Server::sendMessage(const int socketFd, const std::string message)
 {
-    int n;
+    int n, total = 0;
+    size_t length = message.size();
     const char *buffer = message.data();
 
-    n = send(socketFd, buffer, message.size(), 0);
-    if (n == -1) 
-    { 
-        error("ERROR sending message to clients failed"); 
+    while (total < length) 
+    {
+        n = send(socketFd, buffer, strlen(buffer), 0);
+        if (n == -1) 
+        { 
+            error("ERROR sending message to clients failed"); 
+        }
+
+        total += n;
+        buffer += n;
     }
 
     // const char *cstring = message.c_str();
@@ -230,7 +237,7 @@ void Server::sendPerfDataToClient(int time)
     {
         perfData = perfProcess(currPid, time);
         std::string perfStr;
-        perfStr = perfData.dump();
+        perfStr = perfData.dump(2, ' ', true);
 
         
         for (int i = 0; i < activeNetworkClients; i++)
@@ -253,6 +260,7 @@ void Server::shutDownServer()
     {
         int status;
         cout << "Waiting on perf data." << endl;
+        handleMessagingClients();
         waitpid(perfPid, &status, WCONTINUED);
     }
 

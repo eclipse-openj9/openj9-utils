@@ -1,7 +1,4 @@
 #include <jvmti.h>
-#include "objectalloc.hpp"
-#include "methodEntry.hpp"
-#include "exception.hpp"
 #include "infra.hpp"
 #include <string>
 #include <cstring>
@@ -15,6 +12,9 @@
 #include "infra.hpp"
 #include "monitor.hpp"
 #include "objectalloc.hpp"
+#include "exception.hpp"
+#include "methodEntry.hpp"
+
 
 #include "json.hpp"
 using json = nlohmann::json;
@@ -260,7 +260,7 @@ void modifyExceptionEvents(std::string function, std::string command){
     jvmtiError error;
 
     (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-    error = jvmti->GetCapabilities(&capa);
+    error = jvmti -> GetCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Unable to get current capabilties\n");
     if(capa.can_generate_exception_events){
         if( !command.compare("stop")){
@@ -280,10 +280,10 @@ void modifyExceptionEvents(std::string function, std::string command){
             capa.can_generate_exception_events = 1;
             printf("start received\n");
 
-            error = jvmti->AddCapabilities(&capa);
+            error = jvmti -> AddCapabilities(&capa);
             check_jvmti_error(jvmti, error, "Unable to init exception events capability\n");
 
-            error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_EXCEPTION, (jthread)NULL);
+            error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_EXCEPTION, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to enable Exception event notifications.\n");
         } else{ // currently stopped
             printf("Exception events already disabled\n");

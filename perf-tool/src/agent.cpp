@@ -108,7 +108,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     callbacks.VMObjectAlloc = &VMObjectAlloc;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.MethodEntry = &MethodEntry;
-    callbacks.VMObjectAlloc = &VMObjectAlloc;
     callbacks.Exception = &Exception;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");

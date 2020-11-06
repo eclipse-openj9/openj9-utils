@@ -2,25 +2,24 @@
 {
   "body": "Server started",
   "from": "Server",
-  "timestamp": 1604381221
+  "timestamp": 1604382755
 },
 {
   "body": {
     "command": "start",
-    "delay": 0,
     "functionality": "methodEntryEvents"
   },
   "from": "Client",
-  "timestamp": 1604381225
+  "timestamp": 1604382764
 },
 {
   "body": "Server shutting down",
   "from": "Agent",
-  "timestamp": 1604381244
+  "timestamp": 1604382778
 },
 {
   "body": "done",
   "from": "Agent",
-  "timestamp": 1604381244
+  "timestamp": 1604382778
 }
 ]

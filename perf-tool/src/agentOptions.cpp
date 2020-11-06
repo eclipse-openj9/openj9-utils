@@ -225,8 +225,7 @@ void agentCommand(std::string function, std::string command){
         } else if(!function.compare("exceptionBackTrace")) {
             modifyExceptionBackTrace(function, command);
         } else {
-            invalidFunction(function, command);
-        }
+            invalidFunction(function, command);        }
     }
     return;
 }

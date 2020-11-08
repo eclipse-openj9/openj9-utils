@@ -5,5 +5,7 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
             JNIEnv* env,
             jthread thread,
             jmethodID method);
+            
+void setMethodEntrySamplingRate(int rate);
 
 #endif /* METHODENTRY_H_ */

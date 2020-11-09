@@ -30,8 +30,14 @@ void setObjAllocBackTrace(bool val){
     return;
 }
 
+// to turn off backTrace, set sampleRate to 0
 void setObjAllocSampleRate(int rate) {
-    objAllocSampleRate = rate;
+    if (rate > 0) {
+        objAllocBackTraceEnabled = true;
+        objAllocSampleRate = rate;
+    } else {
+        objAllocBackTraceEnabled = false;
+    }
     return;
 }
 

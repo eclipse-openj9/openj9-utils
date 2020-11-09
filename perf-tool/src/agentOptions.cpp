@@ -15,6 +15,9 @@
 #include "monitor.hpp"
 #include "objectalloc.hpp"
 
+#include "json.hpp"
+using json = nlohmann::json;
+
 void invalidCommand(std::string function, std::string command){
     printf("Invalid command with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str() );
 }
@@ -63,16 +66,6 @@ void modifyMonitorEvents(std::string function, std::string command){
     return;
 }
 
-void modifyObjAllocBackTrace(std::string function, std::string command, int sampleRate){
-    if (sampleRate==0){
-        setObjAllocBackTrace(false);
-    } else if (sampleRate>0){
-        setObjAllocBackTrace(true);
-        setObjAllocSampleRate(sampleRate);
-    } else{
-        invalidRate(function, command, sampleRate);
-    }
-}
 
 void modifyObjectAllocEvents(std::string function, std::string command, int sampleRate){
     jvmtiCapabilities capa;
@@ -81,7 +74,7 @@ void modifyObjectAllocEvents(std::string function, std::string command, int samp
     (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
     error = jvmti -> GetCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Unable to get current capabilties");
-    modifyObjAllocBackTrace(function, command, sampleRate);
+    setObjAllocSampleRate(sampleRate);
     if(capa.can_generate_vm_object_alloc_events){
         if(!command.compare("stop")){
             (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
@@ -142,7 +135,7 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable MethodEntry event.\n");
         } else if (!command.compare("start")){ // c == start
-        printf("Method Entry Events already enabled\n");
+            printf("Method Entry Events already enabled\n");
         } else {
             invalidCommand(function, command);
         }
@@ -163,16 +156,28 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
 
 
 
-void agentCommand(std::string function, std::string command, int sampleRate){
+void agentCommand(json jCommand){
     jvmtiCapabilities capa;
     jvmtiError error;
     jvmtiPhase phase;
+    
+    std::string function;
+    function = jCommand["functionality"].get<std::string>();
+    std::string command;
+    command = jCommand["command"].get<std::string>();
+    int sampleRate = 1; // sampleRate is automatically set to 1. To turn off, set to 0
+    if (jCommand.contains("sampleRate")) {
+        sampleRate = jCommand["sampleRate"].get<int>();
+        if (sampleRate <0 ) {
+            invalidRate(function, command, sampleRate);
+        }
+    }
 
     jvmti -> GetPhase(&phase);
     if(!(phase == JVMTI_PHASE_ONLOAD || phase == JVMTI_PHASE_LIVE)){
         check_jvmti_error(jvmti, JVMTI_ERROR_WRONG_PHASE, "AGENT CANNOT RECEIVE COMMANDS DURING THIS PHASE\n");
     } else{
-         error = jvmti -> GetCapabilities(&capa);
+        error = jvmti -> GetCapabilities(&capa);
         check_jvmti_error(jvmti, error, "Unable to get current capabilties");        
         if(!function.compare("monitorEvents")){
             modifyMonitorEvents(function, command);

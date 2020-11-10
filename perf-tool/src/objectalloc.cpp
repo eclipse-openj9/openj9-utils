@@ -93,6 +93,7 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
                             jMethod["methodName"] = methodName;
                             jMethod["methodSignature"] = methodSignature;
                             jMethod["lineNum"] = table_ptr->line_number;
+                            jMethod["methodNum"] = i;
                             jMethods.push_back(jMethod);
                         }
                     }

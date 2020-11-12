@@ -158,7 +158,8 @@ void Server::execCommand(json command)
         sleep(command["delay"]);
     if ((command["functionality"].get<std::string>()).compare("perf"))
     {
-        agentCommand(command["functionality"].get<std::string>(), command["command"].get<std::string>());
+        // agentCommand(command["functionality"].get<std::string>(), command["command"].get<std::string>(), command["sampleRate"].get<int>());
+        agentCommand(command);
     }
     else
     {

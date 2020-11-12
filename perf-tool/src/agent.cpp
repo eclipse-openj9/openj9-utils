@@ -88,8 +88,9 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     capa.can_get_owned_monitor_info = 1;
     capa.can_generate_method_entry_events = 1;
     capa.can_tag_objects = 1;
-    capa.can_get_current_thread_cpu_time	= 1;
+    capa.can_get_current_thread_cpu_time = 1;
     capa.can_get_line_numbers = 1;
+    capa.can_generate_vm_object_alloc_events = 1;
     error = jvmti->AddCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Failed to set jvmtiCapabilities.");
 

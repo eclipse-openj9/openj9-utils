@@ -8,5 +8,8 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
                         jclass object_klass, 
                         jlong size);
 
+void setObjAllocBackTrace(bool val);
+void setObjAllocSampleRate(int sampleRate);
+
 
 #endif /* OBJECTALLOC_H_ */ 

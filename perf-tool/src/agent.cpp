@@ -13,6 +13,7 @@
 #include "objectalloc.hpp"
 #include "methodEntry.hpp"
 #include "server.hpp"
+#include "verboseLog.hpp"
 
 using json = nlohmann::json;
 
@@ -109,6 +110,8 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     callbacks.MethodEntry = &MethodEntry;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
+
+    StartVerboseLogCollector(jvmti);
 
     return JNI_OK;
 }

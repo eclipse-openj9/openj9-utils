@@ -19,8 +19,9 @@ These commands are provided by either a commands file (see [Agent Start-Up Comma
 
 | Command | Associated Events | Expected Value | Description |
 | --- | --- | --- | ---- |
-| start | monitorEvents, objectAllocEvents | Event Name | Start recording an event |
-| stop | monitorEvents, objectAllocEvents| Event Name | Stop recording an event |
+| start | monitorEvents, objectAllocEvents, methodEntryEvents | Event Name | Start recording an event |
+| stop | monitorEvents, objectAllocEvents, methodEntryEvents | Event Name | Stop recording an event |
+| sampleRate | objectAllocEvents, methodEntryEvents | Event Name | Set a sampling rate `n` for retrieving backtrace (set to 0 for none) |
 | delay | All Functionalities | Integer | Time to wait before running the command after it is received (in seconds) |
 | time | perf | Integer | Time to run the command for |
 
@@ -39,13 +40,26 @@ All commands are provided in JSON format, where multiple commands are provided a
   {
     "functionality": "objectAllocEvents",
     "command": "start",
+    "sampleRate": 2,
     "delay": 0
+  },
+  {
+    "functionality": "methodEntryEvents",
+    "command": "start",
+    "sampleRate": 2000,
+    "delay": 0
+  },
+  {
+    "functionality": "methodEntryEvents",
+    "command": "stop",
+    "delay": 4
   },
   {
     "functionality": "monitorEvents",
     "command": "stop",
     "delay": 4
   },
+  
   {
     "functionality": "objectAllocEvents",
     "command": "stop",

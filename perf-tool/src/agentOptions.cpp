@@ -129,6 +129,7 @@ void modifyMonitorStackTrace(std::string function, std::string command){
     }
 }
 
+
 //object alloc capability already enabled
 void modifyMethodEntryEvents(std::string function, std::string command, int sampleRate){
     jvmtiError error;
@@ -146,6 +147,7 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
     }
 }
 
+
 /*
 void modifyMethodEntryEvents(std::string function, std::string command, int sampleRate){
     jvmtiCapabilities capa;
@@ -160,6 +162,7 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
             (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
             capa.can_generate_vm_object_alloc_events = 1;
             capa.can_generate_method_entry_events = 1;
+            capa.can_generate_monitor_events = 1;
 
             error = jvmti -> RelinquishCapabilities(&capa);
             check_jvmti_error(jvmti, error, "Unable to relinquish method entry capability\n");
@@ -174,10 +177,11 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
         }
     }else{ // cannot generate monitor events
         if(!command.compare("start")){
+            printf("\n\n\nSTART\n\n\n\n");
             (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
             capa.can_generate_vm_object_alloc_events = 1;
             capa.can_generate_method_entry_events = 1;
-            capa.can_get_line_numbers = 1;
+            capa.can_generate_monitor_events = 1;
             
             error = jvmti -> AddCapabilities(&capa);
             check_jvmti_error(jvmti, error, "Unable to init method entry events capability");
@@ -194,7 +198,6 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
     }
 }
 */
-
 
 
 void agentCommand(json jCommand){

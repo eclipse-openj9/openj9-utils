@@ -1,11 +1,12 @@
+#include "verboseLog.hpp"
+
 #include <iostream>
+
 #include <jvmti.h>
-#include <ibmjvmti.h>
 
 #include "agentOptions.hpp"
 #include "infra.hpp"
 #include "json.hpp"
-#include "verboseLog.hpp"
 
 using json = nlohmann::json;
 
@@ -17,7 +18,8 @@ void StartVerboseLogCollector(jvmtiEnv *jvmti_env)
     // jint extensionEventCount = 0;
     // jvmtiExtensionEventInfo *extensionEvents = NULL;
     jvmtiVerboseGCSubscriber subscriberCallback = &verboseLogSubscriber;
-    jvmtiVerboseGCAlarm alarmCallback = &verboseAlarm;
+    jvmtiVerboseGCAlarm alarmCallback = &verboseLogAlarm;
+    void *subscriptionID;
     jint extensionFunctionCount = 0;
     jvmtiExtensionFunctionInfo *extensionFunctions = NULL;
     int i = 0, j = 0;
@@ -49,28 +51,29 @@ void StartVerboseLogCollector(jvmtiEnv *jvmti_env)
         {
             /* Found the set dump extension function, now set a dump option to generate javadumps on
             thread starts */
-            cout << "REACHED HERE 1" << endl;
-            rc = function(jvmti_env, "", subscriberCallback, alarmCallback, NULL, NULL, 1);
-            cout << "REACHED HERE 2" << endl;
-            printf("Calling JVMTI extension %s, rc=%i\n", COM_IBM_SET_VM_DUMP, rc);
+            rc = function(jvmti_env, "verbose log subscriber", subscriberCallback, alarmCallback, NULL, &subscriptionID);
+            if (rc != JVMTI_ERROR_NONE)
+            {
+                perror("ERROR registering verbose log Subscriber failed: ");
+            }
+            printf("Calling JVMTI extension %s, rc=%i\n", COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER, rc);
             break;
         }
         extensionFunctions++; /* move on to the next extension function */
     }
 }
 
-jvmtiError verboseLogSubscriber(jvmtiEnv *env, const char *record, jlong length, void *userData)
+jvmtiError verboseLogSubscriber(jvmtiEnv *jvmti_env, const char *record, jlong length, void *user_data)
 {
-    string s = string(record);
+    string s = string("HUH");
     sendToServer(s);
 
     return JVMTI_ERROR_NONE;
 }
 
-jvmtiError verboseAlarm(jvmtiEnv *env, const char *record, jlong length, void *userData)
+void verboseLogAlarm(jvmtiEnv *jvmti_env, void *subscription_id, void *user_data)
 {
-    string s = string(record);
+    string s = string("ERROR subscriber returned error");
     sendToServer(s);
 
-    return JVMTI_ERROR_NONE;
 }

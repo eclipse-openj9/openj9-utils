@@ -1,22 +1,18 @@
-#include <jvmti.h>
-#include "objectalloc.hpp"
-#include "methodEntry.hpp"
-#include "infra.hpp"
-#include <string>
 #include <cstring>
+#include <iostream>
 #include <jvmti.h>
 #include <stdio.h>
-#include <iostream>
 #include <string>
 #include <unistd.h>
 
 #include "agentOptions.hpp"
 #include "infra.hpp"
+#include "methodEntry.hpp"
 #include "monitor.hpp"
 #include "objectalloc.hpp"
+#include "verboseLog.hpp"
 
-#include "json.hpp"
-using json = nlohmann::json;
+VerboseLogSubscriber *verboseLogSubscriber;
 
 void invalidCommand(std::string function, std::string command){
     printf("Invalid command with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str() );
@@ -195,7 +191,17 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
 }
 */
 
-
+void handleVerboseLogSubscriber(std::string command)
+{
+    if (command.compare("start"))
+    {
+        verboseLogSubscriber = new VerboseLogSubscriber(jvmti);
+        verboseLogSubscriber->Subscribe();
+    } else if (command.compare("stop"))
+    {
+        verboseLogSubscriber->Unsubscribe();
+    }
+}
 
 void agentCommand(json jCommand){
     jvmtiCapabilities capa;
@@ -228,6 +234,8 @@ void agentCommand(json jCommand){
             modifyMonitorStackTrace(function, command);
         } else if(!function.compare("methodEntryEvents")){
             modifyMethodEntryEvents(function, command, sampleRate);
+        } else if(!function.compare("verboseLog")){
+            handleVerboseLogSubscriber(command);
         } else {
             invalidFunction(function, command);
         }

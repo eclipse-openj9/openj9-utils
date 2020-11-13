@@ -1,19 +1,18 @@
 #include <jvmti.h>
 #include <iostream>
-#include <stdio.h> 
+#include <stdio.h>
 #include <string.h>
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <thread>
-#include <unistd.h> 
+#include <unistd.h>
 
 #include "agentOptions.hpp"
 #include "infra.hpp"
-#include "monitor.hpp"
 #include "json.hpp"
-#include "objectalloc.hpp"
 #include "methodEntry.hpp"
+#include "monitor.hpp"
+#include "objectalloc.hpp"
 #include "server.hpp"
-#include "verboseLog.hpp"
 
 using json = nlohmann::json;
 
@@ -22,11 +21,12 @@ int portNo;
 std::string commandsPath = "";
 std::string logPath = "logs.json";
 
-JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
+JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
+{
     std::string token;
     std::string optionsDelim = ",";
     std::string pathDelim = ":";
-    std::string oIn = (std::string) options;
+    std::string oIn = (std::string)options;
     int pos1, pos2 = 0;
     portNo = 9002;
 
@@ -34,17 +34,25 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     // "commands" is followed by a path to the commands file
     // "log" is followed by the path to the location for the log file
     // "portno" is followed by a number indicating the port to run the server on
-    while((pos1 = oIn.find(optionsDelim)) != std::string::npos){
-        if(pos1 != std::string::npos){
+    while ((pos1 = oIn.find(optionsDelim)) != std::string::npos)
+    {
+        if (pos1 != std::string::npos)
+        {
             token = oIn.substr(0, pos1);
-            if((pos2 = token.find(pathDelim)) != std::string::npos){
-                if(!token.substr(0, pos2).compare("commandFile")){
+            if ((pos2 = token.find(pathDelim)) != std::string::npos)
+            {
+                if (!token.substr(0, pos2).compare("commandFile"))
+                {
                     token.erase(0, pos2 + pathDelim.length());
                     commandsPath = token;
-                }  else if(!token.substr(0, pos2).compare("logFile")){
+                }
+                else if (!token.substr(0, pos2).compare("logFile"))
+                {
                     token.erase(0, pos2 + pathDelim.length());
                     logPath = token;
-                } else if(!token.substr(0, pos2).compare("portNo")){
+                }
+                else if (!token.substr(0, pos2).compare("portNo"))
+                {
                     token.erase(0, pos2 + pathDelim.length());
                     portNo = stoi(token);
                 }
@@ -52,21 +60,27 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
             oIn.erase(0, pos1 + optionsDelim.length());
         }
     }
-    if(!oIn.empty()){
+    if (!oIn.empty())
+    {
         token = oIn;
-        if((pos2 = token.find(pathDelim)) != std::string::npos){
-            if(!token.substr(0, pos2).compare("commandFile")){
-                    token.erase(0, pos2 + pathDelim.length());
-                    commandsPath = token;
-                }  else if(!token.substr(0, pos2).compare("logFile")){
-                    token.erase(0, pos2 + pathDelim.length());
-                    logPath = token;
-                } else if(!token.substr(0, pos2).compare("portNo")){
-                    token.erase(0, pos2 + pathDelim.length());
-                    portNo = stoi(token);
-                }
+        if ((pos2 = token.find(pathDelim)) != std::string::npos)
+        {
+            if (!token.substr(0, pos2).compare("commandFile"))
+            {
+                token.erase(0, pos2 + pathDelim.length());
+                commandsPath = token;
+            }
+            else if (!token.substr(0, pos2).compare("logFile"))
+            {
+                token.erase(0, pos2 + pathDelim.length());
+                logPath = token;
+            }
+            else if (!token.substr(0, pos2).compare("portNo"))
+            {
+                token.erase(0, pos2 + pathDelim.length());
+                portNo = stoi(token);
+            }
         }
-
     }
 
     std::cout << commandsPath << std::endl;
@@ -74,9 +88,10 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     std::cout << portNo << std::endl;
 
     // server = new Server(portNo, commandsPath, logPath);
-    
-    jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
-    if (rest != JNI_OK || jvmti == NULL) {
+
+    jint rest = jvm->GetEnv((void **)&jvmti, JVMTI_VERSION_1_2);
+    if (rest != JNI_OK || jvmti == NULL)
+    {
 
         printf("Unable to get access to JVMTI version 1.0");
         return JNI_ERR;
@@ -111,7 +126,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
 
-    StartVerboseLogCollector(jvmti);
 
     return JNI_OK;
 }

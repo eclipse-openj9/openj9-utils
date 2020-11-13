@@ -4,9 +4,6 @@
 
 #include "infra.hpp"
 #include "server.hpp"
-#include "verboseLog.hpp"
-
-VerboseLogSubscriber *verboseLogSubscriber;
 
 Server *server;
 
@@ -51,9 +48,6 @@ JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread threa
     error = jvmtiEnv -> RunAgentThread( createNewThread(jni_env),&startServer, portPointer, JVMTI_THREAD_NORM_PRIORITY );
     check_jvmti_error(jvmtiEnv, error, "Error starting agent thread\n");
     printf("VM starting up\n");
-
-    verboseLogSubscriber = new VerboseLogSubscriber(jvmtiEnv);
-    verboseLogSubscriber->Subscribe();
 }
 
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env) {

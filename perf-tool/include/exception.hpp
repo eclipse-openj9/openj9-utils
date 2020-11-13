@@ -13,4 +13,6 @@ JNIEXPORT void JNICALL Exception(jvmtiEnv *jvmtiEnv,
 
 void setExceptionBackTrace(bool val);
 
+void setExceptionSampleRate(int rate);
+
 #endif /* EXCEPTION_H_ */

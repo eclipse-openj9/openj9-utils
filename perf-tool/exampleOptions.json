@@ -22,5 +22,10 @@
     "functionality": "objectAllocEvents",
     "command": "stop",
     "delay": 6
+  },
+  {
+    "functionality": "verboseLog",
+    "command": "start",
+    "delay": 0
   }
 ]

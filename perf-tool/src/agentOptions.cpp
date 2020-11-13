@@ -10,9 +10,9 @@
 #include "methodEntry.hpp"
 #include "monitor.hpp"
 #include "objectalloc.hpp"
-#include "verboseLog.hpp"
+// #include "verboseLog.hpp"
 
-VerboseLogSubscriber *verboseLogSubscriber;
+// VerboseLogSubscriber *verboseLogSubscriber;
 
 void invalidCommand(std::string function, std::string command){
     printf("Invalid command with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str() );
@@ -193,14 +193,14 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
 
 void handleVerboseLogSubscriber(std::string command)
 {
-    if (command.compare("start"))
-    {
-        verboseLogSubscriber = new VerboseLogSubscriber(jvmti);
-        verboseLogSubscriber->Subscribe();
-    } else if (command.compare("stop"))
-    {
-        verboseLogSubscriber->Unsubscribe();
-    }
+    // if (command.compare("start"))
+    // {
+    //     verboseLogSubscriber = new VerboseLogSubscriber(jvmti);
+    //     verboseLogSubscriber->Subscribe();
+    // } else if (command.compare("stop"))
+    // {
+    //     verboseLogSubscriber->Unsubscribe();
+    // }
 }
 
 void agentCommand(json jCommand){

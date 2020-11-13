@@ -87,8 +87,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     std::cout << logPath << std::endl;
     std::cout << portNo << std::endl;
 
-    // server = new Server(portNo, commandsPath, logPath);
-
     jint rest = jvm->GetEnv((void **)&jvmti, JVMTI_VERSION_1_2);
     if (rest != JNI_OK || jvmti == NULL)
     {
@@ -125,7 +123,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     callbacks.MethodEntry = &MethodEntry;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
-
 
     return JNI_OK;
 }

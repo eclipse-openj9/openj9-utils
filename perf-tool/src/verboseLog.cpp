@@ -32,13 +32,16 @@ void VerboseLogSubscriber::Subscribe()
             rc = function(jvmti_env, "verbose log subscriber", subscriberCallback, alarmCallback, NULL, &subscriptionID);
             if (rc != JVMTI_ERROR_NONE)
             {
-                perror("ERROR registering verbose log Subscriber failed: ");
+                perror("ERROR registering verbose log subscriber failed: ");
             }
             printf("Calling JVMTI extension %s, rc=%i\n", COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER, rc);
             break;
         }
         extensionFunctions++; /* move on to the next extension function */
     }
+
+    jvmti->SetSystemProperty("-Dcom.ibm.tools.attach.log.name", "verboseLogs/txt");
+    jvmti->SetVerboseFlag(JVMTI_VERBOSE_CLASS, true);
 }
 
 
@@ -48,6 +51,11 @@ void VerboseLogSubscriber::Unsubscribe()
     jint extensionFunctionCount = 0;
     jvmtiExtensionFunctionInfo *extensionFunctions = NULL;
     int i = 0, j = 0;
+
+    if (subscriptionID == NULL)
+    {
+        return;
+    }
 
     /* Look up all the JVMTI extension functions */
     jvmti_env->GetExtensionFunctions(&extensionFunctionCount, &extensionFunctions);
@@ -63,7 +71,7 @@ void VerboseLogSubscriber::Unsubscribe()
             rc = function(jvmti_env, NULL, &subscriptionID);
             if (rc != JVMTI_ERROR_NONE)
             {
-                perror("ERROR registering verbose log Subscriber failed: ");
+                perror("ERROR deregistering verbose log subscriber failed: ");
             }
             printf("Calling JVMTI extension %s, rc=%i\n", COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER, rc);
             break;

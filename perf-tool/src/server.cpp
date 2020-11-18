@@ -158,7 +158,6 @@ void Server::execCommand(json command)
         sleep(command["delay"]);
     if ((command["functionality"].get<std::string>()).compare("perf"))
     {
-        // agentCommand(command["functionality"].get<std::string>(), command["command"].get<std::string>(), command["sampleRate"].get<int>());
         agentCommand(command);
     }
     else
@@ -234,12 +233,6 @@ void Server::sendPerfDataToClient(int time)
     if (perfPid == 0)
     {
         perfProcess(currPid, time);
-        // std::string perfStr;
-        // perfStr = perfData.dump();
-        //
-        // messageQueue.push(perfStr);
-        // handleMessagingClients();
-        // loggingClient->logData(perfStr, "perf");
 
         exit(EXIT_SUCCESS);
     }
@@ -253,25 +246,25 @@ void Server::shutDownServer()
     {
         int status;
         cout << "Waiting on perf data." << endl;
-        handleMessagingClients();
         waitpid(perfPid, &status, WCONTINUED);
     }
 
     messageQueue.push("Server shutting down");
-    // messageQueue.push("done"); // keyword for clients to close their connection
 
     handleMessagingClients();
-    close(serverSocketFd);
 
     loggingClient->closeFile();
     for (int i = 0; i < activeNetworkClients; i++)
     {
+        sendMessage(networkClients[i]->getSocketFd(), "done");
         networkClients[i]->closeFd();
     }
     if (headlessMode)
     {
         commandClient->closeFile();
     }
+
+    close(serverSocketFd);
 
     cout << "Server shutdown." << endl;
 }

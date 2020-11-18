@@ -201,9 +201,6 @@ void Server::sendMessage(const int socketFd, const std::string message)
         total += n;
         buffer += n;
     }
-
-    // const char *cstring = message.c_str();
-    // send(socketFd, cstring, strlen(cstring), 0);
 }
 
 void Server::handleMessagingClients()

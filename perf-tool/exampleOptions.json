@@ -1,5 +1,10 @@
 [
   {
+    "functionality": "verboseLog",
+    "command": "start",
+    "delay": 0
+  },
+  {
     "functionality": "monitorEvents",
     "command": "start",
     "delay": 0
@@ -22,10 +27,5 @@
     "functionality": "objectAllocEvents",
     "command": "stop",
     "delay": 6
-  },
-  {
-    "functionality": "verboseLog",
-    "command": "start",
-    "delay": 0
   }
 ]

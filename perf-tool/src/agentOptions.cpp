@@ -195,11 +195,11 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
 
 void handleVerboseLogSubscriber(std::string command)
 {
-    if (command.compare("start"))
+    if (!command.compare("start"))
     {
         verboseLogSubscriber = new VerboseLogSubscriber(jvmti);
         verboseLogSubscriber->Subscribe();
-    } else if (command.compare("stop"))
+    } else if (!command.compare("stop"))
     {
         verboseLogSubscriber->Unsubscribe();
     }

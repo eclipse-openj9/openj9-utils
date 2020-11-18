@@ -39,9 +39,6 @@ public:
     /* Handles server functionality and polling*/
     void handleServer();
 
-    /* Add message to queue */
-    void addMessageToQueue(std::string message);
-
     /* Handle the message queue, and sends to all clients */
     void handleMessagingClients();
 

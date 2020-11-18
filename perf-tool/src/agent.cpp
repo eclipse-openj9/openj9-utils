@@ -13,6 +13,7 @@
 #include "monitor.hpp"
 #include "objectalloc.hpp"
 #include "server.hpp"
+#include "exception.hpp"
 
 using json = nlohmann::json;
 
@@ -87,9 +88,8 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     std::cout << logPath << std::endl;
     std::cout << portNo << std::endl;
 
-    jint rest = jvm->GetEnv((void **)&jvmti, JVMTI_VERSION_1_2);
-    if (rest != JNI_OK || jvmti == NULL)
-    {
+    jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
+    if (rest != JNI_OK || jvmti == NULL) {
 
         printf("Unable to get access to JVMTI version 1.0");
         return JNI_ERR;
@@ -105,6 +105,8 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     capa.can_get_current_thread_cpu_time = 1;
     capa.can_get_line_numbers = 1;
     capa.can_generate_vm_object_alloc_events = 1;
+    capa.can_generate_exception_events = 1;
+    capa.can_get_source_file_name = 1;
     error = jvmti->AddCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Failed to set jvmtiCapabilities.");
 
@@ -112,7 +114,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     check_jvmti_error(jvmti, error, "Unable to init VM init event.");
 
     error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_DEATH, (jthread)NULL);
-    check_jvmti_error(jvmti, error, "Unable to init VM death event.");
+    check_jvmti_error(jvmti, error, "Unable to init VM death eventVerboseLogSubscriber.");
 
     jvmtiEventCallbacks callbacks;
     (void)memset(&callbacks, 0, sizeof(jvmtiEventCallbacks));
@@ -121,6 +123,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     callbacks.VMObjectAlloc = &VMObjectAlloc;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.MethodEntry = &MethodEntry;
+    callbacks.Exception = &Exception;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
 

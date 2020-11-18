@@ -39,9 +39,6 @@ void VerboseLogSubscriber::Subscribe()
         }
         extensionFunctions++; /* move on to the next extension function */
     }
-
-    jvmti->SetSystemProperty("-Dcom.ibm.tools.attach.log.name", "verboseLogs/txt");
-    jvmti->SetVerboseFlag(JVMTI_VERBOSE_CLASS, true);
 }
 
 

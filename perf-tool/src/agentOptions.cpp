@@ -88,7 +88,7 @@ void modifyObjectAllocEvents(std::string function, std::string command, int samp
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable ObjectAlloc event.");
         } else if (!command.compare("start")) { // c == start
-            printf("Object Alloc Capability already enabled");
+            printf("Object Alloc Capability already enabled\n");
             error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to enable VM ObjectAlloc event notifications.");
 
@@ -106,7 +106,7 @@ void modifyObjectAllocEvents(std::string function, std::string command, int samp
             error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to enable VM ObjectAlloc event notifications.");
         } else if (!command.compare("stop")) { // c == stop
-            printf("Obect Alloc Capability already disabled");
+            printf("Obect Alloc Capability already disabled\n");
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable ObjectAlloc event.");
         } else {

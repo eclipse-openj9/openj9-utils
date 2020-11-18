@@ -37,6 +37,7 @@ void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void *p)
 void sendToServer(std::string message)
 {
     server->messageQueue.push(message);
+    server->handleMessagingClients();
 }
 
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {

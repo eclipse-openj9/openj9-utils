@@ -1,10 +1,10 @@
 #include <jvmti.h>
 #include <iostream>
-#include <stdio.h> 
+#include <stdio.h>
 #include <string.h>
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <thread>
-#include <unistd.h> 
+#include <unistd.h>
 
 #include "agentOptions.hpp"
 #include "infra.hpp"
@@ -13,6 +13,7 @@
 #include "objectalloc.hpp"
 #include "methodEntry.hpp"
 #include "server.hpp"
+#include "exception.hpp"
 
 using json = nlohmann::json;
 
@@ -73,7 +74,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     std::cout << portNo << std::endl;
 
     // server = new Server(portNo, commandsPath, logPath);
-    
+
     jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
     if (rest != JNI_OK || jvmti == NULL) {
 
@@ -92,6 +93,8 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     capa.can_get_line_numbers = 1;
     capa.can_generate_vm_object_alloc_events = 1;
     capa.can_generate_monitor_events = 1;
+    capa.can_generate_exception_events = 1;
+    capa.can_get_source_file_name = 1;
     error = jvmti->AddCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Failed to set jvmtiCapabilities.");
 
@@ -108,6 +111,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) 
     callbacks.VMObjectAlloc = &VMObjectAlloc;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.MethodEntry = &MethodEntry;
+    callbacks.Exception = &Exception;
     error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks");
 

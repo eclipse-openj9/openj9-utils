@@ -220,12 +220,13 @@ void Server::sendPerfDataToClient(int time)
 
     if (perfPid == 0)
     {
-        perfData = perfProcess(currPid, time);
-        std::string perfStr;
-        perfStr = perfData.dump();
-
-        messageQueue.push(perfStr);
-        loggingClient->logData(perfStr, "perf");
+        perfProcess(currPid, time);
+        // std::string perfStr;
+        // perfStr = perfData.dump();
+        //
+        // messageQueue.push(perfStr);
+        // handleMessagingClients();
+        // loggingClient->logData(perfStr, "perf");
 
         exit(EXIT_SUCCESS);
     }
@@ -243,7 +244,7 @@ void Server::shutDownServer()
     }
 
     messageQueue.push("Server shutting down");
-    messageQueue.push("done"); // keyword for clients to close their connection
+    // messageQueue.push("done"); // keyword for clients to close their connection
 
     handleMessagingClients();
     close(serverSocketFd);

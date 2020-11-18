@@ -10,22 +10,24 @@
 #include <regex>
 #include <fstream>
 #include <string>
+#include <infra.hpp>
 
 
+/* For use later if user specifies which fields to return */
 const perfFieldRegex mapRegex[PERF_FIELD_MAX] = {
     {"unknown", "(.*)"},                        // PERF_FIELD_UNKNOWN
-    {"prog", "\\s+(.+)[\\s]{2,}"},              // PERF_FIELD_PROG
-    {"pid", "\\s*([0-9]+)"},                    // PERF_FIELD_PID
+    {"prog", "\\s+(.+)"},              // PERF_FIELD_PROG
+    {"pid", "\\s+([0-9]+)"},                    // PERF_FIELD_PID
     {"cpu", "\\s+([^\\s]+)"},                   // PERF_FIELD_CPU
     {"time", "\\s+([^\\s]+):"},                 // PERF_FIELD_TIME
-    {"cycles", "\\s+([^\\s]+\\s+)cycles:"},     // PERF_FIELD_CYCLES
+    {"cycles", "\\s+([^\\s]+)\\s+cycles:"},     // PERF_FIELD_CYCLES
     {"address", "\\s+([^\\s]+)"},               // PERF_FIELD_ADDRESS
     {"instruction", "\\s+([^\\s]+)"},           // PERF_FIELD_INSTRUCTION
     {"path", "\\s+([^\\s]+)"},                  // PERF_FIELD_PATH
 };
 
 
-json perfProcess(pid_t processID, int recordTime) {
+void perfProcess(pid_t processID, int recordTime) {
     /* Perf process runs perf tool to collect perf data of given process.
     * Inputs:	pid_t 	processID:	process ID of running application.
     * Outputs:	json	perf_data:	perf data collected from application.
@@ -65,9 +67,6 @@ json perfProcess(pid_t processID, int recordTime) {
     pid = wait(&status);
     system("perf script > perf.data.txt");
 
-    // Save into json format
-    json perfData;
-
     std::ifstream file("perf.data.txt");
     std::string lineStr;
     int idCount = 0;
@@ -89,6 +88,9 @@ json perfProcess(pid_t processID, int recordTime) {
         std::regex expression (progExpression + pidExpression + timeExpression + cyclesExpression + addressExpression + instructionExpression + pathExpression + "$");
 
         if (std::regex_search(lineStr, matches, expression)) {
+            // Save into json format
+            json perfData;
+
             // Put into JSON object
             std::string idStr = std::to_string(idCount); // define unique id for each line
             perfData[idStr]["prog"] = matches[1].str().c_str();
@@ -100,8 +102,10 @@ json perfProcess(pid_t processID, int recordTime) {
             perfData[idStr]["dso"] = matches[7].str().c_str();
             perfData[idStr]["record"] = lineStr.c_str();
             idCount++;
+
+            sendToServer(perfData.dump());
         }
 
     }
-    return perfData;
+    // return perfData;
 }

@@ -16,7 +16,7 @@ std::atomic<int> exceptionSampleRate {1};
 
 
 void setExceptionSampleRate(int rate) {
-    // Set sampling rate and enable/disable backtrace
+    /* Set sampling rate and enable/disable backtrace */
     if (rate > 0) {
         setExceptionBackTrace(true);
         exceptionSampleRate = rate;
@@ -27,7 +27,7 @@ void setExceptionSampleRate(int rate) {
 
 
 void setExceptionBackTrace(bool val){
-    // Enables or disables the stack trace option
+    /* Enables or disables the stack trace option */
     backTraceEnabled = val;
     return;
 }
@@ -46,27 +46,25 @@ JNIEXPORT void JNICALL Exception(jvmtiEnv *jvmtiEnv,
     jvmtiError err;
     jclass klass;
     char *fileName;
+    int lineCount, lineNumber;
+    jvmtiLineNumberEntry *lineTable;
+    char buffer[20];
+    char *methodName;
 
     static int numExceptions = 0; // number of total exceptions recorded
     numExceptions++;
 
     // First get exception address
     char ptrStr[] = "%p";
-    char buffer[20];
     sprintf(buffer, ptrStr, exception);
     string exceptionStr(buffer);
-    jdata["exception"] = (char*)exceptionStr.c_str();
+    jdata["exceptionAddress"] = (char*)exceptionStr.c_str();
 
     /* Get method name */
-    char *methodName;
     err = jvmtiEnv->GetMethodName(method, &methodName, NULL, NULL);
-    // record calling method
-    jdata["callingMethod"] = (char *)methodName;
+    jdata["callingMethod"] = (char *)methodName;  // record calling method
 
     /* Get line number */
-    int lineCount, lineNumber;
-    jvmtiLineNumberEntry *lineTable;
-
     err = jvmtiEnv->GetLineNumberTable(method, &lineCount, &lineTable);
     if (err == JVMTI_ERROR_NONE) { // Find line
         lineNumber = lineTable[0].line_number;
@@ -77,8 +75,7 @@ JNIEXPORT void JNICALL Exception(jvmtiEnv *jvmtiEnv,
                 lineNumber = lineTable[i].line_number;
             }
         }
-        // record line number of calling method
-        jdata["lineNumber"] = lineNumber;
+        jdata["callingMethodLineNumber"] = lineNumber;  // record line number of calling method
     }
 
     /* Get jclass object of calling method*/
@@ -97,13 +94,11 @@ JNIEXPORT void JNICALL Exception(jvmtiEnv *jvmtiEnv,
             int numFrames = 5;
             jvmtiFrameInfo frames[numFrames];
             jint count;
-            jvmtiError err;
             auto jMethods = json::array();
 
             err = jvmtiEnv->GetStackTrace(thread, 0, numFrames,
                                         frames, &count);
             if (err == JVMTI_ERROR_NONE && count >= 1) {
-                // char *methodName;
                 json jMethod;
                 for (int i = 0; i < count; i++) {
                     /* Get method name */
@@ -148,6 +143,10 @@ JNIEXPORT void JNICALL Exception(jvmtiEnv *jvmtiEnv,
     }
 
     jdata["numExceptions"] = numExceptions;
+
+    err = jvmtiEnv->Deallocate((unsigned char*)fileName);
+    err = jvmtiEnv->Deallocate((unsigned char*)methodName);
+    err = jvmtiEnv->Deallocate((unsigned char*)lineTable);
 
     sendToServer(jdata.dump());
 }

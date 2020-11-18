@@ -38,6 +38,11 @@ Server::Server(int portNo, string commandFileName, string logFileName)
     loggingClient->logData("Server started", "Server");
 }
 
+void Server::addMessageToQueue(string message) {
+    messageQueue.push(message);
+    handleMessagingClients();
+}
+
 void Server::handleServer()
 {
     socklen_t clilen;
@@ -249,10 +254,10 @@ void Server::shutDownServer()
     close(serverSocketFd);
 
     loggingClient->closeFile();
-    for (int i = 0; i < activeNetworkClients; i++)
-    {
-        networkClients[i]->closeFd();
-    }
+    // for (int i = 0; i < activeNetworkClients; i++)
+    // {
+    //     networkClients[i]->closeFd();
+    // }
     if (headlessMode)
     {
         commandClient->closeFile();

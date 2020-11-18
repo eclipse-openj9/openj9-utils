@@ -12,13 +12,14 @@
 #include <string>
 
 
+/* For use later if user specifies which fields to return */
 const perfFieldRegex mapRegex[PERF_FIELD_MAX] = {
     {"unknown", "(.*)"},                        // PERF_FIELD_UNKNOWN
-    {"prog", "\\s+(.+)[\\s]{2,}"},              // PERF_FIELD_PROG
-    {"pid", "\\s*([0-9]+)"},                    // PERF_FIELD_PID
+    {"prog", "\\s+(.+)"},              // PERF_FIELD_PROG
+    {"pid", "\\s+([0-9]+)"},                    // PERF_FIELD_PID
     {"cpu", "\\s+([^\\s]+)"},                   // PERF_FIELD_CPU
     {"time", "\\s+([^\\s]+):"},                 // PERF_FIELD_TIME
-    {"cycles", "\\s+([^\\s]+\\s+)cycles:"},     // PERF_FIELD_CYCLES
+    {"cycles", "\\s+([^\\s]+)\\s+cycles:"},     // PERF_FIELD_CYCLES
     {"address", "\\s+([^\\s]+)"},               // PERF_FIELD_ADDRESS
     {"instruction", "\\s+([^\\s]+)"},           // PERF_FIELD_INSTRUCTION
     {"path", "\\s+([^\\s]+)"},                  // PERF_FIELD_PATH

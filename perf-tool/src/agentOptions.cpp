@@ -1,10 +1,7 @@
-#include <jvmti.h>
-#include "infra.hpp"
-#include <string>
 #include <cstring>
+#include <iostream>
 #include <jvmti.h>
 #include <stdio.h>
-#include <iostream>
 #include <string>
 #include <unistd.h>
 
@@ -12,12 +9,12 @@
 #include "infra.hpp"
 #include "monitor.hpp"
 #include "objectalloc.hpp"
+#include "verboseLog.hpp"
 #include "exception.hpp"
 #include "methodEntry.hpp"
 
 
-#include "json.hpp"
-using json = nlohmann::json;
+VerboseLogSubscriber *verboseLogSubscriber;
 
 void invalidCommand(std::string function, std::string command){
     printf("Invalid command with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str() );
@@ -196,6 +193,18 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
 }
 */
 
+void handleVerboseLogSubscriber(std::string command)
+{
+    if (!command.compare("start"))
+    {
+        verboseLogSubscriber = new VerboseLogSubscriber(jvmti);
+        verboseLogSubscriber->Subscribe();
+    } else if (!command.compare("stop"))
+    {
+        verboseLogSubscriber->Unsubscribe();
+    }
+}
+
 void modifyExceptionBackTrace(std::string function, std::string command){
     // enable stack trace
     if (!command.compare("start")) {
@@ -254,6 +263,8 @@ void agentCommand(json jCommand){
             modifyMonitorStackTrace(function, command);
         } else if(!function.compare("methodEntryEvents")){
             modifyMethodEntryEvents(function, command, sampleRate);
+        } else if(!function.compare("verboseLog")){
+            handleVerboseLogSubscriber(command);
         } else if(!function.compare("exceptionEvents")){
             modifyExceptionEvents(function, command, sampleRate);
         } else {

@@ -15,10 +15,11 @@
 int main(int argc, char *argv[])
 {
     int sockfd, portno, n;
+    bool done = false;
     struct sockaddr_in serv_addr;
     struct hostent *server;
     struct pollfd pollFds[2];
-    char buffer[256];
+    char buffer[4096];
 
     pollFds[0].fd = STDIN_FILENO;
     pollFds[0].events = POLLIN;
@@ -60,15 +61,15 @@ int main(int argc, char *argv[])
 
     printf("Enter message to send to server: \n");
 
-    while (true) {
-        bzero(buffer, 256);
+    while (!done) {
+        bzero(buffer, 4096);
 
         if (poll(pollFds, 2, POLL_INTERVAL) == -1){
             error("ERROR on polling");
         }
 
         if (pollFds[0].revents && POLLIN) {
-            fgets(buffer, 255, stdin);
+            fgets(buffer, 4096, stdin);
 
             n = write(sockfd, buffer, strlen(buffer));
             if (n < 0){ 
@@ -77,9 +78,9 @@ int main(int argc, char *argv[])
         }
 
         if (pollFds[1].revents && POLLIN) {
-            bzero(buffer, 256);
+            bzero(buffer, 4096);
 
-            n = read(sockfd, buffer, 255);
+            n = recv(sockfd, buffer, 4095, MSG_DONTWAIT);
             if (n < 0) {
                 error("ERROR reading from socket");
             }
@@ -87,14 +88,15 @@ int main(int argc, char *argv[])
             if (n > 0) {
                 printf("Recieved: %s\n", buffer);
 
-                // if (std::string(buffer).substr(strlen(buffer) - 4, 4) == "done") {
-                //     close(sockfd);
-                //     printf("Closed connection with server.\n");
-                //     break;
-                // }
+                if (std::string(buffer).substr(strlen(buffer) - 4, 4) == "done") {
+                    done = true;
+                }
             }
         }
     }
+    
+    close(sockfd);
+    printf("Closed connection with server.\n");
 
     return 0;
 }

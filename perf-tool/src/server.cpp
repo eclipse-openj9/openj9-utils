@@ -21,7 +21,7 @@ using json = nlohmann::json;
 
 pid_t perfPid = -1;
 
-Server::Server(int portNo, string commandFileName, string logFileName)
+Server::Server(int portNo, const string commandFileName, const string logFileName)
 {
     this->portNo = portNo;
 
@@ -41,7 +41,7 @@ Server::Server(int portNo, string commandFileName, string logFileName)
 void Server::handleServer()
 {
     socklen_t clilen;
-    char buffer[256], msg[256];
+    char buffer[512];
     string message, command;
     struct sockaddr_in serv_addr, cli_addr;
     int n, newsocketFd;
@@ -86,12 +86,13 @@ void Server::handleServer()
     // Use polling to keep track of clients and keyboard input
     while (1)
     {
+        handleMessagingClients();
         if (!keepPolling)
         {
             break;
         }
 
-        bzero(buffer, 256);
+        bzero(buffer, 512);
 
         if (poll(pollFds, activeNetworkClients + ServerConstants::BASE_POLLS, ServerConstants::POLL_INTERVALS) == -1)
         {
@@ -140,7 +141,7 @@ void Server::handleServer()
         // Receiving and sending messages from/to clients
         for (int i = 0; i < activeNetworkClients; i++)
         {
-            bzero(buffer, 256);
+            bzero(buffer, 512);
             command = networkClients[i]->handlePoll(buffer);
             if (!command.empty())
             {
@@ -148,7 +149,6 @@ void Server::handleServer()
             }
         }
 
-        handleMessagingClients();
     }
 }
 
@@ -158,7 +158,6 @@ void Server::execCommand(json command)
         sleep(command["delay"]);
     if ((command["functionality"].get<std::string>()).compare("perf"))
     {
-        // agentCommand(command["functionality"].get<std::string>(), command["command"].get<std::string>(), command["sampleRate"].get<int>());
         agentCommand(command);
     }
     else
@@ -184,10 +183,23 @@ void Server::handleClientCommand(string command, string from)
     loggingClient->logData(command, from);
 }
 
-void Server::sendMessage(int socketFd, std::string message)
+void Server::sendMessage(const int socketFd, const std::string message)
 {
-    const char *cstring = message.c_str();
-    send(socketFd, cstring, strlen(cstring), 0);
+    int n, total = 0;
+    size_t length = message.size();
+    const char *buffer = message.data();
+
+    while (total < length) 
+    {
+        n = send(socketFd, buffer, strlen(buffer), 0);
+        if (n == -1) 
+        { 
+            error("ERROR sending message to clients failed"); 
+        }
+
+        total += n;
+        buffer += n;
+    }
 }
 
 void Server::handleMessagingClients()
@@ -199,7 +211,7 @@ void Server::handleMessagingClients()
             int clientSocketFd = networkClients[i]->getSocketFd();
             sendMessage(clientSocketFd, messageQueue.front());
         }
-        loggingClient->logData(messageQueue.front(), "Agent");
+        loggingClient->logData(messageQueue.front(), "Server");
 
         messageQueue.pop();
     }
@@ -221,12 +233,6 @@ void Server::sendPerfDataToClient(int time)
     if (perfPid == 0)
     {
         perfProcess(currPid, time);
-        // std::string perfStr;
-        // perfStr = perfData.dump();
-        //
-        // messageQueue.push(perfStr);
-        // handleMessagingClients();
-        // loggingClient->logData(perfStr, "perf");
 
         exit(EXIT_SUCCESS);
     }
@@ -244,20 +250,21 @@ void Server::shutDownServer()
     }
 
     messageQueue.push("Server shutting down");
-    // messageQueue.push("done"); // keyword for clients to close their connection
 
     handleMessagingClients();
-    close(serverSocketFd);
 
     loggingClient->closeFile();
     for (int i = 0; i < activeNetworkClients; i++)
     {
+        sendMessage(networkClients[i]->getSocketFd(), "done");
         networkClients[i]->closeFd();
     }
     if (headlessMode)
     {
         commandClient->closeFile();
     }
+
+    close(serverSocketFd);
 
     cout << "Server shutdown." << endl;
 }

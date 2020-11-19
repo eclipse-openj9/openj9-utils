@@ -45,17 +45,13 @@ public:
     /* Join the server thread and closes server's socket */
     void shutDownServer(void);
 
-    void passPathToCommandFile(std::string path);
-
-    void passPathToLogFile(std::string path);
-
     void execCommand(json command);
 
 private:
     /* Handles recieving commands for the agent from clients */
-    void handleClientCommand(std::string command, std::string from);
+    void handleClientCommand(const std::string command, const std::string from);
 
-    void sendMessage(int socketFd, std::string message);
+    void sendMessage(const int socketFd, const std::string message);
 
     void sendPerfDataToClient(int time);
 };

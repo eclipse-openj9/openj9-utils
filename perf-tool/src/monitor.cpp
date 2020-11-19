@@ -40,7 +40,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
     if (str != NULL && error == JVMTI_ERROR_NONE) */
     // record calling class
     j["Class"] = str;
-    printf("%s\n", j.dump().c_str());
+    // printf("%s\n", j.dump().c_str());
 
     numContentions[str].numFirstTier++;
 
@@ -64,7 +64,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
         }
     }
     // printf("%s\n", j.dump().c_str());
-    sendToServer(j.dump());
+    sendToServer(j.dump(2, ' ', true));
 }
 
 

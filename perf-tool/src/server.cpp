@@ -86,7 +86,6 @@ void Server::handleServer()
     // Use polling to keep track of clients and keyboard input
     while (1)
     {
-        handleMessagingClients();
         if (!keepPolling)
         {
             break;
@@ -148,7 +147,12 @@ void Server::handleServer()
                 handleClientCommand(command, "Client");
             }
         }
-
+        
+        while (!messageQueue.empty())
+        {
+            handleMessagingClients(messageQueue.front());
+            messageQueue.pop();
+        }
     }
 }
 
@@ -183,7 +187,7 @@ void Server::handleClientCommand(string command, string from)
     loggingClient->logData(command, from);
 }
 
-void Server::sendMessage(const int socketFd, const std::string message)
+void Server::sendMessage(const int socketFd, const string message)
 {
     int n, total = 0;
     size_t length = message.size();
@@ -202,19 +206,15 @@ void Server::sendMessage(const int socketFd, const std::string message)
     }
 }
 
-void Server::handleMessagingClients()
+void Server::handleMessagingClients(string message)
 {
-    while (!messageQueue.empty())
-    {
-        for (int i = 0; i < activeNetworkClients; i++)
-        {
-            int clientSocketFd = networkClients[i]->getSocketFd();
-            sendMessage(clientSocketFd, messageQueue.front());
-        }
-        loggingClient->logData(messageQueue.front(), "Server");
 
-        messageQueue.pop();
+    for (int i = 0; i < activeNetworkClients; i++)
+    {
+        int clientSocketFd = networkClients[i]->getSocketFd();
+        sendMessage(clientSocketFd, message);
     }
+    loggingClient->logData(message, "Server");
 }
 
 void Server::sendPerfDataToClient(int time)
@@ -234,6 +234,14 @@ void Server::sendPerfDataToClient(int time)
     {
         perfProcess(currPid, time);
 
+        while (!messageQueue.empty())
+        {
+            handleMessagingClients(messageQueue.front());
+            messageQueue.pop();
+        }
+
+        handleMessagingClients("Server shutting down");
+
         exit(EXIT_SUCCESS);
     }
 }
@@ -248,10 +256,6 @@ void Server::shutDownServer()
         cout << "Waiting on perf data." << endl;
         waitpid(perfPid, &status, WCONTINUED);
     }
-
-    messageQueue.push("Server shutting down");
-
-    handleMessagingClients();
 
     loggingClient->closeFile();
     for (int i = 0; i < activeNetworkClients; i++)

@@ -37,10 +37,10 @@ public:
     Server(int portNo, std::string commandFileName = "", std::string logFileName = "logs.txt");
 
     /* Handles server functionality and polling*/
-    void handleServer();
+    void handleServer(void);
 
     /* Handle the message queue, and sends to all clients */
-    void handleMessagingClients();
+    void handleMessagingClients(std::string message);
 
     /* Join the server thread and closes server's socket */
     void shutDownServer(void);

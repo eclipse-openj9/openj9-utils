@@ -80,7 +80,7 @@ void VerboseLogSubscriber::Unsubscribe()
 jvmtiError verboseSubscriberCallback(jvmtiEnv *jvmti_env, const char *record, jlong length, void *user_data)
 {
     string s = string(record);
-    sendToServer(s);
+    sendToServerQueue(s);
 
     return JVMTI_ERROR_NONE;
 }

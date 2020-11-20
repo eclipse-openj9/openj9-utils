@@ -90,7 +90,7 @@ jvmtiError verboseSubscriberCallback(jvmtiEnv *jvmti_env, const char *record, jl
     if (verboseSampleCount % verboseSampleRate == 0)
     {
         string s = string(record);
-        sendToServerQueue(s);
+        sendToServer(s);
     }
 
     verboseSampleCount++;

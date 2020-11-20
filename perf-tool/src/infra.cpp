@@ -39,11 +39,6 @@ void sendToServer(std::string message)
     server->handleMessagingClients(message);
 }
 
-void sendToServerQueue(std::string message)
-{
-    server->messageQueue.push(message);
-}
-
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {
     jvmtiError error;
     int* portPointer = portNo ? &portNo : NULL;

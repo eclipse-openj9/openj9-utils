@@ -148,5 +148,5 @@ JNIEXPORT void JNICALL Exception(jvmtiEnv *jvmtiEnv,
     err = jvmtiEnv->Deallocate((unsigned char*)methodName);
     err = jvmtiEnv->Deallocate((unsigned char*)lineTable);
 
-    sendToServerQueue(jdata.dump());
+    sendToServer(jdata.dump());
 }

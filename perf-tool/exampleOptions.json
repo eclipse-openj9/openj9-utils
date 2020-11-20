@@ -15,8 +15,15 @@
     "time": 1
   },
   {
+    "functionality": "methodEntryEvents",
+    "command": "start",
+    "sampleRate": 2000,
+    "delay": 0
+  },
+  {
     "functionality": "objectAllocEvents",
     "command": "start",
+    "sampleRate": 10,
     "delay": 0
   },
   {

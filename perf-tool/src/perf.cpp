@@ -103,7 +103,7 @@ void perfProcess(pid_t processID, int recordTime) {
             perfData[idStr]["record"] = lineStr.c_str();
             idCount++;
 
-            sendToServerQueue(perfData.dump());
+            sendToServer(perfData.dump());
         }
 
     }

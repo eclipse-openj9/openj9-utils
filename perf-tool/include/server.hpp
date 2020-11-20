@@ -3,7 +3,6 @@
 #define SERVER_H_
 
 #include <thread>
-#include <queue>
 #include <poll.h>
 
 #include "serverClients.hpp"
@@ -18,16 +17,14 @@ class Server
      */
 protected:
 public:
-    std::queue<std::string> messageQueue;
-
 private:
     int serverSocketFd, activeNetworkClients = 0, portNo;
     bool headlessMode = true, keepPolling = true;
-    std::thread mainServerThread;
     struct pollfd pollFds[ServerConstants::BASE_POLLS + ServerConstants::NUM_CLIENTS];
     NetworkClient *networkClients[ServerConstants::NUM_CLIENTS];
     CommandClient *commandClient;
     LoggingClient *loggingClient;
+    std::thread perfThread;
 
     /*
      * Function members
@@ -42,18 +39,18 @@ public:
     /* Handle the message queue, and sends to all clients */
     void handleMessagingClients(std::string message);
 
-    /* Join the server thread and closes server's socket */
+    /* Closes all open files, connectend socketfd, and then the server's socket */
     void shutDownServer(void);
-
-    void execCommand(json command);
 
 private:
     /* Handles recieving commands for the agent from clients */
     void handleClientCommand(const std::string command, const std::string from);
 
+    void execCommand(json command);
+
     void sendMessage(const int socketFd, const std::string message);
 
-    void sendPerfDataToClient(int time);
+    void startPerfThread(int time);
 };
 
 #endif /* SERVER_H_ */

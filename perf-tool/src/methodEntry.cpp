@@ -14,10 +14,14 @@ using json = nlohmann::json;
 std::atomic<int> mEntrySampleCount {0};
 std::atomic<int> mEntrySampleRate {1};
 
+// set sample rate according to command instructions
+// requirement: rate > 0
 void setMethodEntrySampleRate(int rate) {
     mEntrySampleRate = rate;
 }
 
+/*** retrieves method name and line number, and declaring class name and signature
+ *      for every nth method entry                                                 ***/
 JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
             JNIEnv* env,
             jthread thread,

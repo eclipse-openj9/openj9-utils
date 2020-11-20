@@ -21,7 +21,7 @@ These commands are provided by either a commands file (see [Agent Start-Up Comma
 | --- | --- | --- | ---- |
 | start | monitorEvents, objectAllocEvents, methodEntryEvents, exceptionEvents | Event Name | Start recording an event |
 | stop | monitorEvents, objectAllocEvents, methodEntryEvents, exceptionEvents | Event Name | Stop recording an event |
-| sampleRate | objectAllocEvents, methodEntryEvents | Event Name | Set a sampling rate `n` for retrieving backtrace (set to 0 for none) |
+| sampleRate | objectAllocEvents, methodEntryEvents*, exceptionEvents | Event Name | Set a sampling rate `n` for retrieving backtrace (set to 0 for none) *methodEntryEvents required to have sampleRate > 0 |
 | delay | All Functionalities | Integer | Time to wait before running the command after it is received (in seconds) |
 | time | perf | Integer | Time to run the command for |
 

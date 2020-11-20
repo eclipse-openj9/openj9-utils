@@ -3,6 +3,23 @@
 2. Create build directory `mkdir build`, otherwise if the directory already exists `cd build` and run `cmake ..`. This will generate the makefile.  
 3. Now to build the project, run `make all`. The generated `libagent.so` will be in the `build` directory.
 
+# Perf Setup
+1. Prior to running commands to collect perf data, ensure perf is installed on your computer.
+### Ubuntu
+```
+sudo apt install linux-tools-common
+```
+### Debian
+```
+sudo apt install linux-perf
+```
+2. Running perf as a non-root user may cause conflicts. To overcome these conflicts, you will need to change some kernel parameters:
+```
+sudo sh -c " echo 0 > /proc/sys/kernel/kptr_restrict"
+```
+```
+sudo sh -c 'echo -1 >/proc/sys/kernel/perf_event_paranoid'
+```
 
 # Agent Start-Up Commands
 These commands are passed to the agent on start up. The format of the commands should be a comma-seperated list of key:value pairs without white-space provided at the end of the path used to load and run the agent. ie) -agentpath:c:\myLibs\foo.dll=**key1:val1,key2:val2**

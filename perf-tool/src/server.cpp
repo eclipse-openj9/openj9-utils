@@ -2,24 +2,23 @@
 
 #include <arpa/inet.h>
 #include <iostream>
+#include <jvmti.h>
 #include <netinet/in.h>
 #include <stdio.h>
-#include <jvmti.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/wait.h>
+#include <thread>
 #include <unistd.h>
 
+#include "agentOptions.hpp"
+#include <fstream>
 #include "perf.hpp"
 #include "utils.hpp"
-#include <fstream>
-#include "agentOptions.hpp"
 
 using namespace std;
 using json = nlohmann::json;
-
-pid_t perfPid = -1;
 
 Server::Server(int portNo, const string commandFileName, const string logFileName)
 {
@@ -86,7 +85,6 @@ void Server::handleServer()
     // Use polling to keep track of clients and keyboard input
     while (1)
     {
-        handleMessagingClients();
         if (!keepPolling)
         {
             break;
@@ -148,21 +146,20 @@ void Server::handleServer()
                 handleClientCommand(command, "Client");
             }
         }
-
     }
 }
 
 void Server::execCommand(json command)
 {
-    if (!command["delay"].is_null())
-        sleep(command["delay"]);
+    //if (!command["delay"].is_null())
+    //    sleep(command["delay"]);
     if ((command["functionality"].get<std::string>()).compare("perf"))
     {
         agentCommand(command);
     }
     else
     {
-        sendPerfDataToClient(command["time"]);
+        startPerfThread(command["time"]);
     }
 }
 
@@ -183,7 +180,7 @@ void Server::handleClientCommand(string command, string from)
     loggingClient->logData(command, from);
 }
 
-void Server::sendMessage(const int socketFd, const std::string message)
+void Server::sendMessage(const int socketFd, const string message)
 {
     int n, total = 0;
     size_t length = message.size();
@@ -193,7 +190,7 @@ void Server::sendMessage(const int socketFd, const std::string message)
     {
         n = send(socketFd, buffer, strlen(buffer), 0);
         if (n == -1) 
-        { 
+        {
             error("ERROR sending message to clients failed"); 
         }
 
@@ -202,63 +199,47 @@ void Server::sendMessage(const int socketFd, const std::string message)
     }
 }
 
-void Server::handleMessagingClients()
+void Server::handleMessagingClients(string message)
 {
-    while (!messageQueue.empty())
-    {
-        for (int i = 0; i < activeNetworkClients; i++)
-        {
-            int clientSocketFd = networkClients[i]->getSocketFd();
-            sendMessage(clientSocketFd, messageQueue.front());
-        }
-        loggingClient->logData(messageQueue.front(), "Server");
 
-        messageQueue.pop();
+    for (int i = 0; i < activeNetworkClients; i++)
+    {
+        int clientSocketFd = networkClients[i]->getSocketFd();
+        sendMessage(clientSocketFd, message);
     }
+    loggingClient->logData(message, "Server");
 }
 
-void Server::sendPerfDataToClient(int time)
+void Server::startPerfThread(int time)
 {
     pid_t currPid;
-    json perfData;
 
     currPid = getpid();
-    printf("pid: %d\n", currPid);
-    perfPid = fork();
-    if (perfPid == -1)
-    {
-        perror("fork");
-    }
-
-    if (perfPid == 0)
-    {
-        perfProcess(currPid, time);
-
-        exit(EXIT_SUCCESS);
-    }
+    perfThread = thread(&perfProcess, currPid, time);
 }
 
 void Server::shutDownServer()
 {
     keepPolling = false;
 
-    if (perfPid != -1)
+    // wait on perf processing thread to join so its data can be sent before server closing
+    if (perfThread.joinable())
     {
-        int status;
         cout << "Waiting on perf data." << endl;
-        waitpid(perfPid, &status, WCONTINUED);
+        perfThread.join();
     }
 
-    messageQueue.push("Server shutting down");
+    handleMessagingClients("Server shutting down");
 
-    handleMessagingClients();
-
+    // close off commands, logs, and network client sockets
     loggingClient->closeFile();
+
     for (int i = 0; i < activeNetworkClients; i++)
     {
         sendMessage(networkClients[i]->getSocketFd(), "done");
         networkClients[i]->closeFd();
     }
+
     if (headlessMode)
     {
         commandClient->closeFile();

@@ -64,7 +64,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv* env, 
         }
     }
     // printf("%s\n", j.dump().c_str());
-    sendToServer(j.dump(2, ' ', true));
+    sendToServer(j.dump());
 }
 
 

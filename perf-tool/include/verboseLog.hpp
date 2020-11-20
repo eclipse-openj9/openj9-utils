@@ -2,6 +2,7 @@
 #define VERBOSE_LOG_H_
 
 #include <ibmjvmti.h>
+#include <atomic>
 
 void verboseAlarmCallback(jvmtiEnv *jvmti_env, void *subscription_id, void *user_data);
 jvmtiError verboseSubscriberCallback(jvmtiEnv *jvmti_env, const char *record, jlong length, void *user_data);
@@ -26,10 +27,10 @@ public:
     {
         jvmti_env = _jvmti_env;
     }
+
+    void setVerboseGCLogSampleRate(int rate);
     void Subscribe();
     void Unsubscribe();
-
-    friend void verboseAlarmCallback(jvmtiEnv *jvmti_env, void *subscription_id, void *user_data);
 
 private:
 

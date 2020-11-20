@@ -2,6 +2,7 @@
   {
     "functionality": "verboseLog",
     "command": "start",
+    "sampleRate": 200,
     "delay": 0
   },
   {

@@ -29,91 +29,17 @@ void invalidRate(std::string function, std::string command, int sampleRate) {
 }
 
 void modifyMonitorEvents(std::string function, std::string command){
-    jvmtiCapabilities capa;
     jvmtiError error;
-
-    (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-    error = jvmti -> GetCapabilities(&capa);
-    check_jvmti_error(jvmti, error, "Unable to get current capabilties");
-    if(capa.can_generate_monitor_events){
-        if( !command.compare("stop")){
-            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-            capa.can_generate_monitor_events = 1;
-
-            error = jvmti -> RelinquishCapabilities(&capa);
-            check_jvmti_error(jvmti, error, "Unable to relinquish \n");
-            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEntered event.");
-        } else{ // c == start
-            printf("Monitor Events Capability already enabled\n");
-            error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to enable MonitorContendedEntered event notifications.");
-        }
-    } else{ // cannot generate monitor events
-        if(!command.compare("start")){
-            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-            capa.can_generate_monitor_events = 1;
-
-            error = jvmti -> AddCapabilities(&capa);
-            check_jvmti_error(jvmti, error, "Unable to init monitor events capability");
-
-            error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to enable MonitorContendedEntered event notifications.");
-        } else{ // c == stop
-            printf("Monitor Events Capability already disabled\n");
-            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEntered event.");
-        }
+    if( !command.compare("stop")){
+        error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
+        check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEntered event.\n");
+    } else if (!command.compare("start")) { // c == start
+        error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
+        check_jvmti_error(jvmti, error, "Unable to enable MonitorContendedEntered event notifications.\n");
+    } else {
+        invalidCommand(function, command);
     }
     return;
-}
-
-
-void modifyObjectAllocEvents(std::string function, std::string command, int sampleRate){
-    jvmtiCapabilities capa;
-    jvmtiError error;
-
-    (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-    error = jvmti -> GetCapabilities(&capa);
-    check_jvmti_error(jvmti, error, "Unable to get current capabilties");
-    setObjAllocSampleRate(sampleRate);
-    if(capa.can_generate_vm_object_alloc_events){
-        if(!command.compare("stop")){
-            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-            capa.can_generate_vm_object_alloc_events = 1;
-
-            error = jvmti -> RelinquishCapabilities(&capa);
-            check_jvmti_error(jvmti, error, "Unable to relinquish object alloc capability\n");
-
-            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to disable ObjectAlloc event.");
-        } else if (!command.compare("start")) { // c == start
-            printf("Object Alloc Capability already enabled\n");
-            error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to enable VM ObjectAlloc event notifications.");
-
-        } else {
-            invalidCommand(function, command);
-        }
-    }else{ // cannot generate monitor events
-        if(!command.compare("start")){
-            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-            capa.can_generate_vm_object_alloc_events = 1;
-
-            error = jvmti -> AddCapabilities(&capa);
-            check_jvmti_error(jvmti, error, "Unable to init object alloc events capability");
-
-            error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to enable VM ObjectAlloc event notifications.");
-        } else if (!command.compare("stop")) { // c == stop
-            printf("Obect Alloc Capability already disabled\n");
-            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to disable ObjectAlloc event.");
-        } else {
-            invalidCommand(function, command);
-        }
-    }
-
 }
 
 void modifyMonitorStackTrace(std::string function, std::string command){
@@ -127,71 +53,39 @@ void modifyMonitorStackTrace(std::string function, std::string command){
     }
 }
 
-//object alloc capability already enabled
-void modifyMethodEntryEvents(std::string function, std::string command, int sampleRate){
+void modifyObjectAllocEvents(std::string function, std::string command, int sampleRate){
     jvmtiError error;
-    setMethodEntrySampleRate(sampleRate);
+    setObjAllocSampleRate(sampleRate);
     if(!command.compare("stop")){
-        printf("\n\n\nSTOP\n\n\n");
-        error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
-        check_jvmti_error(jvmti, error, "Unable to disable MethodEntry event.\n");
+        error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
+        check_jvmti_error(jvmti, error, "Unable to disable ObjectAlloc event.\n");
     } else if (!command.compare("start")) { // c == start
-        printf("\n\n\nSTART\n\n\n");
-        error = jvmti->SetEventNotificationMode(JVMTI_ENABLE,  JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
-        check_jvmti_error(jvmti, error, "Unable to enable MethodEntry event notifications.\n");
+        error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
+        check_jvmti_error(jvmti, error, "Unable to enable VM ObjectAlloc event notifications.\n");
     } else {
         invalidCommand(function, command);
     }
 }
 
-/*
+
 void modifyMethodEntryEvents(std::string function, std::string command, int sampleRate){
-    jvmtiCapabilities capa;
     jvmtiError error;
-
-    (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-    error = jvmti -> GetCapabilities(&capa);
-    check_jvmti_error(jvmti, error, "Unable to get current capabilties");
-    setMethodEntrySampleRate(sampleRate);
-    if(capa.can_generate_vm_object_alloc_events && capa.can_generate_method_entry_events){
+    if (sampleRate==0) {
+        invalidRate(function, command, sampleRate);
+        printf("\nmethodEntryEvents requires sampleRate > 0\n");
+    } else {
+        setMethodEntrySampleRate(sampleRate);
         if(!command.compare("stop")){
-            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-            capa.can_generate_vm_object_alloc_events = 1;
-            capa.can_generate_method_entry_events = 1;
-
-            error = jvmti -> RelinquishCapabilities(&capa);
-            check_jvmti_error(jvmti, error, "Unable to relinquish method entry capability\n");
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable MethodEntry event.\n");
         } else if (!command.compare("start")) { // c == start
-            printf("Object Alloc Capability already enabled");
             error = jvmti->SetEventNotificationMode(JVMTI_ENABLE,  JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to enable MethodEntry event notifications.\n");
         } else {
             invalidCommand(function, command);
         }
-    }else{ // cannot generate monitor events
-        if(!command.compare("start")){
-            (void)memset(&capa, 0, sizeof(jvmtiCapabilities));
-            capa.can_generate_vm_object_alloc_events = 1;
-            capa.can_generate_method_entry_events = 1;
-            capa.can_get_line_numbers = 1;
-
-            error = jvmti -> AddCapabilities(&capa);
-            check_jvmti_error(jvmti, error, "Unable to init method entry events capability");
-
-            error = jvmti-> SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to enable MethodEntry event notifications.\n");
-        } else if (!command.compare("stop")) { // c == stop
-            printf("Obect Alloc Capability already disabled");
-            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to disable MethodEntry event.\n");
-        } else {
-            invalidCommand(function, command);
-        }
     }
 }
-*/
 
 void modifyVerboseLogSubscriber(std::string command, int sampleRate)
 {
@@ -246,6 +140,7 @@ void agentCommand(json jCommand){
         sampleRate = jCommand["sampleRate"].get<int>();
         if (sampleRate <0 ) {
             invalidRate(function, command, sampleRate);
+            printf("\nsampleRate must be >= 0\n");
         }
     }
 
@@ -254,7 +149,7 @@ void agentCommand(json jCommand){
         check_jvmti_error(jvmti, JVMTI_ERROR_WRONG_PHASE, "AGENT CANNOT RECEIVE COMMANDS DURING THIS PHASE\n");
     } else {
         error = jvmti -> GetCapabilities(&capa);
-        check_jvmti_error(jvmti, error, "Unable to get current capabilties");
+        check_jvmti_error(jvmti, error, "Unable to get current capabilties.\n");
 
         if(!function.compare("monitorEvents")){
             modifyMonitorEvents(function, command);

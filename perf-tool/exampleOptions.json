@@ -23,8 +23,19 @@
   {
     "functionality": "objectAllocEvents",
     "command": "start",
-    "sampleRate": 10,
+    "sampleRate": 2,
     "delay": 0
+  },
+  {
+    "functionality": "methodEntryEvents",
+    "command": "start",
+    "sampleRate": 2000,
+    "delay": 0
+  },
+  {
+    "functionality": "methodEntryEvents",
+    "command": "stop",
+    "delay": 4
   },
   {
     "functionality": "monitorEvents",

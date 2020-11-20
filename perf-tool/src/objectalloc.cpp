@@ -24,7 +24,7 @@ std::atomic<bool> objAllocBackTraceEnabled {true};
 std::atomic<int> objAllocSampleCount {0};
 std::atomic<int> objAllocSampleRate {1};
 
-// Enables or disables the back trace option
+// Enables or disables the back trace option if sampleRate == 0
 void setObjAllocBackTrace(bool val){
     objAllocBackTraceEnabled = val;
     return;
@@ -41,6 +41,8 @@ void setObjAllocSampleRate(int rate) {
     return;
 }
 
+/*** retrieves object type name, size (in bytes), allocation rate (bytes/microsec),
+ *      and backtrace for every nth sample (if enabled)                             ***/
 JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv, 
                         JNIEnv* env, 
                         jthread thread, 
@@ -63,6 +65,7 @@ JNIEXPORT void JNICALL VMObjectAlloc(jvmtiEnv *jvmtiEnv,
 
 
     /*** get information about backtrace at object allocation sites if enabled***/
+    /*** retrieves method names and line numbers, and declaring class name and signature ***/
     if (objAllocBackTraceEnabled) {
         if (objAllocSampleCount % objAllocSampleRate == 0){
             char *methodName;

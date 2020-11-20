@@ -2,6 +2,7 @@
 #define INFRA_H_
 
 #include <string>
+#include <jvmti.h>
 
 void check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str);
 

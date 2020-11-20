@@ -1,5 +1,10 @@
 [
   {
+    "functionality": "verboseLog",
+    "command": "start",
+    "delay": 0
+  },
+  {
     "functionality": "monitorEvents",
     "command": "start",
     "delay": 0

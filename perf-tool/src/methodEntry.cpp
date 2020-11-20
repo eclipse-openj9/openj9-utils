@@ -58,9 +58,9 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
 
     
         std::string s = j.dump();
-        printf("\n%s\n", s.c_str());
+        // printf("\n%s\n", s.c_str());
         // printf("sample num: %i", mEntrySampleCount);
-        // sendToServer(s);
+        sendToServer(s);
     }
     mEntrySampleCount++;
 }

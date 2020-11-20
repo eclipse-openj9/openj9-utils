@@ -15,12 +15,12 @@ These commands are passed to the agent on start up. The format of the commands s
 
 
 # Function Commands
-These commands are provided by either a commands file (see [Agent Start-Up Commands](#agent-start-up-commands)), or by a live client during runtime. These commands dictate what information the agent collects by either stopping or starting certain capabilities. 
+These commands are provided by either a commands file (see [Agent Start-Up Commands](#agent-start-up-commands)), or by a live client during runtime. These commands dictate what information the agent collects by either stopping or starting certain capabilities.
 
 | Command | Associated Events | Expected Value | Description |
 | --- | --- | --- | ---- |
-| start | monitorEvents, objectAllocEvents, methodEntryEvents | Event Name | Start recording an event |
-| stop | monitorEvents, objectAllocEvents, methodEntryEvents | Event Name | Stop recording an event |
+| start | monitorEvents, objectAllocEvents, methodEntryEvents, exceptionEvents | Event Name | Start recording an event |
+| stop | monitorEvents, objectAllocEvents, methodEntryEvents, exceptionEvents | Event Name | Stop recording an event |
 | sampleRate | objectAllocEvents, methodEntryEvents | Event Name | Set a sampling rate `n` for retrieving backtrace (set to 0 for none) |
 | delay | All Functionalities | Integer | Time to wait before running the command after it is received (in seconds) |
 | time | perf | Integer | Time to run the command for |

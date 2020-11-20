@@ -7,7 +7,7 @@
 
 using json = nlohmann::json;
 
-json perfProcess(pid_t processID, int recordTime);
+void perfProcess(pid_t processID, int recordTime);
 
 
 typedef enum { //to-do: get all options

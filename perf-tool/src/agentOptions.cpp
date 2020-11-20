@@ -87,11 +87,12 @@ void modifyMethodEntryEvents(std::string function, std::string command, int samp
     }
 }
 
-void handleVerboseLogSubscriber(std::string command)
+void modifyVerboseLogSubscriber(std::string command, int sampleRate)
 {
     if (!command.compare("start"))
     {
         verboseLogSubscriber = new VerboseLogSubscriber(jvmti);
+        verboseLogSubscriber->setVerboseGCLogSampleRate(sampleRate);
         verboseLogSubscriber->Subscribe();
     } else if (!command.compare("stop"))
     {
@@ -159,7 +160,7 @@ void agentCommand(json jCommand){
         } else if(!function.compare("methodEntryEvents")){
             modifyMethodEntryEvents(function, command, sampleRate);
         } else if(!function.compare("verboseLog")){
-            handleVerboseLogSubscriber(command);
+            modifyVerboseLogSubscriber(command, sampleRate);
         } else if(!function.compare("exceptionEvents")){
             modifyExceptionEvents(function, command, sampleRate);
         } else {

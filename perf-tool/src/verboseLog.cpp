@@ -1,13 +1,21 @@
 #include "verboseLog.hpp"
 
 #include <iostream>
-
 #include <jvmti.h>
 
 #include "agentOptions.hpp"
 #include "infra.hpp"
 
 using namespace std;
+
+std::atomic<int> verboseSampleCount {0};
+std::atomic<int> verboseSampleRate {1};
+
+void VerboseLogSubscriber::setVerboseGCLogSampleRate(int rate) {
+    if (rate > 0) {
+        verboseSampleRate = rate;
+    }
+}
 
 void VerboseLogSubscriber::Subscribe()
 {
@@ -79,8 +87,13 @@ void VerboseLogSubscriber::Unsubscribe()
 
 jvmtiError verboseSubscriberCallback(jvmtiEnv *jvmti_env, const char *record, jlong length, void *user_data)
 {
-    string s = string(record);
-    sendToServer(s);
+    if (verboseSampleCount % verboseSampleRate == 0)
+    {
+        string s = string(record);
+        sendToServer(s);
+    }
+
+    verboseSampleCount++;
 
     return JVMTI_ERROR_NONE;
 }

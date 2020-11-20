@@ -2,6 +2,7 @@
   {
     "functionality": "verboseLog",
     "command": "start",
+    "sampleRate": 200,
     "delay": 0
   },
   {
@@ -12,6 +13,12 @@
   {
     "functionality": "perf",
     "time": 1
+  },
+  {
+    "functionality": "methodEntryEvents",
+    "command": "start",
+    "sampleRate": 2000,
+    "delay": 0
   },
   {
     "functionality": "objectAllocEvents",
@@ -28,7 +35,7 @@
   {
     "functionality": "methodEntryEvents",
     "command": "stop",
-    "delay": 0
+    "delay": 4
   },
   {
     "functionality": "monitorEvents",

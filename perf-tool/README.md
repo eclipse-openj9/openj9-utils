@@ -38,6 +38,12 @@ All commands are provided in JSON format, where multiple commands are provided a
     "time": "1"
   },
   {
+    "functionality": "exceptionEvents",
+    "command": "start",
+    "sampleRate": 5,
+    "delay": 0
+  },
+  {
     "functionality": "objectAllocEvents",
     "command": "start",
     "sampleRate": 2,
@@ -59,9 +65,13 @@ All commands are provided in JSON format, where multiple commands are provided a
     "command": "stop",
     "delay": 4
   },
-  
   {
     "functionality": "objectAllocEvents",
+    "command": "stop",
+    "delay": 6
+  },
+  {
+    "functionality": "exceptionEvents",
     "command": "stop",
     "delay": 6
   }

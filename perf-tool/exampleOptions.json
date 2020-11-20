@@ -15,9 +15,9 @@
     "time": 1
   },
   {
-    "functionality": "methodEntryEvents",
+    "functionality": "exceptionEvents",
     "command": "start",
-    "sampleRate": 2000,
+    "sampleRate": 5,
     "delay": 0
   },
   {
@@ -44,6 +44,11 @@
   },
   {
     "functionality": "objectAllocEvents",
+    "command": "stop",
+    "delay": 6
+  },
+  {
+    "functionality": "exceptionEvents",
     "command": "stop",
     "delay": 6
   }

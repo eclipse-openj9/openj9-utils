@@ -33,7 +33,7 @@ JITServer technology can be used for any Java application running on the latest 
 
 ### 1. Install the JITServer using Helm Chart.
 #### a. Verify the application JDK version and select the appropriate JITServer image.
-Important: The client JVM and the JITServer instance it connects to must use the same (compatible) version. The easiest way to ensure this is using the same release on both JITServer JDK and application JDK.
+Important: The client JVM and the JITServer instance it connects to must use the same (compatible) version. The easiest way to ensure this is using the same release for the JITServer JDK as used by the  application.
 
 Inside your Java application image, run `java -version` to check the JDK release version. In the example below, the `0.21.0` release of Java 11 JDK on `Linux amd64` architecture is used as shown in `build openj9-0.21.0, JRE 11 Linux amd64-64-Bit`. 
 ```bash

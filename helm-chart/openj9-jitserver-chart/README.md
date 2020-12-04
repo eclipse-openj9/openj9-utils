@@ -20,7 +20,7 @@ OpenJDK Assembly Exception [2].
 SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
 -->
 
-# OpenJ9 JITServer Helm Chart
+# Eclipse OpenJ9 JITServer Helm Chart
 
 ## Introduction.
 The OpenJ9 JITServer Helm Chart allows you to deploy, manage JITServer technology into Kubernetes or OpenShift clusters and make it possible for your Java applications to take advantage of it. JITServer is a technology that offers relief from the negative side-effects of the JIT compilation which are mostly felt in short lived applications running in resource constrained environments. The idea behind the technology is to decouple the JIT compiler from the JVM, containerize it and let it run as-a-service, in the cloud, where it can be managed intelligently by an of-the-shelf container orchestrator like k8s. JITServer is available as a "tech preview" in the OpenJ9 JVM and is supported on Linux on x86-64, Linux on Power and Linux on Z running Java8 or Java11

@@ -23,10 +23,10 @@ SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-excepti
 # Eclipse OpenJ9 JITServer Helm Chart
 
 ## Introduction.
-The OpenJ9 JITServer Helm Chart allows you to deploy, manage JITServer technology into Kubernetes or OpenShift clusters and make it possible for your Java applications to take advantage of it. JITServer is a technology that offers relief from the negative side-effects of the JIT compilation which are mostly felt in short lived applications running in resource constrained environments. The idea behind the technology is to decouple the JIT compiler from the JVM, containerize it and let it run as-a-service, in the cloud, where it can be managed intelligently by an of-the-shelf container orchestrator like k8s. JITServer is available as a "tech preview" in the OpenJ9 JVM and is supported on Linux on x86-64, Linux on Power and Linux on Z running Java8 or Java11
+The OpenJ9 JITServer Helm Chart allows you to deploy, manage JITServer technology into Kubernetes or OpenShift clusters and make it possible for your Java applications to take advantage of it. JITServer is a technology that offers relief from the negative side-effects of the JIT compilation which are mostly felt in short lived applications running in resource constrained environments. The idea behind the technology is to decouple the JIT compiler from the JVM, containerize it and let it run as-a-service, in the cloud, where it can be managed intelligently by an of-the-shelf container orchestrator like k8s. JITServer is available as a "tech preview" in the OpenJ9 JVM and is supported on Linux on x86-64, Linux on Power and Linux on Z running Java8 or Java11. For the most up to date information, please check supported configurations at [JITServer technology introduction](https://www.eclipse.org/openj9/docs/jitserver/). 
 
 ## Getting started with OpenJ9 JITServer Technology.
-JITServer technology can be used for any Java application running on the latest release of OpenJ9 on supported Java versions and Linux platforms. You can make use of JITServer technology following the steps below:
+JITServer technology can be used for any Java application running on release 0.18 (or newer) of Open9 on supported Java versions and Linux platforms. You can make use of JITServer technology following the steps below:
 
 1. Install the JITServer using Helm Chart
 2. Enable your application to use JITServer
@@ -46,12 +46,12 @@ OMR      - 113e54219
 JCL      - 95bb504fbb based on jdk-11.0.8+10)
 ```
 
-Find the corresponding image from [AdoptOpenJDK Docker Hub](https://hub.docker.com/_/adoptopenjdk) through keywords search of architecture, Java version and release. In this example, `0.21.0` release of Java 11 is used in the application image, thus the corresponding image tag is [`11.0.8_10-jdk-openj9-0.21.0`](https://hub.docker.com/layers/adoptopenjdk/library/adoptopenjdk/11.0.8_10-jdk-openj9-0.21.0/images/sha256-996bb5bca1ae3fbab7bcd6ed4b19776eb1e176727024ce8866a75536137949b7?context=explore). The image tag will be used in the following step.
+Find the corresponding image from [AdoptOpenJDK Docker Hub](https://hub.docker.com/_/adoptopenjdk) through keywords search of architecture, Java version and release. In this example, `0.21.0` release of Java 11 is used in the application image, thus the corresponding image with tag is [`adoptopenjdk:11.0.8_10-jdk-openj9-0.21.0`](https://hub.docker.com/layers/adoptopenjdk/library/adoptopenjdk/11.0.8_10-jdk-openj9-0.21.0/images/sha256-996bb5bca1ae3fbab7bcd6ed4b19776eb1e176727024ce8866a75536137949b7?context=explore). The image tag `11.0.8_10-jdk-openj9-0.21.0` will be used in the following step.
 
 #### b. Install the JITServer using the selected image and the Helm Chart.
 Add OpenJ9 JITServer helm chart repository to the Helm client.
 ``` bash
-helm repo add openj9 https://<updatewhenweknowtheurl>stable/openj9/repo/index.yaml
+helm repo add openj9 https://raw.githubusercontent.com/eclipse/openj9-utils/master/helm-chart/ 
 helm repo update
 helm search repo openj9-jitserver-chart
 ```
@@ -67,7 +67,7 @@ image:
   tag: 8-openj9
 ```
 
-Java versions 8 and 11 are currently supported on x86, POWER and Z platforms.
+Currently, JITServer is supported on Java versions 8 and 11. 
 
 ### 2. Enable your application to use JITServer.
 Once the JITServer is deployed, you can enable your application to use JITServer by adding the following JVM option as an environment variable into your Java application container.
@@ -87,7 +87,7 @@ Setting the `JAVA_OPTIONS` environment variable on a new or an already in produc
 
 ## JITServer considerations and platform support
 ### How to select a platform and a Java version 
-Platforms are handled by multi-arch images from AdoptOpenJDK docker hub, thus platform specific JITServer is deployed based on which platform the install is being done on. The JITServer Java version has to match the application Java version. For example, Java 8 applications need Java 8 JITServer.
+Platforms are handled by multi-arch images from AdoptOpenJDK docker hub, thus platform specific JITServer is deployed based on which platform the install is being done on. The JITServer Java version has to exactly match the application Java version. For example, Java 8 applications need Java 8 JITServer running on the exact same JDK version. (See details above)
 
 If your application uses a different version of Java, please include the option `--set image.tag="REPLACE_IMAGE_TAG"` in the `helm install` command which overrides below section in `Values.yaml`.
 
@@ -186,7 +186,7 @@ helm delete jitserver-release
 ```
 
 ### Removing the JITServer
-Avoid removing the JITServer instance before applications terminate. There is a risk of application JVM has insufficient memory since it assumes JITServer handles the JIT Compilations.
+Avoid removing the JITServer instance before applications terminate. If the memory limit for the container running the application JDK has been set based on the assumption that JITServer handles all JIT compilations, the application may experience a native out-of-memory scenario and be terminated.
 Once all applications are retired, you can safely remove the JITServer instance. 
 ``` bash
 helm delete jitserver-release
@@ -225,4 +225,4 @@ This chart does not require PodDisruptionBudgets to be bound to the target names
 
 ## Limitations
 * Deploys on Linux on x86-64, Linux on Power and Linux on Z 64-bit only. In the future other platforms may be supported as well.
-* Supports Java 8 and Java 11. Other Java versions may be supported in future releases.
+* Supports Java 8 and Java 11 only. For the most up to date information, please check the [JITServer technology introduction](https://www.eclipse.org/openj9/docs/jitserver/).

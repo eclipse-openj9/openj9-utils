@@ -46,7 +46,8 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          command: {{ .Values.image.command }}
+          command: ["/bin/bash"]
+          args: ["-c", "jitserver &> /tmp/output.log"]
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -59,13 +60,19 @@ spec:
           livenessProbe:
             exec:
               command:
-              - "ls"
-              - "/opt"
+              - "/bin/bash"
+              - "-c"
+              - "tail -10 /tmp/output.log"
+            initialDelaySeconds: 5
+            periodSeconds: 10
           readinessProbe:
             exec:
               command:
-              - "java"
-              - "-version"
+              - "/bin/bash"
+              - "-c"
+              - "grep -Fxq 'JITServer is ready to accept incoming requests' /tmp/output.log;"
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

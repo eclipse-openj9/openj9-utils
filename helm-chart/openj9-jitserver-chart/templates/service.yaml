@@ -28,6 +28,7 @@ metadata:
     {{- include "openj9-jitserver-chart.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  sessionAffinity: {{ .Values.service.sessionAffinity }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: 38400

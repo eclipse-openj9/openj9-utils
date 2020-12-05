@@ -26,9 +26,9 @@ This quick start guide walks you through an example of enabling JITServer Techno
 
 You will be provided with a basic understanding of JITServer technology and how it works with your java application. 
 
-## Installing Open Liberty WebServer
+## Installing Open Liberty Application Server
 
-This quick start guide uses Open Liberty WebServer as an example Java application, and shows how to enable JITServer technology even after your Java application is deployed. 
+This quick start guide uses Open Liberty Application Server as an example Java application, and shows how to enable JITServer technology even after your Java application is deployed. 
 
 Please follow Open Liberty Helm Chart [Installation Guide](https://github.com/IBM/charts/tree/master/stable/ibm-open-liberty#installing-the-chart) to install Open Liberty on your cluster. 
 

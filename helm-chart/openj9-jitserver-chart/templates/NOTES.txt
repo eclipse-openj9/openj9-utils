@@ -20,10 +20,16 @@
 * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
 *******************************************************************************/ -}}
 
-Welcome to OpenJ9 JITServer Helm Chart, the application has been deployed successfully. 
+Welcome to OpenJ9 JITServer Helm Chart. The JITServer technology has been deployed successfully and ready for connection.
 
-1. Get JITServer endpoint by running these commands:
-{{- if eq "jitserver" (index .Values.image.command 0) }}
+1. Printing version of the chart and application
+  Chart version: {{ .Chart.Version }}
+  OpenJ9 release: {{ .Chart.AppVersion }}
+
+2. Get Java version by running these commands:
+  export POD_NAME=$(kubectl get pod --namespace {{ .Release.Namespace }} -o jsonpath="{..metadata.name}" | grep {{ include "openj9-jitserver-chart.fullname" . }})
+  kubectl exec $POD_NAME -i -t -- java -version
+
+3. Get JITServer endpoint by running these commands:
   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "openj9-jitserver-chart.fullname" . }} -o jsonpath="{..metadata.name}")
   echo Endpoint: $SERVICE_IP:{{ .Values.service.port }}
-{{- end }}

@@ -1,0 +1,25 @@
+apiVersion: v1
+entries:
+  openj9-jitserver-chart:
+  - apiVersion: v2
+    appVersion: 0.24.0
+    created: "2021-01-11T10:37:05.164743965-08:00"
+    description: "Eclipse OpenJ9 JITServer Helm Chart. \n\nLicense\nBy installing
+      this product you accept the Eclipse Public License v2.0: https://www.eclipse.org/legal/epl-2.0/."
+    digest: 20b6f828730be12cc09f26412416bbd1791c96ae2fa077552b6e0fd7135bc4d7
+    icon: https://pbs.twimg.com/profile_images/910853900181364736/bmWkKoLn_400x400.jpg
+    keywords:
+    - amd64
+    - ppc64le
+    - Java
+    - Eclipse
+    - OpenJ9
+    - JITServer
+    - JVM
+    - JIT
+    name: openj9-jitserver-chart
+    type: application
+    urls:
+    - https://github.com/eclipse/openj9-utils/files/5825427/openj9-jitserver-chart-0.24.0.tar.gz
+    version: 0.24.0
+generated: "2021-01-11T10:37:05.162604577-08:00"

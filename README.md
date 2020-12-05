@@ -23,7 +23,7 @@ SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-excepti
 Welcome to the Eclipse OpenJ9 Utils repository
 ========================================
 
-This repo is intended as an interim home for utilities that are still finding their place in the OpenJ9 ecosystem.  This repo provides a place for groups to colaborate around the tools & utilities and to grow communities around them.
+This repo is intended as an interim home for utilities that are still finding their place in the OpenJ9 ecosystem.  This repo provides a place for groups to collaborate around the tools & utilities and to grow communities around them.
 
 Though some utilites may eventually be merged into the main #eclipse/openj9 repository as part of the regular OpenJ9 builds, not all utils are expected to do that.  Some may live forever here as useful utils for debugging, experimenting, etc with the OpenJ9 and the broader Java ecosystem.
 

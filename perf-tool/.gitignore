@@ -1,0 +1,14 @@
+ 
+build/*
+
+*.vscode
+
+*.swp
+
+CMakeCache.txt
+CMakeFiles
+Makefile
+*.o
+*.so
+cmake_install.cmake
+client

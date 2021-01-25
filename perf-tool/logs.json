@@ -1,0 +1,3366 @@
+[
+{
+  "body": "Server started",
+  "from": "Server",
+  "timestamp": 1606960355
+},
+{
+  "body": {
+    "command": "start",
+    "delay": 0,
+    "functionality": "objectAllocEvents",
+    "sampleRate": 2
+  },
+  "from": "Client",
+  "timestamp": 1606960359
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.0070859165862202644,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": 6564,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 0,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960365
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 2.08695650100708,
+      "objNum": 1,
+      "objType": "[C",
+      "size": 48
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960365
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.007005253806710243,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": 101,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 2,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.9047619104385376,
+      "objNum": 3,
+      "objType": "[C",
+      "size": 40
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.007262823637574911,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": 0,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 4,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.5517241358757019,
+      "objNum": 5,
+      "objType": "[C",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.00163599185179919,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": -1375703447,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 6,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.3137255012989044,
+      "objNum": 7,
+      "objType": "[C",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.0010613598860800266,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": 1667449188,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 8,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.7058823704719543,
+      "objNum": 9,
+      "objType": "[C",
+      "size": 24
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.0011032960610464215,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": 1667449188,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 10,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.4444444477558136,
+      "objNum": 11,
+      "objType": "[C",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.003407154930755496,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3258,
+          "methodName": "print",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3228,
+          "methodName": "print",
+          "methodNum": 1,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 32,
+          "methodName": "print",
+          "methodNum": 2,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2800,
+          "methodName": "printFloat",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2747,
+          "methodName": "print",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2503,
+          "methodName": "format",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 152,
+          "methodName": "format",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/lang/String;",
+          "methodLineNum": -299624,
+          "methodName": "format",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 234,
+          "methodName": "run",
+          "methodNum": 8,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 298,
+          "methodName": "bumbleMain",
+          "methodNum": 9,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 12,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 5.5,
+      "objNum": 13,
+      "objType": "[C",
+      "size": 88
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.01966085098683834,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 16,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 32,
+          "methodName": "loadClass",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3264,
+          "methodName": "print",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3234,
+          "methodName": "print",
+          "methodNum": 4,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 1818850421,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2803,
+          "methodName": "printFloat",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2754,
+          "methodName": "print",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2508,
+          "methodName": "format",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 0,
+          "methodName": "format",
+          "methodNum": 9,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        }
+      ],
+      "objNum": 14,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.695652186870575,
+      "objNum": 15,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.026666667312383652,
+      "objBackTrace": [
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal$Form;",
+          "methodLineNum": 32,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3261,
+          "methodName": "print",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3230,
+          "methodName": "print",
+          "methodNum": 2,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": -1370912320,
+          "methodName": "print",
+          "methodNum": 3,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2801,
+          "methodName": "printFloat",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2748,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2504,
+          "methodName": "format",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 1968072046,
+          "methodName": "format",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/lang/String;",
+          "methodLineNum": -1160008415,
+          "methodName": "format",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 236,
+          "methodName": "run",
+          "methodNum": 9,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 16,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.185185194015503,
+      "objNum": 17,
+      "objType": "[C",
+      "size": 32
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.018735362216830254,
+      "objBackTrace": [
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal$Form;",
+          "methodLineNum": 32,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3261,
+          "methodName": "print",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3230,
+          "methodName": "print",
+          "methodNum": 2,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": -1370912320,
+          "methodName": "print",
+          "methodNum": 3,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2801,
+          "methodName": "printFloat",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2748,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2504,
+          "methodName": "format",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": -1474428912,
+          "methodName": "format",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/lang/String;",
+          "methodLineNum": -1476392752,
+          "methodName": "format",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 236,
+          "methodName": "run",
+          "methodNum": 9,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 18,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.695652186870575,
+      "objNum": 19,
+      "objType": "[C",
+      "size": 32
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.02113606408238411,
+      "objBackTrace": [
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal$Form;",
+          "methodLineNum": 32,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3261,
+          "methodName": "print",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3230,
+          "methodName": "print",
+          "methodNum": 2,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": -1370912320,
+          "methodName": "print",
+          "methodNum": 3,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2801,
+          "methodName": "printFloat",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2748,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2504,
+          "methodName": "format",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": -1474205744,
+          "methodName": "format",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/lang/String;",
+          "methodLineNum": 2072,
+          "methodName": "format",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 236,
+          "methodName": "run",
+          "methodNum": 9,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 20,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.3793103694915771,
+      "objNum": 21,
+      "objType": "[C",
+      "size": 40
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.025236593559384346,
+      "objBackTrace": [
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal$Form;",
+          "methodLineNum": 32,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3261,
+          "methodName": "print",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3230,
+          "methodName": "print",
+          "methodNum": 2,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": -1370912320,
+          "methodName": "print",
+          "methodNum": 3,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2801,
+          "methodName": "printFloat",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2748,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2504,
+          "methodName": "format",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": -1474166675,
+          "methodName": "format",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/lang/String;",
+          "methodLineNum": 6,
+          "methodName": "format",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 236,
+          "methodName": "run",
+          "methodNum": 9,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 22,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.8888888955116272,
+      "objNum": 23,
+      "objType": "[C",
+      "size": 24
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.1955990195274353,
+      "objBackTrace": [
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal$Form;",
+          "methodLineNum": 32,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3261,
+          "methodName": "print",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3230,
+          "methodName": "print",
+          "methodNum": 2,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": -1370912320,
+          "methodName": "print",
+          "methodNum": 3,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2801,
+          "methodName": "printFloat",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2748,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2504,
+          "methodName": "format",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 0,
+          "methodName": "format",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/lang/String;",
+          "methodLineNum": 164,
+          "methodName": "format",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 236,
+          "methodName": "run",
+          "methodNum": 9,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 24,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.8421052694320679,
+      "objNum": 25,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.03455723449587822,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3258,
+          "methodName": "print",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3228,
+          "methodName": "print",
+          "methodNum": 1,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 32,
+          "methodName": "print",
+          "methodNum": 2,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2800,
+          "methodName": "printFloat",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2747,
+          "methodName": "print",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2503,
+          "methodName": "format",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": -1474436448,
+          "methodName": "format",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/lang/String;",
+          "methodLineNum": -1474166675,
+          "methodName": "format",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 234,
+          "methodName": "run",
+          "methodNum": 8,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 298,
+          "methodName": "bumbleMain",
+          "methodNum": 9,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 26,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.8181818723678589,
+      "objNum": 27,
+      "objType": "[C",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.02015621028840542,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 16,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 32,
+          "methodName": "loadClass",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3264,
+          "methodName": "print",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3234,
+          "methodName": "print",
+          "methodNum": 4,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": -1476392752,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2803,
+          "methodName": "printFloat",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2754,
+          "methodName": "print",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2508,
+          "methodName": "format",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 101,
+          "methodName": "format",
+          "methodNum": 9,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        }
+      ],
+      "objNum": 28,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.0666667222976685,
+      "objNum": 29,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.0016293278895318508,
+      "objBackTrace": [
+        {
+          "methodClass": "Lcom/ibm/oti/vm/VM;",
+          "methodName": "getClassNameImpl",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/Class;)Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Ljava/lang/Class;",
+          "methodLineNum": 1567,
+          "methodName": "getName",
+          "methodNum": 1,
+          "methodSignature": "()Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Ljava/lang/Class;",
+          "methodLineNum": 2036,
+          "methodName": "desiredAssertionStatus",
+          "methodNum": 2,
+          "methodSignature": "()Z"
+        },
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal;",
+          "methodLineNum": -1370912320,
+          "methodName": "<clinit>",
+          "methodNum": 3,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3267,
+          "methodName": "print",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3237,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": -1474168656,
+          "methodName": "print",
+          "methodNum": 6,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2804,
+          "methodName": "printFloat",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2757,
+          "methodName": "print",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2509,
+          "methodName": "format",
+          "methodNum": 9,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        }
+      ],
+      "objNum": 30,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 2.1621620655059814,
+      "objNum": 31,
+      "objType": "[C",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.03595505654811859,
+      "objBackTrace": [
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal;",
+          "methodLineNum": 30,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3261,
+          "methodName": "print",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3230,
+          "methodName": "print",
+          "methodNum": 2,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": -1370912320,
+          "methodName": "print",
+          "methodNum": 3,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2801,
+          "methodName": "printFloat",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2748,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2504,
+          "methodName": "format",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": -1375705747,
+          "methodName": "format",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/lang/String;",
+          "methodLineNum": 6,
+          "methodName": "format",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 236,
+          "methodName": "run",
+          "methodNum": 9,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 32,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 2.1621620655059814,
+      "objNum": 33,
+      "objType": "[C",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.0070808990858495235,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 16,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 32,
+          "methodName": "loadClass",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal;",
+          "methodLineNum": -1370912320,
+          "methodName": "<clinit>",
+          "methodNum": 3,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3267,
+          "methodName": "print",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3237,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 6565,
+          "methodName": "print",
+          "methodNum": 6,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2804,
+          "methodName": "printFloat",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2757,
+          "methodName": "print",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2509,
+          "methodName": "format",
+          "methodNum": 9,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        }
+      ],
+      "objNum": 34,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.6666666865348816,
+      "objNum": 35,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.017877094447612762,
+      "objBackTrace": [
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal;",
+          "methodLineNum": 57,
+          "methodName": "<init>",
+          "methodNum": 0,
+          "methodSignature": "(ILsun/misc/FormattedFloatingDecimal$Form;Lsun/misc/FloatingDecimal$BinaryToASCIIConverter;)V"
+        },
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal;",
+          "methodLineNum": 37,
+          "methodName": "valueOf",
+          "methodNum": 1,
+          "methodSignature": "(DILsun/misc/FormattedFloatingDecimal$Form;)Lsun/misc/FormattedFloatingDecimal;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3263,
+          "methodName": "print",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3231,
+          "methodName": "print",
+          "methodNum": 3,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 33,
+          "methodName": "print",
+          "methodNum": 4,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2802,
+          "methodName": "printFloat",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2753,
+          "methodName": "print",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": 2506,
+          "methodName": "format",
+          "methodNum": 7,
+          "methodSignature": "(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter;",
+          "methodLineNum": -1474429696,
+          "methodName": "format",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/Formatter;"
+        },
+        {
+          "methodClass": "Ljava/lang/String;",
+          "methodLineNum": -1476392752,
+          "methodName": "format",
+          "methodNum": 9,
+          "methodSignature": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;"
+        }
+      ],
+      "objNum": 36,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 3.4782607555389404,
+      "objNum": 37,
+      "objType": "[C",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.01717844046652317,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 16,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 32,
+          "methodName": "loadClass",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal;",
+          "methodLineNum": 60,
+          "methodName": "<init>",
+          "methodNum": 3,
+          "methodSignature": "(ILsun/misc/FormattedFloatingDecimal$Form;Lsun/misc/FloatingDecimal$BinaryToASCIIConverter;)V"
+        },
+        {
+          "methodClass": "Lsun/misc/FormattedFloatingDecimal;",
+          "methodLineNum": -1370912320,
+          "methodName": "valueOf",
+          "methodNum": 4,
+          "methodSignature": "(DILsun/misc/FormattedFloatingDecimal$Form;)Lsun/misc/FormattedFloatingDecimal;"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3271,
+          "methodName": "print",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/StringBuilder;DLjava/util/Locale;Ljava/util/Formatter$Flags;CIZ)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 3238,
+          "methodName": "print",
+          "methodNum": 6,
+          "methodSignature": "(DLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": -1476895896,
+          "methodName": "print",
+          "methodNum": 7,
+          "methodSignature": "(FLjava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2806,
+          "methodName": "printFloat",
+          "methodNum": 8,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        },
+        {
+          "methodClass": "Ljava/util/Formatter$FormatSpecifier;",
+          "methodLineNum": 2758,
+          "methodName": "print",
+          "methodNum": 9,
+          "methodSignature": "(Ljava/lang/Object;Ljava/util/Locale;)V"
+        }
+      ],
+      "objNum": 38,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.6153846383094788,
+      "objNum": 39,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.002847988624125719,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": 0,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 40,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.7272727489471436,
+      "objNum": 41,
+      "objType": "[C",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.0077444338239729404,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": -1474153472,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 42,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.09302325546741486,
+      "objNum": 43,
+      "objType": "[C",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.014856081455945969,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": -1476366743,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 44,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.8888888955116272,
+      "objNum": 45,
+      "objType": "[C",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.0022237664088606834,
+      "objBackTrace": [
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 225,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/BumbleBench;",
+          "methodLineNum": 283,
+          "methodName": "bumbleMain",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/ParallelBench;",
+          "methodLineNum": 98,
+          "methodName": "bumbleMain",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodName": "invoke0",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/NativeMethodAccessorImpl;",
+          "methodLineNum": 54,
+          "methodName": "invoke",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lsun/reflect/DelegatingMethodAccessorImpl;",
+          "methodLineNum": 789,
+          "methodName": "invoke",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/lang/reflect/Method;",
+          "methodLineNum": 496,
+          "methodName": "invoke",
+          "methodNum": 6,
+          "methodSignature": "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": -1370912320,
+          "methodName": "runBumbleMainOn",
+          "methodNum": 7,
+          "methodSignature": "(Lnet/adoptopenjdk/bumblebench/core/BumbleBench;)V"
+        },
+        {
+          "methodClass": "Lnet/adoptopenjdk/bumblebench/core/Launcher;",
+          "methodLineNum": 48,
+          "methodName": "main",
+          "methodNum": 8,
+          "methodSignature": "([Ljava/lang/String;)V"
+        }
+      ],
+      "objNum": 46,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.6666666269302368,
+      "objNum": 47,
+      "objType": "[C",
+      "size": 40
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.00657894741743803,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/security/AccessController;",
+          "methodName": "getAccSnapshot",
+          "methodNum": 0,
+          "methodSignature": "(IZ)[Ljava/lang/Object;"
+        },
+        {
+          "methodClass": "Ljava/security/AccessController;",
+          "methodLineNum": 453,
+          "methodName": "getContextHelper",
+          "methodNum": 1,
+          "methodSignature": "(Z)Ljava/security/AccessControlContext;"
+        },
+        {
+          "methodClass": "Ljava/security/AccessController;",
+          "methodLineNum": -1370912320,
+          "methodName": "getContext",
+          "methodNum": 2,
+          "methodSignature": "()Ljava/security/AccessControlContext;"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 352,
+          "methodName": "initialize",
+          "methodNum": 3,
+          "methodSignature": "(ZLjava/lang/ThreadGroup;Ljava/lang/Thread;Ljava/security/AccessControlContext;Z)V"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 88,
+          "methodName": "<init>",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/Object;IZ)V"
+        }
+      ],
+      "objNum": 48,
+      "objType": "[Ljava/lang/Object;",
+      "size": 24
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.5714285969734192,
+      "objNum": 49,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.28015562891960144,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/util/IdentityHashMap;",
+          "methodLineNum": 967,
+          "methodName": "keySet",
+          "methodNum": 0,
+          "methodSignature": "()Ljava/util/Set;"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks;",
+          "methodLineNum": 97,
+          "methodName": "runHooks",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks$1;",
+          "methodLineNum": 32,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 121,
+          "methodName": "runHooks",
+          "methodNum": 3,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 172,
+          "methodName": "sequence",
+          "methodNum": 4,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 237,
+          "methodName": "shutdown",
+          "methodNum": 5,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 50,
+      "objType": "[C",
+      "size": 72
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.4035087823867798,
+      "objNum": 51,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.009702850133180618,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 16,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 32,
+          "methodName": "loadClass",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/util/IdentityHashMap;",
+          "methodLineNum": 970,
+          "methodName": "keySet",
+          "methodNum": 3,
+          "methodSignature": "()Ljava/util/Set;"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks;",
+          "methodLineNum": 101,
+          "methodName": "runHooks",
+          "methodNum": 4,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks$1;",
+          "methodLineNum": 1395615598,
+          "methodName": "run",
+          "methodNum": 5,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 129,
+          "methodName": "runHooks",
+          "methodNum": 6,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 175,
+          "methodName": "sequence",
+          "methodNum": 7,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 240,
+          "methodName": "shutdown",
+          "methodNum": 8,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 52,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.3478260934352875,
+      "objNum": 53,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.29931971430778503,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/util/IdentityHashMap$KeySet;",
+          "methodLineNum": 977,
+          "methodName": "iterator",
+          "methodNum": 0,
+          "methodSignature": "()Ljava/util/Iterator;"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks;",
+          "methodLineNum": 97,
+          "methodName": "runHooks",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks$1;",
+          "methodLineNum": 32,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 121,
+          "methodName": "runHooks",
+          "methodNum": 3,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 172,
+          "methodName": "sequence",
+          "methodNum": 4,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 237,
+          "methodName": "shutdown",
+          "methodNum": 5,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 54,
+      "objType": "[C",
+      "size": 88
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.3478260934352875,
+      "objNum": 55,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.0943555161356926,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 16,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 32,
+          "methodName": "loadClass",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/util/IdentityHashMap$KeySet;",
+          "methodLineNum": 85,
+          "methodName": "iterator",
+          "methodNum": 3,
+          "methodSignature": "()Ljava/util/Iterator;"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks;",
+          "methodLineNum": 101,
+          "methodName": "runHooks",
+          "methodNum": 4,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks$1;",
+          "methodLineNum": -1476393440,
+          "methodName": "run",
+          "methodNum": 5,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 129,
+          "methodName": "runHooks",
+          "methodNum": 6,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 175,
+          "methodName": "sequence",
+          "methodNum": 7,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 240,
+          "methodName": "shutdown",
+          "methodNum": 8,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 56,
+      "objType": "[C",
+      "size": 112
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 2.1621620655059814,
+      "objNum": 57,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.00042781891534104943,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 16,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 32,
+          "methodName": "loadClass",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 3,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 20,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 4,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 795307617,
+          "methodName": "loadClass",
+          "methodNum": 5,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/util/IdentityHashMap$KeySet;",
+          "methodLineNum": 1949919784,
+          "methodName": "iterator",
+          "methodNum": 6,
+          "methodSignature": "()Ljava/util/Iterator;"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks;",
+          "methodLineNum": 104,
+          "methodName": "runHooks",
+          "methodNum": 7,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks$1;",
+          "methodLineNum": 538976288,
+          "methodName": "run",
+          "methodNum": 8,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 126,
+          "methodName": "runHooks",
+          "methodNum": 9,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 58,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 2.6666667461395264,
+      "objNum": 59,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.006264682859182358,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 16,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 32,
+          "methodName": "loadClass",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/util/IdentityHashMap$KeySet;",
+          "methodLineNum": 97,
+          "methodName": "iterator",
+          "methodNum": 3,
+          "methodSignature": "()Ljava/util/Iterator;"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks;",
+          "methodLineNum": 101,
+          "methodName": "runHooks",
+          "methodNum": 4,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks$1;",
+          "methodLineNum": -1476393520,
+          "methodName": "run",
+          "methodNum": 5,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 129,
+          "methodName": "runHooks",
+          "methodNum": 6,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 175,
+          "methodName": "sequence",
+          "methodNum": 7,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 240,
+          "methodName": "shutdown",
+          "methodNum": 8,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 60,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.22535210847854614,
+      "objNum": 61,
+      "objType": "Ljava/lang/OutOfMemoryError;",
+      "size": 32
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.20370370149612427,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodName": "startImpl",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 985,
+          "methodName": "start",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks;",
+          "methodLineNum": 98,
+          "methodName": "runHooks",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/ApplicationShutdownHooks$1;",
+          "methodLineNum": -1370912320,
+          "methodName": "run",
+          "methodNum": 3,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 122,
+          "methodName": "runHooks",
+          "methodNum": 4,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 173,
+          "methodName": "sequence",
+          "methodNum": 5,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Shutdown;",
+          "methodLineNum": 238,
+          "methodName": "shutdown",
+          "methodNum": 6,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 62,
+      "objType": "[J",
+      "size": 264
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.5925925970077515,
+      "objNum": 63,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.8275862336158752,
+      "objBackTrace": [
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 498,
+          "methodName": "run",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 64,
+      "objType": "[C",
+      "size": 48
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.0,
+      "objNum": 65,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.6746987700462341,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 1308,
+          "methodName": "getState",
+          "methodNum": 0,
+          "methodSignature": "()Ljava/lang/Thread$State;"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 500,
+          "methodName": "run",
+          "methodNum": 1,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 66,
+      "objType": "[C",
+      "size": 56
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 6.153846263885498,
+      "objNum": 67,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.004376367665827274,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodName": "findClassOrNull",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/VMAccess;",
+          "methodLineNum": 16,
+          "methodName": "findClassOrNullHelper",
+          "methodNum": 1,
+          "methodSignature": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Lcom/ibm/oti/vm/BootstrapClassLoader;",
+          "methodLineNum": 32,
+          "methodName": "loadClass",
+          "methodNum": 2,
+          "methodSignature": "(Ljava/lang/String;)Ljava/lang/Class;"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 1311,
+          "methodName": "getState",
+          "methodNum": 3,
+          "methodSignature": "()Ljava/lang/Thread$State;"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 504,
+          "methodName": "run",
+          "methodNum": 4,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 68,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.0,
+      "objNum": 69,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.014427412301301956,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/Thread$State;",
+          "methodLineNum": 1278,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 1309,
+          "methodName": "getState",
+          "methodNum": 1,
+          "methodSignature": "()Ljava/lang/Thread$State;"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 501,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 70,
+      "objType": "[C",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.695652186870575,
+      "objNum": 71,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.10389610379934311,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/Thread$State;",
+          "methodLineNum": 1278,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 1309,
+          "methodName": "getState",
+          "methodNum": 1,
+          "methodSignature": "()Ljava/lang/Thread$State;"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 501,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 72,
+      "objType": "[C",
+      "size": 24
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.3333333730697632,
+      "objNum": 73,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.24242424964904785,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/Thread$State;",
+          "methodLineNum": 1278,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 1309,
+          "methodName": "getState",
+          "methodNum": 1,
+          "methodSignature": "()Ljava/lang/Thread$State;"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 501,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 74,
+      "objType": "[C",
+      "size": 24
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 1.454545497894287,
+      "objNum": 75,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.24742268025875092,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/Thread$State;",
+          "methodLineNum": 1278,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 1309,
+          "methodName": "getState",
+          "methodNum": 1,
+          "methodSignature": "()Ljava/lang/Thread$State;"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 501,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 76,
+      "objType": "[C",
+      "size": 24
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.7272727489471436,
+      "objNum": 77,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.12422360479831696,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/Thread$State;",
+          "methodLineNum": 1278,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 1309,
+          "methodName": "getState",
+          "methodNum": 1,
+          "methodSignature": "()Ljava/lang/Thread$State;"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 501,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 78,
+      "objType": "[C",
+      "size": 40
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.3478260934352875,
+      "objNum": 79,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.11678832024335861,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/Thread$State;",
+          "methodLineNum": 1278,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 1309,
+          "methodName": "getState",
+          "methodNum": 1,
+          "methodSignature": "()Ljava/lang/Thread$State;"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 501,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 80,
+      "objType": "[C",
+      "size": 32
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 2.9629628658294678,
+      "objNum": 81,
+      "objType": "Ljava/lang/Class;",
+      "size": 80
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.0559440553188324,
+      "objBackTrace": [
+        {
+          "methodClass": "Ljava/lang/Thread$State;",
+          "methodLineNum": 1278,
+          "methodName": "<clinit>",
+          "methodNum": 0,
+          "methodSignature": "()V"
+        },
+        {
+          "methodClass": "Ljava/lang/Thread;",
+          "methodLineNum": 1309,
+          "methodName": "getState",
+          "methodNum": 1,
+          "methodSignature": "()Ljava/lang/Thread$State;"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 501,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 82,
+      "objType": "Ljava/lang/J9VMInternals$ClassInitializationLock;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.3404255211353302,
+      "objNum": 83,
+      "objType": "Ljava/lang/String;",
+      "size": 16
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": {
+    "object": {
+      "objAllocRate": 0.2012578547000885,
+      "objBackTrace": [
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/TargetDirectory;",
+          "methodLineNum": 163,
+          "methodName": "deleteTargetDirectory",
+          "methodNum": 0,
+          "methodSignature": "(Ljava/lang/String;)V"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/TargetDirectory;",
+          "methodLineNum": 154,
+          "methodName": "deleteMyDirectory",
+          "methodNum": 1,
+          "methodSignature": "(Z)V"
+        },
+        {
+          "methodClass": "Lopenj9/internal/tools/attach/target/AttachHandler$teardownHook;",
+          "methodLineNum": 501,
+          "methodName": "run",
+          "methodNum": 2,
+          "methodSignature": "()V"
+        }
+      ],
+      "objNum": 84,
+      "objType": "[C",
+      "size": 64
+    }
+  },
+  "from": "Server",
+  "timestamp": 1606960366
+},
+{
+  "body": "Server shutting down",
+  "from": "Server",
+  "timestamp": 1606960366
+}
+]

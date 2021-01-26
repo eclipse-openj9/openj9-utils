@@ -36,13 +36,14 @@
 #include "objectalloc.hpp"
 #include "server.hpp"
 #include "exception.hpp"
+#include "serverClients.hpp"
 
 using json = nlohmann::json;
 
 jvmtiEnv *jvmti;
 
 /* Server arguments with defaults */
-int portNo = 9002;
+int portNo = ServerConstants::DEFAULT_PORT;
 std::string commandsPath = "";
 std::string logPath = "logs.json";
 

@@ -29,7 +29,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-
+#include "serverClients.hpp"
 #include "utils.hpp"
 
 #define POLL_INTERVAL 150
@@ -166,7 +166,7 @@ void Client::closeClient()
 int main(int argc, char const *argv[])
 {
     string hostname = "localhost";
-    int portno = 9003;
+    int portno = ServerConstants::DEFAULT_PORT;
 
     if (argc > 2)
     {

@@ -39,6 +39,7 @@ public:
     static constexpr int POLL_INTERVALS = 250;
     static constexpr int COMMAND_INTERVALS = 500;
     static constexpr int BUFFER_SIZE = 512;
+    static constexpr int DEFAULT_PORT = 9002;
 };
 
 class NetworkClient

@@ -22,6 +22,7 @@
 
 #include <atomic>
 #include <iostream>
+#include <mutex>
 #include <jvmti.h>
 #include <ibmjvmti.h>
 #include <map>
@@ -31,13 +32,7 @@
 
 //how many times
 using json = nlohmann::json;
-struct ClassCycleInfo
-{
-    int numFirstTier;
-    // to be used for tiered spinning
-    int numSecondTier;
-    int numThirdTier;
-};
+
 std::atomic<bool> stackTraceEnabled{true};
 std::atomic<int> monitorSampleRate{1};
 std::atomic<int> monitorSampleCount{0};
@@ -64,7 +59,7 @@ void setMonitorSampleRate(int rate)
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, jthread thread, jobject object){
     json j;
     jvmtiError error;
-    static std::map<const char *, ClassCycleInfo> numContentions;
+    static std::map<std::string, int> numContentions;
     jclass cls = env->GetObjectClass(object);
     /* First get the class object */
     jmethodID mid = env->GetMethodID(cls, "getClass", "()Ljava/lang/Class;");
@@ -81,25 +76,25 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     j["Class"] = str;
     
     /* free str */
-
-
-    numContentions[str].numFirstTier++;
-
-    int num = numContentions[str].numFirstTier;
-    j["numTypeContentions"] = num;
+   
+    static std::mutex contentionMutex;
+    int samplesPerObjectType = 0;
+    {
+    std::lock_guard<std::mutex> lg(contentionMutex);
+    samplesPerObjectType = ++(numContentions[std::string(str)]);
+    }
+    j["numTypeContentions"] = samplesPerObjectType;
     /* Release the memory pinned char array */
     env->ReleaseStringUTFChars(strObj, str);
     env->DeleteLocalRef(cls);
 
-
-    int numMonitors;
     /* Get number of methods and increment */
-    numMonitors = atomic_fetch_add(&monitorSampleCount, 1);
+    int numSamples = atomic_fetch_add(&monitorSampleCount, 1);
 
     if (true)
     { /* only run if the backtrace is enabled */
-    jvmtiError err;
-        if (numMonitors % monitorSampleRate == 0)
+        jvmtiError err;
+        if (numSamples % monitorSampleRate == 0)
         {
             jvmtiFrameInfo frames[5];
             jint count;
@@ -118,7 +113,6 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
                 
             }
         }
-        monitorSampleCount = atomic_fetch_add(&monitorSampleCount, 1);
     }
     sendToServer(j.dump());
 }

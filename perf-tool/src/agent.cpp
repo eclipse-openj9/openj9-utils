@@ -36,58 +36,56 @@
 #include "objectalloc.hpp"
 #include "server.hpp"
 #include "exception.hpp"
+#include "serverClients.hpp"
 
 using json = nlohmann::json;
 
 jvmtiEnv *jvmti;
 
 /* Server arguments with defaults */
-int portNo = 9002;
+int portNo = ServerConstants::DEFAULT_PORT;
 std::string commandsPath = "";
 std::string logPath = "logs.json";
 
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
 {
-    std::string token;
     std::string optionsDelim = ",";
     std::string pathDelim = ":";
-    std::string oIn = (std::string)options;
+    std::string oIn(options);
     int pos1, pos2 = 0;
 
-    /* there is a max of two options the user can supply here
+    /* there is a max of three options the user can supply here
      * "commands" is followed by a path to the commands file
      * "log" is followed by the path to the location for the log file
      * "portno" is followed by a number indicating the port to run the server on 
      */
     while ((pos1 = oIn.find(optionsDelim)) != std::string::npos)
     {
-        if (pos1 != std::string::npos)
+        std::string token = oIn.substr(0, pos1);
+        if ((pos2 = token.find(pathDelim)) != std::string::npos)
         {
-            token = oIn.substr(0, pos1);
-            if ((pos2 = token.find(pathDelim)) != std::string::npos)
+            if (!token.substr(0, pos2).compare("commandFile"))
             {
-                if (!token.substr(0, pos2).compare("commandFile"))
-                {
-                    token.erase(0, pos2 + pathDelim.length());
-                    commandsPath = token;
-                }
-                else if (!token.substr(0, pos2).compare("logFile"))
-                {
-                    token.erase(0, pos2 + pathDelim.length());
-                    logPath = token;
-                }
-                else if (!token.substr(0, pos2).compare("portNo"))
-                {
-                    token.erase(0, pos2 + pathDelim.length());
-                    portNo = stoi(token);
-                }
+                fprintf(stderr, "commandFile\n");
+                token.erase(0, pos2 + pathDelim.length());
+                commandsPath = token;
             }
-            oIn.erase(0, pos1 + optionsDelim.length());
+            else if (!token.substr(0, pos2).compare("logFile"))
+            {
+                token.erase(0, pos2 + pathDelim.length());
+                logPath = token;
+            }
+            else if (!token.substr(0, pos2).compare("portNo"))
+            {
+                token.erase(0, pos2 + pathDelim.length());
+                portNo = stoi(token);
+            }
         }
+        oIn.erase(0, pos1 + optionsDelim.length());
     }
     if (!oIn.empty())
     {
-        token = oIn;
+        std::string token = oIn;
         if ((pos2 = token.find(pathDelim)) != std::string::npos)
         {
             if (!token.substr(0, pos2).compare("commandFile"))

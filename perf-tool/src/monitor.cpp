@@ -91,8 +91,8 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     /* Get number of methods and increment */
     int numSamples = atomic_fetch_add(&monitorSampleCount, 1);
 
-    if (true)
-    { /* only run if the backtrace is enabled */
+    if (stackTraceEnabled)
+    {
         jvmtiError err;
         if (numSamples % monitorSampleRate == 0)
         {

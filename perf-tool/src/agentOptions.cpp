@@ -57,11 +57,17 @@ void invalidRate(const std::string& function, const std::string& command, int sa
     printf("Invalid rate with parameters: {functionality: %s, command: %s, sampleRate: %i}\n", function.c_str(), command.c_str(), sampleRate);
 }
 
-void modifyMonitorEvents(const std::string& function, const std::string& command, int rate)
+void invalidStackTraceDepth(const std::string& function, const std::string& command, int stackTraceDepth)
+{
+    printf("Invalid stackTraceDepth with parameters: {functionality: %s, command: %s, stackTraceDepth: %i}\n", function.c_str(), command.c_str(), stackTraceDepth);
+}
+
+void modifyMonitorEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth)
 {
     jvmtiCapabilities capa;
     jvmtiError error;
     setMonitorSampleRate(rate);
+    setMonitorStackTraceDepth(stackTraceDepth);
     memset(&capa, 0, sizeof(jvmtiCapabilities));
     error = jvmti->GetCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Unable to get current capabilties.");
@@ -280,6 +286,15 @@ void agentCommand(const json& jCommand)
             invalidRate(function, command, sampleRate);
         }
     }
+    int stackTraceDepth = 0; /* default is no stacktrace */
+    if (jCommand.contains("stackTraceDepth"))
+    {
+        stackTraceDepth = jCommand["stackTraceDepth"].get<int>();
+        if (stackTraceDepth < 0)
+        {
+            invalidStackTraceDepth(function, command, stackTraceDepth);
+        }
+    }
 
     jvmti->GetPhase(&phase);
     if (!(phase == JVMTI_PHASE_ONLOAD || phase == JVMTI_PHASE_LIVE))
@@ -290,7 +305,7 @@ void agentCommand(const json& jCommand)
     {
         if (!function.compare("monitorEvents"))
         {
-            modifyMonitorEvents(function, command, sampleRate);
+            modifyMonitorEvents(function, command, sampleRate, stackTraceDepth);
         }
         else if (!function.compare("objectAllocEvents"))
         {

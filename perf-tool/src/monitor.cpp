@@ -36,6 +36,7 @@ using json = nlohmann::json;
 std::atomic<bool> stackTraceEnabled{true};
 std::atomic<int> monitorSampleRate{1};
 std::atomic<int> monitorSampleCount{0};
+std::atomic<int> monitorStackTraceDepth{0};
 
 void setMonitorStackTrace(bool val)
 {
@@ -56,9 +57,25 @@ void setMonitorSampleRate(int rate)
     }
 }
 
+static const int MAX_TRACE_DEPTH = 128;
+
+void setMonitorStackTraceDepth(int stackTraceDepth)
+{
+    /* Refuse to generate more than 128 deep */
+    if (stackTraceDepth > MAX_TRACE_DEPTH)
+       stackTraceDepth = MAX_TRACE_DEPTH;
+    monitorStackTraceDepth = stackTraceDepth;
+}
+
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, jthread thread, jobject object){
     json j;
     jvmtiError error;
+
+    /* Get number of events and increment */
+    int numSamples = atomic_fetch_add(&monitorSampleCount, 1);
+    if (numSamples % monitorSampleRate != 0)
+        return;
+
     static std::map<std::string, int> numContentions;
     jclass cls = env->GetObjectClass(object);
     /* First get the class object */
@@ -88,30 +105,59 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     env->ReleaseStringUTFChars(strObj, str);
     env->DeleteLocalRef(cls);
 
-    /* Get number of methods and increment */
-    int numSamples = atomic_fetch_add(&monitorSampleCount, 1);
-
-    if (stackTraceEnabled)
+    if (monitorStackTraceDepth > 0)
     {
         jvmtiError err;
-        if (numSamples % monitorSampleRate == 0)
+        jvmtiFrameInfo frames[MAX_TRACE_DEPTH];
+        jint count;
+        err = jvmtiEnv->GetStackTrace(thread, 0, monitorStackTraceDepth, frames, &count);
+        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Stack Trace.") && count >= 1)
         {
-            jvmtiFrameInfo frames[5];
-            jint count;
-            err = jvmtiEnv->GetStackTrace(thread, 0, 5,
-                                          frames, &count);
-            if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Stack Trace.") && count >= 1)
+            auto jMethods = json::array();
+            bool error = false;
+            for (int i=0; i < count && !error; i++)
             {
                 char *methodName;
-                err = jvmtiEnv->GetMethodName(frames[0].method,
-                                              &methodName, NULL, NULL);
-                if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Name.\n")) {
-                    j["Method"] = methodName;
+                char *signature;
+                err = jvmtiEnv->GetMethodName(frames[i].method, &methodName, &signature, NULL);
+                if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Name.\n")) 
+                {
+                    jclass declaring_class;
+                    err = jvmtiEnv->GetMethodDeclaringClass(frames[i].method, &declaring_class);
+                    if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class.\n")) 
+                    {
+                        char *declaringClassName;
+                        err = jvmtiEnv->GetClassSignature(declaring_class, &declaringClassName, NULL);
+                        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class Signature.\n")) 
+                        {
+                            json jMethod;
+                            jMethod["class"] = declaringClassName;
+                            jMethod["method"] = methodName;
+                            jMethod["signature"] = signature;
+                            jMethods.push_back(jMethod);
+                            err = jvmtiEnv->Deallocate((unsigned char*)declaringClassName);
+                            check_jvmti_error(jvmtiEnv, err, "Unable to deallocate class name.\n");
+                        }
+                        else
+                        {
+                            error = true;
+                        }
+                    }
+                    else
+                    {
+                        error = true;
+                    }
                     err = jvmtiEnv->Deallocate((unsigned char*)methodName);
                     check_jvmti_error(jvmtiEnv, err, "Unable to deallocate methodName.\n");
+                    err = jvmtiEnv->Deallocate((unsigned char*)signature);
+                    check_jvmti_error(jvmtiEnv, err, "Unable to deallocate method signature.\n");
                 }
-                
-            }
+                else
+                {
+                    error = true;
+                }
+            } /* end for loop */
+            j["stackTrace"] = jMethods;
         }
     }
     sendToServer(j.dump());

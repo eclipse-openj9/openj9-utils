@@ -160,5 +160,39 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
             j["stackTrace"] = jMethods;
         }
     }
+    /* Get the thread name */
+    jvmtiThreadInfo threadInfo;
+    error = jvmtiEnv->GetThreadInfo(thread, &threadInfo);
+    if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread info."))
+    {
+        j["threadName"] = threadInfo.name;
+        error = jvmtiEnv->Deallocate((unsigned char*)(threadInfo.name));
+        check_jvmti_error(jvmtiEnv, error, "Unable to deallocate thread name.\n");
+        // Local JNI refs to threadInfo.thread_group and threadInfo.context_class_loader will be freed upon return
+    }
+
+    /* Get OS thread ID 
+     * We need to use OpenJ9 JVMTI extension functions
+     */
+    jint extensionFunctionCount = 0;
+    jvmtiExtensionFunctionInfo *extensionFunctions = NULL;
+    jvmtiEnv->GetExtensionFunctions(&extensionFunctionCount, &extensionFunctions);
+    for (int i=0; i < extensionFunctionCount; i++) /* search for desired function */
+    {
+        jvmtiExtensionFunction function = extensionFunctions->func;
+        if (strcmp(extensionFunctions->id, COM_IBM_GET_OS_THREAD_ID) == 0)
+        {
+            jlong threadID = 0;
+            /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
+            error = function(jvmtiEnv, thread, &threadID);
+            if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
+            {
+                j["threadID"] = threadID;
+            }
+            break;
+        }
+        extensionFunctions++; /* move on to the next extension function */
+    }
+    
     sendToServer(j.dump());
 }

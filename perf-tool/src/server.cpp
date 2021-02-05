@@ -45,7 +45,7 @@
 using namespace std;
 using json = nlohmann::json;
 
-Server::Server(int portNo, const string commandFileName, const string logFileName)
+Server::Server(int portNo, const string &commandFileName, const string &logFileName)
 {
     this->portNo = portNo;
 
@@ -70,85 +70,81 @@ void Server::handleServer()
     int n, newsocketFd;
     json jsonCommand;
 
-    /* create a socket */
-    /* socket(int domain, int type, int protocol) */
-    serverSocketFd = socket(AF_INET, SOCK_STREAM, 0);
-    if (serverSocketFd < 0)
+    if (portNo != 0)
     {
-        error("ERROR opening socket");
+        /* create a socket */
+        /* socket(int domain, int type, int protocol) */
+        serverSocketFd = socket(AF_INET, SOCK_STREAM, 0);
+        if (serverSocketFd < 0)
+        {
+            error("ERROR opening socket");
+        }
+
+        /* clear address structure */
+        bzero((char *)&serv_addr, sizeof(serv_addr));
+
+        /* setup the host_addr structure for use in bind call */
+        /* server byte order */
+        serv_addr.sin_family = AF_INET;
+
+        /* automatically be filled with current host's IP address */
+        serv_addr.sin_addr.s_addr = INADDR_ANY;
+
+        /* convert short integer value for port must be converted into network byte order */
+        serv_addr.sin_port = htons(portNo);
+
+        /* This bind() call will bind  the socket to the current IP address on port, portNo */
+        if (bind(serverSocketFd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+        {
+            error("ERROR on binding");
+        }
+
+        /* This listen() call tells the socket to listen to the incoming connections. */
+        listen(serverSocketFd, ServerConstants::NUM_CLIENTS);
+
+        pollFds[0].fd = serverSocketFd;
+        pollFds[0].events = POLLIN;
+        pollFds[0].revents = 0;
     }
-
-    /* clear address structure */
-    bzero((char *)&serv_addr, sizeof(serv_addr));
-
-    /* setup the host_addr structure for use in bind call */
-    /* server byte order */
-    serv_addr.sin_family = AF_INET;
-
-    /* automatically be filled with current host's IP address */
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-
-    /* convert short integer value for port must be converted into network byte order */
-    serv_addr.sin_port = htons(portNo);
-
-    /* This bind() call will bind  the socket to the current IP address on port, portNo */
-    if (bind(serverSocketFd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-        error("ERROR on binding");
-    }
-
-    /* This listen() call tells the socket to listen to the incoming connections. */
-    listen(serverSocketFd, ServerConstants::NUM_CLIENTS);
-
-    pollFds[0].fd = serverSocketFd;
-    pollFds[0].events = POLLIN;
-    pollFds[0].revents = 0;
 
     printf("Server started.\n");
 
     /* Use polling to keep track of clients and keyboard input */
-    while (1)
+    while (keepPolling)
     {
-        if (!keepPolling)
+        if (serverSocketFd >= 0)
         {
-            break;
-        }
-
-        if (poll(pollFds, activeNetworkClients + ServerConstants::BASE_POLLS, ServerConstants::POLL_INTERVALS) == -1)
-        {
-            perror("ERROR on polling, server will now shut down");
-            break;
-        }
-
-        if (activeNetworkClients < ServerConstants::NUM_CLIENTS && pollFds[0].revents && POLLIN)
-        {
-            /* The accept() call actually accepts an incoming connection */
-            clilen = sizeof(cli_addr);
-
-            /* This accept() function will write the connecting client's address info 
-             *into the the address structure and the size of that structure is clilen.
-             */
-            newsocketFd = accept(serverSocketFd, (struct sockaddr *)&cli_addr, &clilen);
-            if (newsocketFd < 0)
+            if (poll(pollFds, activeNetworkClients + ServerConstants::BASE_POLLS, ServerConstants::POLL_INTERVALS) == -1)
             {
-                perror("ERROR on accept");
-            }
-            else
-            {
-                networkClients[activeNetworkClients] = new NetworkClient(newsocketFd);
+                perror("ERROR on polling, server will now shut down");
+                break;
             }
 
-            printf("server: got connection from %s port %d\n",
-                   inet_ntoa(cli_addr.sin_addr),
-                   ntohs(cli_addr.sin_port));
+            if (activeNetworkClients < ServerConstants::NUM_CLIENTS && (pollFds[0].revents & POLLIN))
+            {
+                /* The accept() call actually accepts an incoming connection */
+                clilen = sizeof(cli_addr);
 
-            /* Send a welcome message */
-            sendMessage(newsocketFd, "Connection to server succeeded");
+                /* This accept() function will write the connecting client's address info 
+                 *into the the address structure and the size of that structure is clilen.
+                 */
+                newsocketFd = accept(serverSocketFd, (struct sockaddr *)&cli_addr, &clilen);
+                if (newsocketFd < 0)
+                    perror("ERROR on accept");
+                else
+                    networkClients[activeNetworkClients] = new NetworkClient(newsocketFd);
 
-            /* Update number of active clients */
-            activeNetworkClients++;
+                printf("server: got connection from %s port %d\n",
+                       inet_ntoa(cli_addr.sin_addr),
+                       ntohs(cli_addr.sin_port));
+
+                /* Send a welcome message */
+                sendMessage(newsocketFd, "Connection to server succeeded");
+
+                /* Update number of active clients */
+                activeNetworkClients++;
+            }
         }
-
         /* Check for commands from commands file if running in headless mode */
         if (headlessMode)
         {

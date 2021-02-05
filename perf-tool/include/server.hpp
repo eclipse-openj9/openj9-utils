@@ -47,7 +47,7 @@ class Server
 protected:
 public:
 private:
-    int serverSocketFd, activeNetworkClients = 0, portNo;
+    int serverSocketFd = -1, activeNetworkClients = 0, portNo;
     bool headlessMode = true, keepPolling = true;
     struct pollfd pollFds[ServerConstants::BASE_POLLS + ServerConstants::NUM_CLIENTS];
     NetworkClient *networkClients[ServerConstants::NUM_CLIENTS];
@@ -61,7 +61,7 @@ private:
      */
 protected:
 public:
-    Server(int portNo, std::string commandFileName = "", std::string logFileName = "logs.txt");
+    Server(int portNo, const std::string &commandFileName = "", const std::string &logFileName = "logs.txt");
 
     /* Handles server functionality and polling*/
     void handleServer(void);

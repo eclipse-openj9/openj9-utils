@@ -49,15 +49,16 @@ std::string logPath = "logs.json";
 
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
 {
-    std::string optionsDelim = ",";
-    std::string pathDelim = ":";
+    const std::string optionsDelim = ",";
+    const std::string pathDelim = ":";
     std::string oIn(options);
     int pos1, pos2 = 0;
+    printf("Options passed in: %s\n", options);
 
     /* there is a max of three options the user can supply here
      * "commands" is followed by a path to the commands file
      * "log" is followed by the path to the location for the log file
-     * "portno" is followed by a number indicating the port to run the server on 
+     * "portNo" is followed by a number indicating the port to run the server on 
      */
     while ((pos1 = oIn.find(optionsDelim)) != std::string::npos)
     {
@@ -66,7 +67,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
         {
             if (!token.substr(0, pos2).compare("commandFile"))
             {
-                fprintf(stderr, "commandFile\n");
                 token.erase(0, pos2 + pathDelim.length());
                 commandsPath = token;
             }

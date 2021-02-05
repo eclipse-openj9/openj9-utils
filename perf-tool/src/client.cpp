@@ -168,12 +168,11 @@ int main(int argc, char const *argv[])
     string hostname = "localhost";
     int portno = ServerConstants::DEFAULT_PORT;
 
-    if (argc > 2)
+    if (argc > 1)
     {
-        hostname = argv[1];
-        if (argc >= 3) {
-            portno = atoi(argv[2]);
-        }
+        portno = atoi(argv[1]);
+        if (argc > 2)
+            hostname = argv[2];
     }
 
     Client client(portno, hostname, true);

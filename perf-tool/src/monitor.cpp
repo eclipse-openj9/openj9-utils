@@ -170,6 +170,25 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
         check_jvmti_error(jvmtiEnv, error, "Unable to deallocate thread name.\n");
         // Local JNI refs to threadInfo.thread_group and threadInfo.context_class_loader will be freed upon return
     }
+    /* Get Java thread ID */
+    jclass threadClass = env->FindClass("java/lang/Thread");
+    if (threadClass)
+    {
+        jmethodID getIdMethod = env->GetMethodID(threadClass, "getId", "()J");
+        if (getIdMethod)
+        {
+            jlong tid = env->CallLongMethod(thread, getIdMethod);
+            j["threadID"] = tid; 
+        }
+        else
+        {
+            printf ("Error calling GetMethodID for java/lang/Thread.getId()J\n");
+        }
+    }
+    else
+    {
+        printf ("Error calling FindClass for java/lang/Thread\n");
+    }
 
     /* Get OS thread ID 
      * We need to use OpenJ9 JVMTI extension functions
@@ -187,7 +206,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
             error = function(jvmtiEnv, thread, &threadID);
             if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
             {
-                j["threadID"] = threadID;
+                j["threadNativeID"] = threadID;
             }
             break;
         }

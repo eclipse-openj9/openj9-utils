@@ -1,5 +1,5 @@
 <!--
-Copyright (c) 2020, 2020 IBM Corp. and others
+Copyright (c) 2020, 2021 IBM Corp. and others
 
 This program and the accompanying materials are made available under
 the terms of the Eclipse Public License 2.0 which accompanies this
@@ -22,7 +22,7 @@ SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-excepti
 
 # Quick Start: Enabling JITServer Technology
 
-This quick start guide walks you through an example of enabling JITServer Technology for your java application. This guide uses [Open Liberty WebServer](https://openliberty.io) as a Java application. JITServer technology can be used for any Java application running on recent releases of OpenJ9 for Java 8 and Java 11. Please make sure that JITServer image is compatible with the JDK that runs your application, as described [here](./README.md#a-verify-the-application-jdk-version-and-select-the-appropriate-jitserver-image).
+This quick start guide walks you through an example of enabling JITServer Technology for your java application. This guide uses [Open Liberty Application Server](https://openliberty.io) as a Java application. JITServer technology can be used for any Java application running on recent releases of OpenJ9 for Java 8 and Java 11. Please make sure that JITServer image is compatible with the JDK that runs your application, as described [here](./README.md#a-verify-the-application-jdk-version-and-select-the-appropriate-jitserver-image).
 
 You will be provided with a basic understanding of JITServer technology and how it works with your java application. 
 

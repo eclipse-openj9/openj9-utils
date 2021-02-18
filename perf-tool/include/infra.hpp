@@ -25,6 +25,8 @@
 
 #include <string>
 #include <jvmti.h>
+class Server;
+extern Server *server;
 
 void check_jvmti_error_throw(jvmtiEnv *jvmti, jvmtiError errnum, const char *str);
 
@@ -33,7 +35,8 @@ bool check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str);
 
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread);
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env);
-void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni);
+jthread createNewThread(JNIEnv* jni_env);
+void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void *p);
 void sendToServer(std::string message);
 
 extern int portNo;

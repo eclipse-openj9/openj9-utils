@@ -40,21 +40,23 @@
 
 using json = nlohmann::json;
 
-jvmtiEnv *jvmti;
+jvmtiEnv *jvmti = NULL;
 
-/* Server arguments with defaults */
+/* Server arguments with defaults
+ * These will be set by parseAgentOptions
+ */
 int portNo = ServerConstants::DEFAULT_PORT;
 std::string commandsPath = "";
 std::string logPath = "logs.json";
 
-JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
+
+void parseAgentOptions(const char *options)
 {
     const std::string optionsDelim = ",";
     const std::string pathDelim = ":";
     std::string oIn(options);
     int pos1, pos2 = 0;
-    printf("Options passed in: %s\n", options);
-
+    
     /* there is a max of three options the user can supply here
      * "commands" is followed by a path to the commands file
      * "log" is followed by the path to the location for the log file
@@ -109,36 +111,11 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     printf("%s\n", commandsPath.c_str());
     printf("%s\n", logPath.c_str());
     printf("%i\n", portNo);
+}
 
-    jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
-    if (rest != JNI_OK || jvmti == NULL) {
-
-        printf("Unable to get access to JVMTI version 1.2");
-        return JNI_ERR;
-    }
-
-    jvmtiCapabilities capa;
-    jvmtiError error;
-    memset(&capa, 0, sizeof(jvmtiCapabilities));
-    capa.can_signal_thread = 1;
-    capa.can_get_owned_monitor_info = 1;
-    capa.can_generate_method_entry_events = 1;
-    capa.can_tag_objects = 1;
-    capa.can_get_current_thread_cpu_time = 1;
-    capa.can_get_line_numbers = 1;
-    capa.can_generate_vm_object_alloc_events = 1;
-    capa.can_generate_monitor_events = 1;
-    capa.can_generate_exception_events = 1;
-    capa.can_get_source_file_name = 1;
-    error = jvmti->AddCapabilities(&capa);
-    check_jvmti_error(jvmti, error, "Failed to set jvmtiCapabilities.");
-
-    error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_INIT, (jthread)NULL);
-    check_jvmti_error(jvmti, error, "Unable to init VM init event.");
-
-    error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_DEATH, (jthread)NULL);
-    check_jvmti_error(jvmti, error, "Unable to init VM death eventVerboseLogSubscriber.");
-
+    
+jvmtiError setCallbacks(jvmtiEnv *jvmti)
+{
     jvmtiEventCallbacks callbacks;
     memset(&callbacks, 0, sizeof(jvmtiEventCallbacks));
     callbacks.VMInit = &VMInit;
@@ -147,8 +124,81 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.MethodEntry = &MethodEntry;
     callbacks.Exception = &Exception;
-    error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
+    jvmtiError error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks.");
+    return error;
+}
+
+
+JNIEXPORT jint JNICALL Agent_OnAttach(JavaVM* vm, char *options, void *reserved)
+{
+    jint rc;
+    /* If a previous attach operation loaded the library and created
+     * the server, don't try to do it again
+     */
+    if (!server)
+    {
+        jvmtiError error;
+        printf("On attach initiated with options: %s\n", options);
+        parseAgentOptions(options);
+        
+        rc = vm->GetEnv((void **)&jvmti, JVMTI_VERSION_1_2);
+        if (rc != JNI_OK)
+        {
+            fprintf(stderr, "Cannot get JVMTI env\n");
+            return rc;
+        }
+        JNIEnv *jni_env;
+        rc = vm->GetEnv((void **)&jni_env, JNI_VERSION_1_8);
+        if (rc != JNI_OK)
+        {
+            fprintf(stderr, "Cannot get JNI env\n");
+            return rc;
+        }
+
+        error = setCallbacks(jvmti);
+        if (error != JVMTI_ERROR_NONE)
+            return JNI_ERR; /* without callbacks I cannot do anything */
+
+        error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_DEATH, (jthread)NULL);
+        check_jvmti_error(jvmti, error, "Unable to init VM death event.");
+
+
+        /* Create the server and start the server thread */
+        server = new Server(portNo, commandsPath, logPath);
+        error = jvmti->RunAgentThread( createNewThread(jni_env), &startServer, NULL, JVMTI_THREAD_NORM_PRIORITY );
+        if (error != JVMTI_ERROR_NONE)
+        {
+            fprintf(stderr, "Error starting agent thread\n");
+            delete server;
+            server = NULL;
+            return JNI_ERR;
+        }
+    }
+    return JNI_OK;
+}
+
+JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
+{
+    printf("Options passed in: %s\n", options);
+    parseAgentOptions(options);
+
+    jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
+    if (rest != JNI_OK || jvmti == NULL) {
+
+        printf("Unable to get access to JVMTI version 1.2");
+        return JNI_ERR;
+    }
+
+    jvmtiError error = setCallbacks(jvmti);
+    if (error != JVMTI_ERROR_NONE)
+        return JNI_ERR;
+
+    error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_INIT, (jthread)NULL);
+    check_jvmti_error(jvmti, error, "Unable to init VM init event.");
+
+    error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_DEATH, (jthread)NULL);
+    check_jvmti_error(jvmti, error, "Unable to init VM death event.");
 
     return JNI_OK;
 }

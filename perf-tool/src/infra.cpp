@@ -73,17 +73,19 @@ void sendToServer(const std::string message)
 
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {
     jvmtiError error;
-    int* portPointer = portNo ? &portNo : NULL;
-
     server = new Server(portNo, commandsPath, logPath);
 
-    error = jvmtiEnv -> RunAgentThread( createNewThread(jni_env),&startServer, portPointer, JVMTI_THREAD_NORM_PRIORITY );
+    error = jvmtiEnv -> RunAgentThread( createNewThread(jni_env), &startServer, NULL, JVMTI_THREAD_NORM_PRIORITY );
     check_jvmti_error_throw(jvmtiEnv, error, "Error starting agent thread.");
     printf("VM starting up.\n");
 }
 
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env) {
-    server->shutDownServer();
-    delete server;
+    if (server)
+    {
+        server->shutDownServer();
+        delete server;
+        server = NULL;
+    }
     printf("VM shutting down.\n");
 }

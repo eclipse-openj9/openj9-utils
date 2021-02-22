@@ -49,6 +49,59 @@ bool check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
     return true;
 }
 
+void EventConfig::setCallbacks(const std::string& cls, const std::string& method, const std::string& sig)
+{
+    std::lock_guard<std::mutex> lg(configMutex);
+    callbackClass.assign(cls);
+    callbackMethod.assign(method);
+    callbackSignature.assign(sig);
+    /* Also reset the cached IDs; they need to be re-discovered */
+    if (callbackIDs.cachedCallbackClass)
+        jni_env->DeleteGlobalRef(callbackIDs.cachedCallbackClass);
+    callbackIDs.cachedCallbackClass = NULL;
+    callbackIDs.cachedCallbackMethodId = NULL;
+}
+
+EventConfig::CallbackIDs EventConfig::getCallBackIDs(JNIEnv *env)
+{
+    std::lock_guard<std::mutex> lg(configMutex);
+    if (!getCachedCallbackClass() || !getCachedCallbackMethodId())
+    {
+        /* Need to compute them */
+        if (!getCallbackClass().empty() && !getCallbackMethod().empty() && !getCallbackSignature().empty())
+        {
+            jclass callbackCls = env->FindClass(getCallbackClass().c_str());
+            if (callbackCls)
+            {
+                jmethodID callbackMethodID = env->GetStaticMethodID(callbackCls, getCallbackMethod().c_str(), getCallbackSignature().c_str());
+                if (callbackMethodID)
+                {
+                    jclass cls = (jclass)env->NewGlobalRef(callbackCls); /* If we cache it, we need to pin the class to avoid unloading */
+                    callbackIDs.cachedCallbackClass = cls;
+                    callbackIDs.cachedCallbackMethodId = callbackMethodID;
+                }
+                else
+                {
+                    if (env->ExceptionCheck() == JNI_TRUE)
+                        env->ExceptionClear();
+                    fprintf(stderr, "Cannot find callback method %s%s\n", getCallbackMethod().c_str(), getCallbackSignature().c_str());
+                    /* Delete the name of the method, so that we don't search over and over */
+                    callbackMethod.clear();
+                }
+            }
+            else
+            {
+                if (env->ExceptionCheck() == JNI_TRUE)
+                    env->ExceptionClear();
+                fprintf(stderr, "Cannot find callback class %s\n", getCallbackClass().c_str());
+                /* Delete the name of the class, so that we don't search over and over */
+                callbackClass.clear();
+            }
+        }
+    }
+    return callbackIDs;
+}
+
 jthread createNewThread(JNIEnv* jni_env){
     /* allocates a new java thread object using JNI */
     jclass threadClass;

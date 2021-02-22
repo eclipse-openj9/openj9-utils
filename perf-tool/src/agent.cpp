@@ -41,6 +41,7 @@
 using json = nlohmann::json;
 
 jvmtiEnv *jvmti = NULL;
+JNIEnv *jni_env = NULL;
 
 /* Server arguments with defaults
  * These will be set by parseAgentOptions
@@ -148,7 +149,6 @@ JNIEXPORT jint JNICALL Agent_OnAttach(JavaVM* vm, char *options, void *reserved)
             fprintf(stderr, "Cannot get JVMTI env\n");
             return rc;
         }
-        JNIEnv *jni_env;
         rc = vm->GetEnv((void **)&jni_env, JNI_VERSION_1_8);
         if (rc != JNI_OK)
         {

@@ -93,20 +93,20 @@ If your application uses a different version of Java, please include the option 
 
 Alternatively, if you have a copy of the helm chart then, in order to select a specific java version, you can edit `image.repository` and `image.tag` fields inside `Values.yaml` to change the image location.
 
-For example, this helm chart pulls `adoptopenjdk:8-openj9` image and runs `jitserver`.
+For example, this helm chart currently pulls AdoptOpenJDK OpenJ9 Java 8 `0.24.0` release images (`adoptopenjdk:8u282-b08-jdk-openj9-0.24.0`) and runs `jitserver`.
 ``` yaml
 image:
   repository: adoptopenjdk
-  tag: 8-openj9
+  tag: 8u282-b08-jdk-openj9-0.24.0
   pullPolicy: Always
   command: ["jitserver"]
 ```
 
-Should you want to deploy AdoptOpenJDK Java 11 images, change `image` fields inside `Values.yaml` as shown below.
+Should you want to deploy AdoptOpenJDK OpenJ9 Java 11 `0.24.0` release images, change `image` fields inside `Values.yaml` as shown below.
 ``` yaml
 image:
   repository: adoptopenjdk
-  tag: 11-openj9
+  tag: 11.0.10_9-jdk-openj9-0.24.0
   pullPolicy: Always
   command: ["jitserver"]
 ```

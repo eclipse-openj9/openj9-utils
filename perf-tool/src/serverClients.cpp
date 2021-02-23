@@ -97,7 +97,7 @@ void LoggingClient::logData(const string message, const std::string receivedFrom
     {
         json log;
         auto currentClockTime = std::chrono::system_clock::now();
-        std::time_t currentTime = std::chrono::system_clock::to_time_t(currentClockTime);
+	long long int nano = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
         
         /* If message was a proper json, log as formatted json
          * otherwise log the string as it is
@@ -112,7 +112,7 @@ void LoggingClient::logData(const string message, const std::string receivedFrom
         }
         
         log["from"] = receivedFrom;
-        log["timestamp"] = currentTime;
+        log["timestamp"] = nano;
         logFile << log.dump(2, ' ', true) << ',' << endl;
     }
 }

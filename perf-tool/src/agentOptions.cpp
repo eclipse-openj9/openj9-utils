@@ -41,6 +41,7 @@
 using json = nlohmann::json;
 
 VerboseLogSubscriber *verboseLogSubscriber;
+extern EventConfig monitorConfig;
 
 void invalidCommand(const std::string& function, const std::string& command)
 {
@@ -62,12 +63,14 @@ void invalidStackTraceDepth(const std::string& function, const std::string& comm
     printf("Invalid stackTraceDepth with parameters: {functionality: %s, command: %s, stackTraceDepth: %i}\n", function.c_str(), command.c_str(), stackTraceDepth);
 }
 
-void modifyMonitorEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth)
+void modifyMonitorEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth,
+                         const std::string& callbackClass, const std::string& callbackMethod, const std::string& callbackSignature)
 {
     jvmtiCapabilities capa;
     jvmtiError error;
-    setMonitorSampleRate(rate);
-    setMonitorStackTraceDepth(stackTraceDepth);
+    monitorConfig.setSampleRate(rate);
+    monitorConfig.setStackTraceDepth(stackTraceDepth);
+    monitorConfig.setCallbacks(callbackClass, callbackMethod, callbackSignature);
     memset(&capa, 0, sizeof(jvmtiCapabilities));
     error = jvmti->GetCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Unable to get current capabilties.");
@@ -295,6 +298,18 @@ void agentCommand(const json& jCommand)
             invalidStackTraceDepth(function, command, stackTraceDepth);
         }
     }
+    std::string callbackClass;
+    std::string callbackMethod;
+    std::string callbackSignature;
+    if (jCommand.contains("callback"))
+        {
+        auto jcallback = jCommand["callback"];
+        callbackClass = jcallback["class"].get<std::string>();
+        callbackMethod = jcallback["method"].get<std::string>();
+        callbackSignature = jcallback["signature"].get<std::string>();
+        printf("Found callback: %s.%s%s\n", callbackClass.c_str(), callbackMethod.c_str(), callbackSignature.c_str());
+        }
+ 
 
     jvmti->GetPhase(&phase);
     if (!(phase == JVMTI_PHASE_ONLOAD || phase == JVMTI_PHASE_LIVE))
@@ -305,7 +320,7 @@ void agentCommand(const json& jCommand)
     {
         if (!function.compare("monitorEvents"))
         {
-            modifyMonitorEvents(function, command, sampleRate, stackTraceDepth);
+            modifyMonitorEvents(function, command, sampleRate, stackTraceDepth, callbackClass, callbackMethod, callbackSignature);
         }
         else if (!function.compare("objectAllocEvents"))
         {

@@ -23,10 +23,14 @@
 #ifndef INFRA_H_
 #define INFRA_H_
 
+#include <algorithm>
+#include <mutex>
 #include <string>
 #include <jvmti.h>
+
 class Server;
 extern Server *server;
+extern JNIEnv *jni_env;
 
 void check_jvmti_error_throw(jvmtiEnv *jvmti, jvmtiError errnum, const char *str);
 
@@ -42,6 +46,38 @@ void sendToServer(std::string message);
 extern int portNo;
 extern std::string commandsPath;
 extern std::string logPath;
+
+class EventConfig
+{
+public:
+    struct CallbackIDs 
+    {
+        jclass cachedCallbackClass = NULL;
+        jmethodID cachedCallbackMethodId = NULL;
+    };
+private:
+    int sampleRate = 1;
+    int stackTraceDepth = 0;
+    std::string callbackClass;
+    std::string callbackMethod;
+    std::string callbackSignature;
+    CallbackIDs callbackIDs;
+    std::mutex configMutex;
+    #define MAX_TRACE_DEPTH 128
+public:
+    static constexpr int getMaxTraceDepth() { return MAX_TRACE_DEPTH; } 
+    int getSampleRate(void) const { return sampleRate; }
+    void setSampleRate(int rate) { sampleRate = (rate > 0 ? rate : 1); }
+    int getStackTraceDepth() const { return stackTraceDepth; }
+    void setStackTraceDepth(int depth) { stackTraceDepth = std::min(depth, MAX_TRACE_DEPTH); }
+    const std::string& getCallbackClass() const { return callbackClass; }
+    const std::string& getCallbackMethod() const { return callbackMethod; }
+    const std::string &getCallbackSignature() const { return callbackSignature; }
+    void setCallbacks(const std::string& cls, const std::string& method, const std::string& sig);
+    jclass getCachedCallbackClass() const { return callbackIDs.cachedCallbackClass; }
+    jmethodID getCachedCallbackMethodId() const { return callbackIDs.cachedCallbackMethodId; }
+    CallbackIDs getCallBackIDs(JNIEnv *env);
+};
 
 
 #endif /* INFRA_H_ */

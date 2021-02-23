@@ -33,39 +33,9 @@
 //how many times
 using json = nlohmann::json;
 
-std::atomic<bool> stackTraceEnabled{true};
-std::atomic<int> monitorSampleRate{1};
 std::atomic<int> monitorSampleCount{0};
-std::atomic<int> monitorStackTraceDepth{0};
+EventConfig monitorConfig;
 
-void setMonitorStackTrace(bool val)
-{
-    /* Enables or disables the stack trace option */
-    stackTraceEnabled = val;
-}
-
-void setMonitorSampleRate(int rate)
-{
-    if (rate > 0)
-    {
-        stackTraceEnabled = true;
-        monitorSampleRate = rate;
-    }
-    else
-    {
-        stackTraceEnabled = false;
-    }
-}
-
-static const int MAX_TRACE_DEPTH = 128;
-
-void setMonitorStackTraceDepth(int stackTraceDepth)
-{
-    /* Refuse to generate more than 128 deep */
-    if (stackTraceDepth > MAX_TRACE_DEPTH)
-       stackTraceDepth = MAX_TRACE_DEPTH;
-    monitorStackTraceDepth = stackTraceDepth;
-}
 
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, jthread thread, jobject object){
     json j;
@@ -73,7 +43,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
 
     /* Get number of events and increment */
     int numSamples = atomic_fetch_add(&monitorSampleCount, 1);
-    if (numSamples % monitorSampleRate != 0)
+    if (numSamples % monitorConfig.getSampleRate() != 0)
         return;
 
     static std::map<std::string, int> numContentions;
@@ -105,12 +75,12 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     env->ReleaseStringUTFChars(strObj, str);
     env->DeleteLocalRef(cls);
 
-    if (monitorStackTraceDepth > 0)
+    if (monitorConfig.getStackTraceDepth() > 0)
     {
         jvmtiError err;
-        jvmtiFrameInfo frames[MAX_TRACE_DEPTH];
+        jvmtiFrameInfo frames[EventConfig::getMaxTraceDepth()];
         jint count;
-        err = jvmtiEnv->GetStackTrace(thread, 0, monitorStackTraceDepth, frames, &count);
+        err = jvmtiEnv->GetStackTrace(thread, 0, monitorConfig.getStackTraceDepth(), frames, &count);
         if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Stack Trace.") && count >= 1)
         {
             auto jMethods = json::array();
@@ -214,4 +184,24 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     }
     
     sendToServer(j.dump());
+
+    /* Also call the callback */
+    EventConfig::CallbackIDs callbackIDs = monitorConfig.getCallBackIDs(env);
+    if (callbackIDs.cachedCallbackClass && callbackIDs.cachedCallbackMethodId)
+    {
+        jstring jsonEntry = env->NewStringUTF(j.dump().c_str());
+        if (jsonEntry)
+        { 
+            env->CallStaticVoidMethod(callbackIDs.cachedCallbackClass, callbackIDs.cachedCallbackMethodId, jsonEntry);
+            /* If the callback generates an exception that is not caught
+             * suppress that exception from being propagated further
+             * because it can be confusing 
+             */
+            if (env->ExceptionCheck() == JNI_TRUE)
+            {
+                env->ExceptionDescribe();
+                env->ExceptionClear();
+            }
+        }
+    }
 }

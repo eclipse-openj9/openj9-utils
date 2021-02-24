@@ -46,6 +46,15 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     if (numSamples % monitorConfig.getSampleRate() != 0)
         return;
 
+    jvmtiError err;
+    jint hash;
+    err = jvmtiEnv->GetObjectHashCode(object, &hash);
+    if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve object hashcode.")) {
+	    char str[32];
+	    sprintf(str, "0x%x", hash);
+	    j["monitorHash"] = str;
+    }
+
     static std::map<std::string, int> numContentions;
     jclass cls = env->GetObjectClass(object);
     /* First get the class object */

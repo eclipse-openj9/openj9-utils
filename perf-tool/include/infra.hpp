@@ -44,7 +44,7 @@ JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread threa
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env);
 jthread createNewThread(JNIEnv* jni_env);
 void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void *p);
-void sendToServer(std::string message);
+void sendToServer(std::string message, std::string event);
 
 extern int portNo;
 extern std::string commandsPath;

@@ -92,7 +92,7 @@ void LoggingClient::closeFile(void)
     }
 }
 
-void LoggingClient::logData(const string message, const std::string receivedFrom)
+void LoggingClient::logData(const string message, std::string event, const std::string receivedFrom)
 {
     if (logFile.is_open())
     {
@@ -113,6 +113,7 @@ void LoggingClient::logData(const string message, const std::string receivedFrom
         }
         
         log["from"] = receivedFrom;
+        log["eventType"] = event;
         log["timestamp"] = nano;
         logFile << log.dump(2, ' ', true) << ',' << endl;
     }

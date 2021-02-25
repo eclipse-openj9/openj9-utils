@@ -67,7 +67,7 @@ public:
     void handleServer(void);
 
     /* Handle the message queue, and sends to all clients */
-    void handleMessagingClients(std::string message);
+    void handleMessagingClients(std::string message, std::string event);
 
     /* Closes all open files, connectend socketfd, and then the server's socket */
     void shutDownServer(void);

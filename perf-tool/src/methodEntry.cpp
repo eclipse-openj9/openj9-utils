@@ -91,7 +91,7 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
         }
     
         std::string s = j.dump();
-        sendToServer(s);
+        sendToServer(s, "methodEntryEvent");
     }
     mEntrySampleCount = atomic_fetch_add(&mEntrySampleCount, 1);
 }

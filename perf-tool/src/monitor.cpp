@@ -164,7 +164,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
         }
     }
     
-    sendToServer(j.dump());
+    sendToServer(j.dump(), "monitorContendedEnteredEvent");
 
     /* Also call the callback */
     
@@ -326,6 +326,9 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
             j["OwnerThread"] = jOwner;
         }
     }
+
+    sendToServer(j.dump(), "monitorContendedEnterEvent");
+
     json jCurrent;
     /* Get StackTrace */
     monitorConfig.getStackTrace(jvmtiEnv, thread, jCurrent, stackTraceDepth);

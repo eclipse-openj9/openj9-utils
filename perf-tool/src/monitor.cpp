@@ -139,12 +139,14 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
             j["stackTrace"] = jMethods;
         }
     }
+    json jMethod;
+    auto jMethods = json::array();
     /* Get the thread name */
     jvmtiThreadInfo threadInfo;
     error = jvmtiEnv->GetThreadInfo(thread, &threadInfo);
     if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread info."))
     {
-        j["threadName"] = threadInfo.name;
+        jMethod["threadName"] = threadInfo.name;
         error = jvmtiEnv->Deallocate((unsigned char*)(threadInfo.name));
         check_jvmti_error(jvmtiEnv, error, "Unable to deallocate thread name.\n");
         // Local JNI refs to threadInfo.thread_group and threadInfo.context_class_loader will be freed upon return
@@ -157,7 +159,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
         if (getIdMethod)
         {
             jlong tid = env->CallLongMethod(thread, getIdMethod);
-            j["threadID"] = tid; 
+            jMethod["threadID"] = tid; 
         }
         else
         {
@@ -185,12 +187,14 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
             error = function(jvmtiEnv, thread, &threadID);
             if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
             {
-                j["threadNativeID"] = threadID;
+                jMethod["threadNativeID"] = threadID;
             }
             break;
         }
         extensionFunctions++; /* move on to the next extension function */
     }
+    jMethods.push_back(jMethod);
+    j["OwnerThread"] = jMethods;
     
     sendToServer(j.dump());
 

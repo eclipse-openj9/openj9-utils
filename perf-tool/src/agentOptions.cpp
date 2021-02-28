@@ -74,23 +74,28 @@ void modifyMonitorEvents(const std::string& function, const std::string& command
     memset(&capa, 0, sizeof(jvmtiCapabilities));
     error = jvmti->GetCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Unable to get current capabilties.");
-    if (capa.can_generate_monitor_events)
+    if (capa.can_generate_monitor_events && capa.can_get_monitor_info)
     {
         if (!command.compare("stop"))
         {
             memset(&capa, 0, sizeof(jvmtiCapabilities));
             capa.can_generate_monitor_events = 1;
+            capa.can_get_monitor_info = 1;
 
             error = jvmti->RelinquishCapabilities(&capa);
             check_jvmti_error(jvmti, error, "Unable to relinquish Monitor Events Capability.");
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEntered event.");
+            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTER, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEnter event.");
         }
         else if (!command.compare("start"))
         { 
             printf("Monitor Events Capability already enabled\n");
             error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to enable MonitorContendedEntered event notifications.");
+            error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTER, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to enable MonitorContendedEnter event notifications.");
         } else {
             invalidCommand(function, command);
         }
@@ -101,16 +106,22 @@ void modifyMonitorEvents(const std::string& function, const std::string& command
         {
             memset(&capa, 0, sizeof(jvmtiCapabilities));
             capa.can_generate_monitor_events = 1;
+            capa.can_get_monitor_info = 1;
+
 
             error = jvmti->AddCapabilities(&capa);
             check_jvmti_error(jvmti, error, "Unable to init Monitor Events capability.");
 
+            error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTER, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to enable MonitorContendedEnter event notifications.");
             error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to enable MonitorContendedEntered event notifications.");
         }
         else if (!command.compare("stop"))
         { 
             printf("Monitor Events Capability already disabled.");
+            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTER, (jthread)NULL);
+            check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEnter event.");
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEntered event.");
         } else {

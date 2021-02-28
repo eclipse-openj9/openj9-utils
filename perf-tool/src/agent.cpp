@@ -122,6 +122,7 @@ jvmtiError setCallbacks(jvmtiEnv *jvmti)
     callbacks.VMInit = &VMInit;
     callbacks.VMDeath = &VMDeath;
     callbacks.VMObjectAlloc = &VMObjectAlloc;
+    callbacks.MonitorContendedEnter = &MonitorContendedEnter;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.MethodEntry = &MethodEntry;
     callbacks.Exception = &Exception;

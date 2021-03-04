@@ -100,7 +100,8 @@ void VerboseLogSubscriber::Unsubscribe()
             {
                 perror("ERROR deregistering verbose log subscriber failed: ");
             }
-            printf("Calling JVMTI extension %s, rc=%i\n", COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER, rc);
+            if (verbose >= WARN)
+                printf("Calling JVMTI extension %s, rc=%i\n", COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER, rc);
             break;
         }
         extensionFunctions++; /* move on to the next extension function */

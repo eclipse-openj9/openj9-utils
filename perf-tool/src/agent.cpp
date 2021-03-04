@@ -49,7 +49,7 @@ JNIEnv *jni_env = NULL;
 int portNo = ServerConstants::DEFAULT_PORT;
 std::string commandsPath = "";
 std::string logPath = "logs.json";
-
+int verbose = NONE;
 
 void parseAgentOptions(const char *options)
 {
@@ -58,10 +58,12 @@ void parseAgentOptions(const char *options)
     std::string oIn(options);
     int pos1, pos2 = 0;
     
-    /* there is a max of three options the user can supply here
+    /* there is a max of four options the user can supply here
      * "commands" is followed by a path to the commands file
      * "log" is followed by the path to the location for the log file
-     * "portNo" is followed by a number indicating the port to run the server on 
+     * "portNo" is followed by a number indicating the port to run the server on
+     * "verbose" is used to indicate the degree of verbosity to show the 
+     * additional information
      */
     while ((pos1 = oIn.find(optionsDelim)) != std::string::npos)
     {
@@ -83,7 +85,13 @@ void parseAgentOptions(const char *options)
                 token.erase(0, pos2 + pathDelim.length());
                 portNo = stoi(token);
             }
+            else if (!token.substr(0, pos2).compare("verbose"))
+            {
+                token.erase(0, pos2 + pathDelim.length());
+                verbose = static_cast<Verbose>(stoi(token));
+            }
         }
+	    
         oIn.erase(0, pos1 + optionsDelim.length());
     }
     if (!oIn.empty())
@@ -106,12 +114,27 @@ void parseAgentOptions(const char *options)
                 token.erase(0, pos2 + pathDelim.length());
                 portNo = stoi(token);
             }
+            else if (!token.substr(0, pos2).compare("verbose"))
+            {
+                token.erase(0, pos2 + pathDelim.length());
+                verbose = static_cast<Verbose>(stoi(token));
+	
+            }
         }
     }
 
-    printf("%s\n", commandsPath.c_str());
-    printf("%s\n", logPath.c_str());
-    printf("%i\n", portNo);
+    if (verbose != ERROR && verbose != WARN && verbose != INFO)
+    {
+        verbose = NONE;
+    }
+    
+    if (verbose == INFO)
+    {
+        printf("verbosity: %i\n", verbose); 
+        printf("path to command: %s\n", commandsPath.c_str());
+        printf("logpath: %s\n", logPath.c_str());
+        printf("port number: %i\n", portNo);
+    }
 }
 
     
@@ -140,19 +163,22 @@ JNIEXPORT jint JNICALL Agent_OnAttach(JavaVM* vm, char *options, void *reserved)
     if (!server)
     {
         jvmtiError error;
-        printf("On attach initiated with options: %s\n", options);
         parseAgentOptions(options);
-        
+        if (verbose >= WARN)
+            printf("On attach initiated with options: %s\n", options);
+	
         rc = vm->GetEnv((void **)&jvmti, JVMTI_VERSION_1_2);
         if (rc != JNI_OK)
         {
-            fprintf(stderr, "Cannot get JVMTI env\n");
+            if (verbose >= ERROR)
+                fprintf(stderr, "Cannot get JVMTI env\n");
             return rc;
         }
         rc = vm->GetEnv((void **)&jni_env, JNI_VERSION_1_8);
         if (rc != JNI_OK)
         {
-            fprintf(stderr, "Cannot get JNI env\n");
+            if (verbose >= ERROR)	
+                fprintf(stderr, "Cannot get JNI env\n");
             return rc;
         }
 
@@ -169,7 +195,8 @@ JNIEXPORT jint JNICALL Agent_OnAttach(JavaVM* vm, char *options, void *reserved)
         error = jvmti->RunAgentThread( createNewThread(jni_env), &startServer, NULL, JVMTI_THREAD_NORM_PRIORITY );
         if (error != JVMTI_ERROR_NONE)
         {
-            fprintf(stderr, "Error starting agent thread\n");
+            if (verbose >= ERROR)	
+                fprintf(stderr, "Error starting agent thread\n");
             delete server;
             server = NULL;
             return JNI_ERR;
@@ -180,12 +207,14 @@ JNIEXPORT jint JNICALL Agent_OnAttach(JavaVM* vm, char *options, void *reserved)
 
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
 {
-    printf("Options passed in: %s\n", options);
     parseAgentOptions(options);
+    if (verbose >= WARN)
+        printf("Options passed in: %s\n", options);
 
     jint rest = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_2);
     if (rest != JNI_OK || jvmti == NULL) {
-
+       
+        if (verbose >= ERROR)    
         printf("Unable to get access to JVMTI version 1.2");
         return JNI_ERR;
     }

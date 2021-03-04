@@ -47,6 +47,10 @@ extern int portNo;
 extern std::string commandsPath;
 extern std::string logPath;
 
+enum Verbose { NONE, ERROR, WARN, INFO};
+
+extern int verbose;
+
 class EventConfig
 {
 public:

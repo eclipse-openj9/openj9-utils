@@ -41,6 +41,7 @@
 #include "agentOptions.hpp"
 #include "perf.hpp"
 #include "utils.hpp"
+#include "infra.hpp"
 
 using namespace std;
 using json = nlohmann::json;
@@ -106,8 +107,9 @@ void Server::handleServer()
         pollFds[0].events = POLLIN;
         pollFds[0].revents = 0;
     }
-
-    printf("Server started.\n");
+    
+    if (verbose >= WARN)
+        printf("Server started.\n");
 
     /* Use polling to keep track of clients and keyboard input */
     while (keepPolling)
@@ -133,8 +135,9 @@ void Server::handleServer()
                     perror("ERROR on accept");
                 else
                     networkClients[activeNetworkClients] = new NetworkClient(newsocketFd);
-
-                printf("server: got connection from %s port %d\n",
+                
+                if (verbose == INFO)
+                    printf("server: got connection from %s port %d\n",
                        inet_ntoa(cli_addr.sin_addr),
                        ntohs(cli_addr.sin_port));
 

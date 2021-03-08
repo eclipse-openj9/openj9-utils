@@ -21,6 +21,7 @@
  *******************************************************************************/
 
 #include "serverClients.hpp"
+#include "infra.hpp"
 
 #include <chrono>
 #include <ctime>
@@ -122,7 +123,8 @@ CommandClient::CommandClient(const string filename)
     commandsFile.open(filename);
     if (!commandsFile.is_open())
     {
-        printf("filename: %s\n", filename.c_str());
+        if (verbose >= ERROR)
+            printf("filename: %s\n", filename.c_str());
         perror("ERROR opening commands file");
     }
 

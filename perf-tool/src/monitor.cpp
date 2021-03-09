@@ -36,7 +36,6 @@ using json = nlohmann::json;
 std::atomic<int> monitorSampleCount{0};
 EventConfig monitorConfig;
 
-
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, jthread thread, jobject object){
     json j;
     jvmtiError error;
@@ -161,7 +160,8 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
         }
         else
         {
-            printf ("Error calling GetMethodID for java/lang/Thread.getId()J\n");
+            if (verbose >= ERROR)
+                fprintf (stderr, "Error calling GetMethodID for java/lang/Thread.getId()J\n");
         }
     }
     else
@@ -195,6 +195,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     sendToServer(j.dump());
 
     /* Also call the callback */
+    
     EventConfig::CallbackIDs callbackIDs = monitorConfig.getCallBackIDs(env);
     if (callbackIDs.cachedCallbackClass && callbackIDs.cachedCallbackMethodId)
     {

@@ -45,22 +45,26 @@ extern EventConfig monitorConfig;
 
 void invalidCommand(const std::string& function, const std::string& command)
 {
-    printf("Invalid command with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str());
+    if (verbose >= ERROR)	
+        fprintf(stderr, "Invalid command with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str());
 }
 
 void invalidFunction(const std::string& function, const std::string& command)
 {
-    printf("Invalid function with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str());
+    if (verbose >= ERROR)
+        fprintf(stderr, "Invalid function with parameters: {functionality: %s, command: %s}\n", function.c_str(), command.c_str());
 }
 
 void invalidRate(const std::string& function, const std::string& command, int sampleRate)
 {
-    printf("Invalid rate with parameters: {functionality: %s, command: %s, sampleRate: %i}\n", function.c_str(), command.c_str(), sampleRate);
+    if (verbose >= ERROR)
+        fprintf(stderr, "Invalid rate with parameters: {functionality: %s, command: %s, sampleRate: %i}\n", function.c_str(), command.c_str(), sampleRate);
 }
 
 void invalidStackTraceDepth(const std::string& function, const std::string& command, int stackTraceDepth)
 {
-    printf("Invalid stackTraceDepth with parameters: {functionality: %s, command: %s, stackTraceDepth: %i}\n", function.c_str(), command.c_str(), stackTraceDepth);
+    if (verbose >= ERROR)
+        fprintf(stderr, "Invalid stackTraceDepth with parameters: {functionality: %s, command: %s, stackTraceDepth: %i}\n", function.c_str(), command.c_str(), stackTraceDepth);
 }
 
 void modifyMonitorEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth,
@@ -91,7 +95,8 @@ void modifyMonitorEvents(const std::string& function, const std::string& command
         }
         else if (!command.compare("start"))
         { 
-            printf("Monitor Events Capability already enabled\n");
+            if (verbose == INFO)
+                printf("Monitor Events Capability already enabled\n");
             error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to enable MonitorContendedEntered event notifications.");
             error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTER, (jthread)NULL);
@@ -119,9 +124,8 @@ void modifyMonitorEvents(const std::string& function, const std::string& command
         }
         else if (!command.compare("stop"))
         { 
-            printf("Monitor Events Capability already disabled.");
-            error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTER, (jthread)NULL);
-            check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEnter event.");
+            if (verbose == INFO)
+                printf("Monitor Events Capability already disabled.");
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable MonitorContendedEntered event.");
         } else {
@@ -179,7 +183,8 @@ void modifyObjectAllocEvents(const std::string& function,const std::string& comm
         }
         else if (!command.compare("stop"))
         {
-            printf("Obect Alloc Capability already disabled");
+            if (verbose == INFO)
+                printf("Obect Alloc Capability already disabled");
             error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_VM_OBJECT_ALLOC, (jthread)NULL);
             check_jvmti_error(jvmti, error, "Unable to disable ObjectAlloc event.");
         }
@@ -318,7 +323,8 @@ void agentCommand(const json& jCommand)
         callbackClass = jcallback["class"].get<std::string>();
         callbackMethod = jcallback["method"].get<std::string>();
         callbackSignature = jcallback["signature"].get<std::string>();
-        printf("Found callback: %s.%s%s\n", callbackClass.c_str(), callbackMethod.c_str(), callbackSignature.c_str());
+        if (verbose == INFO)
+            printf("Found callback: %s.%s%s\n", callbackClass.c_str(), callbackMethod.c_str(), callbackSignature.c_str());
         }
  
 

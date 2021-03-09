@@ -33,7 +33,8 @@ void check_jvmti_error_throw(jvmtiEnv *jvmti, jvmtiError errnum, const char *str
     if (errnum != JVMTI_ERROR_NONE) {
         char *errnum_str = NULL;
         jvmti->GetErrorName(errnum, &errnum_str);
-        printf("ERROR: JVMTI: [%d] %s - %s\n", errnum, (errnum_str == NULL ? "Unknown": errnum_str), (str == NULL ? "" : str));
+        if (verbose >= ERROR)
+            fprintf(stderr, "ERROR: JVMTI: [%d] %s - %s\n", errnum, (errnum_str == NULL ? "Unknown": errnum_str), (str == NULL ? "" : str));
         throw "Oops!";
     }
 }
@@ -43,7 +44,8 @@ bool check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
         char *errnum_str;
         errnum_str = NULL;
         jvmti->GetErrorName(errnum, &errnum_str);
-        printf("ERROR: JVMTI: [%d] %s - %s\n", errnum, (errnum_str == NULL ? "Unknown": errnum_str), (str == NULL ? "" : str));
+        if (verbose >= ERROR)
+            fprintf(stderr, "ERROR: JVMTI: [%d] %s - %s\n", errnum, (errnum_str == NULL ? "Unknown": errnum_str), (str == NULL ? "" : str));
         return false;
     }
     return true;
@@ -84,7 +86,8 @@ EventConfig::CallbackIDs EventConfig::getCallBackIDs(JNIEnv *env)
                 {
                     if (env->ExceptionCheck() == JNI_TRUE)
                         env->ExceptionClear();
-                    fprintf(stderr, "Cannot find callback method %s%s\n", getCallbackMethod().c_str(), getCallbackSignature().c_str());
+                    if (verbose >= ERROR)
+                        fprintf(stderr, "Cannot find callback method %s%s\n", getCallbackMethod().c_str(), getCallbackSignature().c_str());
                     /* Delete the name of the method, so that we don't search over and over */
                     callbackMethod.clear();
                 }
@@ -93,7 +96,8 @@ EventConfig::CallbackIDs EventConfig::getCallBackIDs(JNIEnv *env)
             {
                 if (env->ExceptionCheck() == JNI_TRUE)
                     env->ExceptionClear();
-                fprintf(stderr, "Cannot find callback class %s\n", getCallbackClass().c_str());
+                if (verbose >= ERROR)
+                    fprintf(stderr, "Cannot find callback class %s\n", getCallbackClass().c_str());
                 /* Delete the name of the class, so that we don't search over and over */
                 callbackClass.clear();
             }
@@ -130,7 +134,8 @@ JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread threa
 
     error = jvmtiEnv -> RunAgentThread( createNewThread(jni_env), &startServer, NULL, JVMTI_THREAD_NORM_PRIORITY );
     check_jvmti_error_throw(jvmtiEnv, error, "Error starting agent thread.");
-    printf("VM starting up.\n");
+    if (verbose >= WARN)
+        printf("VM starting up.\n");
 }
 
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env) {
@@ -140,5 +145,6 @@ JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env) {
         delete server;
         server = NULL;
     }
-    printf("VM shutting down.\n");
+    if (verbose >= WARN)
+        printf("VM shutting down.\n");
 }

@@ -36,53 +36,8 @@ using json = nlohmann::json;
 std::atomic<int> monitorSampleCount{0};
 EventConfig monitorConfig;
 
-JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, jthread thread, jobject object){
-    json j;
-    jvmtiError error;
-
-    /* Get number of events and increment */
-    int numSamples = atomic_fetch_add(&monitorSampleCount, 1);
-    if (numSamples % monitorConfig.getSampleRate() != 0)
-        return;
-
-    jvmtiError err;
-    jint hash;
-    err = jvmtiEnv->GetObjectHashCode(object, &hash);
-    if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve object hashcode.")) {
-	    char str[32];
-	    sprintf(str, "0x%x", hash);
-	    j["monitorHash"] = str;
-    }
-
-    static std::map<std::string, int> numContentions;
-    jclass cls = env->GetObjectClass(object);
-    /* First get the class object */
-    jmethodID mid = env->GetMethodID(cls, "getClass", "()Ljava/lang/Class;");
-    jobject clsObj = env->CallObjectMethod(object, mid);
-    /* Now get the class object's class descriptor */
-    cls = env->GetObjectClass(clsObj);
-    /* Find the getName() method on the class object */
-    mid = env->GetMethodID(cls, "getName", "()Ljava/lang/String;");
-    /* Call the getName() to get a jstring object back */ 
-    jstring strObj = (jstring)env->CallObjectMethod(clsObj, mid);
-    /* Now get the c string from the java jstring object */
-    const char *str = env->GetStringUTFChars(strObj, NULL);
-    /* record calling class */
-    j["Class"] = str;
-    
-    /* free str */
-   
-    static std::mutex contentionMutex;
-    int samplesPerObjectType = 0;
-    {
-    std::lock_guard<std::mutex> lg(contentionMutex);
-    samplesPerObjectType = ++(numContentions[std::string(str)]);
-    }
-    j["numTypeContentions"] = samplesPerObjectType;
-    /* Release the memory pinned char array */
-    env->ReleaseStringUTFChars(strObj, str);
-    env->DeleteLocalRef(cls);
-
+void getStackTrace(jvmtiEnv *jvmtiEnv, jthread thread, json& j)
+{
     if (monitorConfig.getStackTraceDepth() > 0)
     {
         jvmtiError err;
@@ -138,6 +93,112 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
             j["stackTrace"] = jMethods;
         }
     }
+    return;
+}
+
+JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, jthread thread, jobject object){
+    json j;
+    jvmtiError error;
+
+    /* Get number of events and increment */
+    int numSamples = atomic_fetch_add(&monitorSampleCount, 1);
+    if (numSamples % monitorConfig.getSampleRate() != 0)
+        return;
+
+    jvmtiError err;
+    jint hash;
+    err = jvmtiEnv->GetObjectHashCode(object, &hash);
+    if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve object hashcode.")) {
+	    char str[32];
+	    sprintf(str, "0x%x", hash);
+	    j["monitorHash"] = str;
+    }
+
+    static std::map<std::string, int> numContentions;
+    jclass cls = env->GetObjectClass(object);
+    /* First get the class object */
+    jmethodID mid = env->GetMethodID(cls, "getClass", "()Ljava/lang/Class;");
+    jobject clsObj = env->CallObjectMethod(object, mid);
+    /* Now get the class object's class descriptor */
+    cls = env->GetObjectClass(clsObj);
+    /* Find the getName() method on the class object */
+    mid = env->GetMethodID(cls, "getName", "()Ljava/lang/String;");
+    /* Call the getName() to get a jstring object back */ 
+    jstring strObj = (jstring)env->CallObjectMethod(clsObj, mid);
+    /* Now get the c string from the java jstring object */
+    const char *str = env->GetStringUTFChars(strObj, NULL);
+    /* record calling class */
+    j["Class"] = str;
+    
+    /* free str */
+   
+    static std::mutex contentionMutex;
+    int samplesPerObjectType = 0;
+    {
+    std::lock_guard<std::mutex> lg(contentionMutex);
+    samplesPerObjectType = ++(numContentions[std::string(str)]);
+    }
+    j["numTypeContentions"] = samplesPerObjectType;
+    /* Release the memory pinned char array */
+    env->ReleaseStringUTFChars(strObj, str);
+    env->DeleteLocalRef(cls);
+
+    getStackTrace(jvmtiEnv, thread, j);
+    /* if (monitorConfig.getStackTraceDepth() > 0)
+    {
+        jvmtiError err;
+        jvmtiFrameInfo frames[EventConfig::getMaxTraceDepth()];
+        jint count;
+        err = jvmtiEnv->GetStackTrace(thread, 0, monitorConfig.getStackTraceDepth(), frames, &count);
+        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Stack Trace.") && count >= 1)
+        {
+            auto jMethods = json::array();
+            bool error = false;
+            for (int i=0; i < count && !error; i++)
+            {
+                char *methodName;
+                char *signature;
+                err = jvmtiEnv->GetMethodName(frames[i].method, &methodName, &signature, NULL);
+                if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Name.\n")) 
+                {
+                    jclass declaring_class;
+                    err = jvmtiEnv->GetMethodDeclaringClass(frames[i].method, &declaring_class);
+                    if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class.\n")) 
+                    {
+                        char *declaringClassName;
+                        err = jvmtiEnv->GetClassSignature(declaring_class, &declaringClassName, NULL);
+                        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class Signature.\n")) 
+                        {
+                            json jMethod;
+                            jMethod["class"] = declaringClassName;
+                            jMethod["method"] = methodName;
+                            jMethod["signature"] = signature;
+                            jMethods.push_back(jMethod);
+                            err = jvmtiEnv->Deallocate((unsigned char*)declaringClassName);
+                            check_jvmti_error(jvmtiEnv, err, "Unable to deallocate class name.\n");
+                        }
+                        else
+                        {
+                            error = true;
+                        }
+                    }
+                    else
+                    {
+                        error = true;
+                    }
+                    err = jvmtiEnv->Deallocate((unsigned char*)methodName);
+                    check_jvmti_error(jvmtiEnv, err, "Unable to deallocate methodName.\n");
+                    err = jvmtiEnv->Deallocate((unsigned char*)signature);
+                    check_jvmti_error(jvmtiEnv, err, "Unable to deallocate method signature.\n");
+                }
+                else
+                {
+                    error = true;
+                }
+            } 
+            j["stackTrace"] = jMethods;
+        }
+    }*/
     /* Get the thread name */
     jvmtiThreadInfo threadInfo;
     error = jvmtiEnv->GetThreadInfo(thread, &threadInfo);
@@ -273,6 +334,8 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
         if (monitor_usage.owner != NULL)
         {
             json jOwner;
+            getStackTrace(jvmtiEnv, monitor_usage.owner, jOwner);
+            /*
             if (monitorConfig.getStackTraceDepth() > 0)
             {
                 jvmtiError err;
@@ -324,10 +387,10 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
                         {
                             error = true;
                         }
-                    } /* end for loop */
+                    } 
                     jOwner["stackTrace"] = jMethods;
                 }
-            }
+            }*/
             /* Get the thread name */
             jvmtiThreadInfo threadInfo;
             error = jvmtiEnv->GetThreadInfo(monitor_usage.owner, &threadInfo);
@@ -383,6 +446,8 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
         }
     }
     json jCurrent;
+    getStackTrace(jvmtiEnv, thread, jCurrent);
+    /*
     if (monitorConfig.getStackTraceDepth() > 0)
     {
         jvmtiError err;
@@ -434,10 +499,10 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
                 {
                     error = true;
                 }
-            } /* end for loop */
+            } 
             jCurrent["stackTrace"] = jMethods;
         }
-    }
+    }*/
 
     /* Get the current thread name */
     jvmtiThreadInfo threadInfo;

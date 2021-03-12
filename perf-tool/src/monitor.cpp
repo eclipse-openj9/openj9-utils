@@ -375,7 +375,7 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
         }
     }
     j["CurrentThread"] = jCurrent;
-    sendToServer(j.dump());
+    sendToServer(j.dump(), "MonitorContendedEnter");
 
     /* Also call the callback */
 

@@ -33,40 +33,31 @@
 
 using json = nlohmann::json;
 
-std::atomic<int> mEntrySampleCount {0};
-std::atomic<int> mEntrySampleRate {1};
+EventConfig methodEnterConfig;
 
-/* set sample rate according to command instructions
- * requirement: rate > 0                                */
-void setMethodEntrySampleRate(int rate) {
-    mEntrySampleRate = rate;
-}
+std::atomic<int> mEntrySampleCount {0};
+
 
 /* retrieves method name and line number, and declaring class name and signature
  *      for every nth method entry                                                 */
 JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
-            JNIEnv* env,
-            jthread thread,
-            jmethodID method) {
-
-    int numMethods;
+                                   JNIEnv* env,
+                                   jthread thread,
+                                   jmethodID method) 
+{
     /* Get number of methods and increment */
-    numMethods = atomic_fetch_add(&mEntrySampleCount, 1);
+    int numMethods = atomic_fetch_add(&mEntrySampleCount, 1);
 
-    if (numMethods % mEntrySampleRate == 0) {           
+    if (numMethods % methodEnterConfig.getSampleRate() == 0) 
+    {          
         json j;
-        jvmtiError err;
-        char *name_ptr;
-        char *signature_ptr;
-        char *declaringClassName;
-        jclass declaring_class;
-        jint entry_count_ptr;
-        jvmtiLineNumberEntry* table_ptr;
-
         j["methodNum"] = numMethods;
         
-        err = jvmtiEnv->GetMethodName(method, &name_ptr, &signature_ptr, NULL);
-        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Name.\n")) {
+        char *name_ptr;
+        char *signature_ptr;
+        jvmtiError err = jvmtiEnv->GetMethodName(method, &name_ptr, &signature_ptr, NULL);
+        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Name.\n")) 
+        {
             j["methodName"] = name_ptr;
             j["methodSig"] = signature_ptr;
             err = jvmtiEnv->Deallocate((unsigned char*)name_ptr);
@@ -74,24 +65,44 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
             err = jvmtiEnv->Deallocate((unsigned char*)signature_ptr);
             check_jvmti_error(jvmtiEnv, err, "Unable to deallocate signature_ptr.\n");
         }
+        else
+        {
+            /* Without the method name, there is no point in continuing to get the class */
+            return; 
+        }
+
+        jclass declaring_class;
         err = jvmtiEnv->GetMethodDeclaringClass(method, &declaring_class);
-        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class.\n")) {
+        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class.\n")) 
+        {
+            char *declaringClassName;
             err = jvmtiEnv->GetClassSignature(declaring_class, &declaringClassName, NULL);
-            if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class Signature.\n")) {
+            if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class Signature.\n")) 
+            {
                 j["methodClass"] = declaringClassName;
                 err = jvmtiEnv->Deallocate((unsigned char*)declaringClassName);
                 check_jvmti_error(jvmtiEnv, err, "Unable to deallocate declaringClassName.\n");
             }
         }
+
+        /* Get StackTrace */
+        methodEnterConfig.getStackTrace(jvmtiEnv, thread, j, methodEnterConfig.getStackTraceDepth());
+/*
+        The following code needs "can_get_line_numbers" capability.
+        Due to the high frequency of MethodEnter events it's better to keep
+        the overhead down by not getting information about the line numbers.
+        This can be added in the future through an addional option.
+
+        jint entry_count_ptr;
+        jvmtiLineNumberEntry* table_ptr;
         err = jvmtiEnv->GetLineNumberTable(method, &entry_count_ptr, &table_ptr);
-        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Line Number Table.\n")) {
+        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Line Number Table.\n")) 
+        {
             j["methodLineNum"] = table_ptr->line_number;
             err = jvmtiEnv->Deallocate((unsigned char*)table_ptr);
             check_jvmti_error(jvmtiEnv, err, "Unable to deallocate table_ptr.\n");
         }
-    
-        std::string s = j.dump();
-        sendToServer(s, "methodEntryEvent");
+*/
+        sendToServer(j.dump(), "methodEntryEvent");
     }
-    mEntrySampleCount = atomic_fetch_add(&mEntrySampleCount, 1);
 }

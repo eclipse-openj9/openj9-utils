@@ -42,6 +42,7 @@ using json = nlohmann::json;
 
 VerboseLogSubscriber *verboseLogSubscriber;
 extern EventConfig monitorConfig;
+extern EventConfig methodEnterConfig;
 
 void invalidCommand(const std::string& function, const std::string& command)
 {
@@ -79,6 +80,8 @@ void modifyMonitorEvents(const std::string& function, const std::string& command
     monitorConfig.setCallbacks(callbackClass, callbackMethod, callbackSignature);
     if (!command.compare("start"))
     {
+        if (verbose >= Verbose::INFO)
+            printf("Processing MonitorEvents start command\n");
         error = jvmti->GetCapabilities(&capa);
         check_jvmti_error(jvmti, error, "Unable to get current capabilties.");
         if (!capa.can_generate_monitor_events)
@@ -98,6 +101,8 @@ void modifyMonitorEvents(const std::string& function, const std::string& command
     }
     else if (!command.compare("stop"))
     {
+        if (verbose >= Verbose::INFO)
+            printf("Processing MonitorEvents stop command\n");
         memset(&capa, 0, sizeof(jvmtiCapabilities));
         capa.can_generate_monitor_events = 1;
         capa.can_get_monitor_info = 1;
@@ -175,34 +180,23 @@ void modifyObjectAllocEvents(const std::string& function,const std::string& comm
     }
 }
 
-void modifyMonitorStackTrace(const std::string& function, const std::string& command)
-{
-    /* enable stack trace */
-    if (!command.compare("start"))
-    {
-        setMonitorStackTrace(true);
-    }
-    else if (!command.compare("stop"))
-    {
-        setMonitorStackTrace(false);
-    }
-    else
-    {
-        invalidCommand(function, command);
-    }
-}
 
-void modifyMethodEntryEvents(const std::string& function, const std::string& command, int sampleRate)
+void modifyMethodEntryEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth)
 {
     jvmtiError error;
-    setMethodEntrySampleRate(sampleRate);
+    methodEnterConfig.setSampleRate(rate);
+    methodEnterConfig.setStackTraceDepth(stackTraceDepth);
     if (!command.compare("stop"))
     {
+        if (verbose >= Verbose::INFO)
+            printf("Processing MethodEnter stop command\n");
         error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
         check_jvmti_error(jvmti, error, "Unable to disable MethodEntry event.");
     }
     else if (!command.compare("start"))
     { 
+        if (verbose >= Verbose::INFO)
+            printf("Processing MethodEnter start command\n");
         error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
         check_jvmti_error(jvmti, error, "Unable to enable MethodEntry event notifications.");
     }
@@ -344,7 +338,7 @@ void modifyJLM(const std::string& function, const std::string& command)
             j["JLM size"] = dumpSize;
             j["javaMonitors"] = javaMonitors;
             j["rawMonitors"] = rawMonitors;
-            sendToServer(j.dump());
+            sendToServer(j.dump(), "jlm");
         }
         error = (ExtensionFunctions::_jlmSet)(jvmti, COM_IBM_JLM_STOP_TIME_STAMP);
         check_jvmti_error(jvmti, error, "Unable to stop JLM.");
@@ -364,11 +358,11 @@ void agentCommand(const json& jCommand)
 
     std::string function = jCommand["functionality"].get<std::string>();
     std::string command  = jCommand["command"].get<std::string>();
-    int sampleRate = 1; /* sampleRate is automatically set to 1. To turn off, set to 0 */
+    int sampleRate = 1; /* sampleRate is automatically set to 1 */
     if (jCommand.contains("sampleRate"))
     {
         sampleRate = jCommand["sampleRate"].get<int>();
-        if (sampleRate < 0)
+        if (sampleRate <= 0)
         {
             invalidRate(function, command, sampleRate);
         }
@@ -411,13 +405,9 @@ void agentCommand(const json& jCommand)
         {
             modifyObjectAllocEvents(function, command, sampleRate);
         }
-        else if (!function.compare("monitorStackTrace"))
-        {
-            modifyMonitorStackTrace(function, command);
-        }
         else if (!function.compare("methodEntryEvents"))
         {
-            modifyMethodEntryEvents(function, command, sampleRate);
+            modifyMethodEntryEvents(function, command, sampleRate, stackTraceDepth);
         }
         else if (!function.compare("exceptionEvents"))
         {

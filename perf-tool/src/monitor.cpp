@@ -153,24 +153,15 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     /* Get OS thread ID 
      * We need to use OpenJ9 JVMTI extension functions
      */
-    jint extensionFunctionCount = 0;
-    jvmtiExtensionFunctionInfo *extensionFunctions = NULL;
-    jvmtiEnv->GetExtensionFunctions(&extensionFunctionCount, &extensionFunctions);
-    for (int i=0; i < extensionFunctionCount; i++) /* search for desired function */
+    if (ExtensionFunctions::_osThreadID)
     {
-        jvmtiExtensionFunction function = extensionFunctions->func;
-        if (strcmp(extensionFunctions->id, COM_IBM_GET_OS_THREAD_ID) == 0)
+        jlong threadID = 0;
+        /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
+        error = (ExtensionFunctions::_osThreadID)(jvmtiEnv, thread, &threadID);
+        if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
         {
-            jlong threadID = 0;
-            /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
-            error = function(jvmtiEnv, thread, &threadID);
-            if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
-            {
-                j["threadNativeID"] = threadID;
-            }
-            break;
+            j["threadNativeID"] = threadID;
         }
-        extensionFunctions++; /* move on to the next extension function */
     }
     
     sendToServer(j.dump());
@@ -322,24 +313,15 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
             /* Get OS thread ID
              * We need to use OpenJ9 JVMTI extension functions
              */
-            jint extensionFunctionCount = 0;
-            jvmtiExtensionFunctionInfo *extensionFunctions = NULL;
-            jvmtiEnv->GetExtensionFunctions(&extensionFunctionCount, &extensionFunctions);
-            for (int i=0; i < extensionFunctionCount; i++) /* search for desired function */
+            if (ExtensionFunctions::_osThreadID)
             {
-                jvmtiExtensionFunction function = extensionFunctions->func;
-                if (strcmp(extensionFunctions->id, COM_IBM_GET_OS_THREAD_ID) == 0)
+                jlong threadID = 0;
+                /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
+                error = (ExtensionFunctions::_osThreadID)(jvmtiEnv, monitor_usage.owner, &threadID);
+                if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
                 {
-                    jlong threadID = 0;
-                    /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
-                    error = function(jvmtiEnv, monitor_usage.owner, &threadID);
-                    if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
-                    {
-                        jOwner["threadNativeID"] = threadID;
-                    }
-                    break;
+                    jOwner["threadNativeID"] = threadID;
                 }
-                extensionFunctions++; /* move on to the next extension function */    
             }
             j["OwnerThread"] = jOwner;
         }
@@ -379,24 +361,15 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
     /* Get OS thread ID
      * We need to use OpenJ9 JVMTI extension functions
      */
-    jint extensionFunctionCount = 0;
-    jvmtiExtensionFunctionInfo *extensionFunctions = NULL;
-    jvmtiEnv->GetExtensionFunctions(&extensionFunctionCount, &extensionFunctions);
-    for (int i=0; i < extensionFunctionCount; i++) /* search for desired function */
+    if (ExtensionFunctions::_osThreadID)
     {
-        jvmtiExtensionFunction function = extensionFunctions->func;
-        if (strcmp(extensionFunctions->id, COM_IBM_GET_OS_THREAD_ID) == 0)
+        jlong threadID = 0;
+        /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
+        error = (ExtensionFunctions::_osThreadID)(jvmtiEnv, thread, &threadID);
+        if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
         {
-            jlong threadID = 0;
-            /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
-            error = function(jvmtiEnv, thread, &threadID);
-            if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
-            {
-                jCurrent["threadNativeID"] = threadID;
-            }
-            break;
+            jCurrent["threadNativeID"] = threadID;
         }
-        extensionFunctions++; /* move on to the next extension function */
     }
     j["CurrentThread"] = jCurrent;
     sendToServer(j.dump());

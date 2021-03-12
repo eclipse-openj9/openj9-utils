@@ -33,79 +33,51 @@ using namespace std;
 std::atomic<int> verboseSampleCount {0};
 std::atomic<int> verboseSampleRate {1};
 
-void VerboseLogSubscriber::setVerboseGCLogSampleRate(int rate) {
-    if (rate > 0) {
+void VerboseLogSubscriber::setVerboseGCLogSampleRate(int rate) 
+{
+    if (rate > 0)
         verboseSampleRate = rate;
-    }
 }
 
 void VerboseLogSubscriber::Subscribe()
 {
-    jvmtiError rc;
+    if (!ExtensionFunctions::_verboseGCSubcriber)
+    {
+        if (verbose >= Verbose::ERROR)
+            fprintf(stderr, "Error using GC subscriber: OpenJ9 JVMTI extensions not found\n");
+        return;
+    }
     jvmtiVerboseGCSubscriber subscriberCallback =  &verboseSubscriberCallback;
     jvmtiVerboseGCAlarm alarmCallback = &verboseAlarmCallback;
-    jint extensionFunctionCount = 0;
-    jvmtiExtensionFunctionInfo *extensionFunctions = NULL;
-    int i = 0, j = 0;
 
-    /* Look up all the JVMTI extension functions */
-    jvmti_env->GetExtensionFunctions(&extensionFunctionCount, &extensionFunctions);
+    if (verbose >= Verbose::INFO)
+        printf("Subscribe to verbose GC\n");
 
-    /* Find the JVMTI extension function we want */
-    while (j++ < extensionFunctionCount)
-    {
-        jvmtiExtensionFunction function = extensionFunctions->func;
-
-        if (strcmp(extensionFunctions->id, COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER) == 0)
-        {
-            // Found the register verbose gc subscriber function
-            rc = function(jvmti_env, "verbose log subscriber", subscriberCallback, alarmCallback, NULL, &subscriptionID);
-            if (rc != JVMTI_ERROR_NONE)
-            {
-                perror("ERROR registering verbose log subscriber failed: ");
-            }
-            printf("Calling JVMTI extension %s, rc=%i\n", COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER, rc);
-            break;
-        }
-        extensionFunctions++; /* move on to the next extension function */
-    }
+    // Use the register verbose gc subscriber function
+    jvmtiError rc = (ExtensionFunctions::_verboseGCSubcriber)(jvmti_env, "verbose log subscriber", subscriberCallback, alarmCallback, NULL, &subscriptionID);
+    check_jvmti_error(jvmti_env, rc, "registering verbose log subscriber failed");
 }
 
 
 void VerboseLogSubscriber::Unsubscribe()
 {
-    jvmtiError rc;
-    jint extensionFunctionCount = 0;
-    jvmtiExtensionFunctionInfo *extensionFunctions = NULL;
-    int i = 0, j = 0;
-
-    if (subscriptionID == NULL)
+    if (!ExtensionFunctions::_verboseGCUnsubcriber)
     {
+        if (verbose >= Verbose::ERROR)
+            fprintf(stderr, "Error using GC unsubscriber: OpenJ9 JVMTI extensions not found\n");
         return;
     }
-
-    /* Look up all the JVMTI extension functions */
-    jvmti_env->GetExtensionFunctions(&extensionFunctionCount, &extensionFunctions);
-
-    /* Find the JVMTI extension function we want */
-    while (j++ < extensionFunctionCount)
+    if (subscriptionID == NULL)
     {
-        jvmtiExtensionFunction function = extensionFunctions->func;
-
-        if (strcmp(extensionFunctions->id, COM_IBM_DEREGISTER_VERBOSEGC_SUBSCRIBER) == 0)
-        {
-            // Found the deregister verbose gc subscriber function
-            rc = function(jvmti_env, NULL, &subscriptionID);
-            if (rc != JVMTI_ERROR_NONE)
-            {
-                perror("ERROR deregistering verbose log subscriber failed: ");
-            }
-            if (verbose >= WARN)
-                printf("Calling JVMTI extension %s, rc=%i\n", COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER, rc);
-            break;
-        }
-        extensionFunctions++; /* move on to the next extension function */
+        if (verbose >= Verbose::WARN)
+            fprintf(stderr, "Aborting verbose GC unsubscription because subscriptionID is NULL\n");
+        return;
     }
+    if (verbose >= Verbose::INFO)
+        printf("Unsubscribe to verbose GC\n");
+
+    jvmtiError rc = (ExtensionFunctions::_verboseGCUnsubcriber)(jvmti_env, NULL, &subscriptionID);
+    check_jvmti_error(jvmti_env, rc, "de-registering verbose log subscriber failed");
 }
 
 jvmtiError verboseSubscriberCallback(jvmtiEnv *jvmti_env, const char *record, jlong length, void *user_data)

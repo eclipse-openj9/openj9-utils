@@ -21,6 +21,7 @@
  *******************************************************************************/
 
 #include <jvmti.h>
+#include <ibmjvmti.h>
 #include <thread>
 #include <string.h>
 
@@ -165,6 +166,69 @@ EventConfig::CallbackIDs EventConfig::getCallBackIDs(JNIEnv *env)
         }
     }
     return callbackIDs;
+}
+
+
+jvmtiExtensionFunction ExtensionFunctions::_jlmSet = NULL;
+jvmtiExtensionFunction ExtensionFunctions::_jlmDump = NULL;
+jvmtiExtensionFunction ExtensionFunctions::_jlmDumpStats = NULL;
+jvmtiExtensionFunction ExtensionFunctions::_osThreadID = NULL;
+jvmtiExtensionFunction ExtensionFunctions::_verboseGCSubcriber = NULL;
+jvmtiExtensionFunction ExtensionFunctions::_verboseGCUnsubcriber = NULL;
+
+void ExtensionFunctions::getExtensionFunctions(jvmtiEnv *jvmtiEnv)
+{
+    jint extensionFunctionCount = 0;
+    jvmtiExtensionFunctionInfo *extensionFunctions = NULL;
+    jvmtiError result = jvmtiEnv->GetExtensionFunctions(&extensionFunctionCount, &extensionFunctions);
+    if (check_jvmti_error(jvmtiEnv, result, "Unable to retrieve extension functions"))
+    {
+        for (int i=0; i < extensionFunctionCount; i++) /* search for desired function */
+        {
+            if (strcmp(extensionFunctions[i].id, COM_IBM_SET_VM_JLM) == 0)
+            {
+                _jlmSet = extensionFunctions[i].func;
+            }
+            else if (strcmp(extensionFunctions[i].id, COM_IBM_SET_VM_JLM_DUMP) == 0)
+            {
+                _jlmDump = extensionFunctions[i].func;
+            }
+            else if (strcmp(extensionFunctions[i].id, COM_IBM_JLM_DUMP_STATS) == 0)
+            {
+                _jlmDumpStats = extensionFunctions[i].func;
+            }
+            else if (strcmp(extensionFunctions[i].id, COM_IBM_GET_OS_THREAD_ID) == 0)
+            {
+                _osThreadID = extensionFunctions[i].func;
+            }
+            else if (strcmp(extensionFunctions[i].id, COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER) == 0)
+            {
+                _verboseGCSubcriber = extensionFunctions[i].func;
+            }
+            else if (strcmp(extensionFunctions[i].id, COM_IBM_DEREGISTER_VERBOSEGC_SUBSCRIBER) == 0)
+            {
+                _verboseGCUnsubcriber = extensionFunctions[i].func;
+            }
+        }
+        result = jvmtiEnv->Deallocate((unsigned char*)extensionFunctions);
+        check_jvmti_error(jvmtiEnv, result, "Unable to deallocate extension functions");
+        if (verbose >= Verbose::WARN)
+        {
+            if (!_jlmSet)
+                fprintf(stderr, "Could not set COM_IBM_SET_VM_JLM extended function\n");
+            if (!_jlmDump)
+                fprintf(stderr, "Could not set COM_IBM_SET_VM_JLM_DUMP extended function\n");
+            if (!_jlmDumpStats)
+                fprintf(stderr, "Could not set COM_IBM_JLM_DUMP_STATS extended function\n");
+            if (!_osThreadID)
+                fprintf(stderr, "Could not set COM_IBM_GET_OS_THREAD_ID extended function\n");
+            if (!_verboseGCSubcriber)
+                fprintf(stderr, "Could not set COM_IBM_REGISTER_VERBOSEGC_SUBSCRIBER extended function\n");
+            if (!_verboseGCUnsubcriber)
+                fprintf(stderr, "Could not set COM_IBM_DEREGISTER_VERBOSEGC_SUBSCRIBER extended function\n");
+        }
+    }
+
 }
 
 jthread createNewThread(JNIEnv* jni_env){

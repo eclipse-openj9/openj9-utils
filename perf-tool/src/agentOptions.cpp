@@ -100,6 +100,9 @@ void modifyMonitorEvents(const std::string& function, const std::string& command
     {
         error = jvmti->GetCapabilities(&capa);
         check_jvmti_error(jvmti, error, "Unable to get current capabilties.");
+        memset(&capa, 0, sizeof(jvmtiCapabilities));
+        capa.can_generate_monitor_events = 1;
+        capa.can_get_monitor_info = 1;
         error = jvmti->RelinquishCapabilities(&capa);
         check_jvmti_error(jvmti, error, "Unable to relinquish Monitor Events Capability.");
         error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_MONITOR_CONTENDED_ENTERED, (jthread)NULL);

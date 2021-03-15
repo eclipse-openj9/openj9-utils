@@ -67,6 +67,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
         {
             env->ExceptionDescribe();
             env->ExceptionClear();
+            return;
         }
         /* Now get the class object's class descriptor */
         cls = env->GetObjectClass(clsObj);
@@ -80,21 +81,30 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
             {
                 env->ExceptionDescribe();
                 env->ExceptionClear();
+                return;
             }
             /* Now get the c string from the java jstring object */
             const char *str = env->GetStringUTFChars(strObj, NULL);
-            /* record calling class */
-            j["Class"] = str;
-            static std::mutex contentionMutex;
-            int samplesPerObjectType = 0;
+            if (str)
             {
-            std::lock_guard<std::mutex> lg(contentionMutex);
-            samplesPerObjectType = ++(numContentions[std::string(str)]);
+                /* record calling class */
+                j["Class"] = str;
+                static std::mutex contentionMutex;
+                int samplesPerObjectType = 0;
+                {
+                    std::lock_guard<std::mutex> lg(contentionMutex);
+                    samplesPerObjectType = ++(numContentions[std::string(str)]);
+                }
+                j["numTypeContentions"] = samplesPerObjectType;
+                /* Release the memory pinned char array */
+                env->ReleaseStringUTFChars(strObj, str);
+                env->DeleteLocalRef(cls);
             }
-            j["numTypeContentions"] = samplesPerObjectType;
-            /* Release the memory pinned char array */
-            env->ReleaseStringUTFChars(strObj, str);
-            env->DeleteLocalRef(cls);
+            else
+            {
+                if (verbose >= ERROR)
+                    fprintf(stderr, "%s:%d ERROR: Failed to get UTF-8 characters\n", __FILE__, __LINE__);
+            }
         }
         else
         {
@@ -216,6 +226,7 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
         {
             env->ExceptionDescribe();
             env->ExceptionClear();
+            return;
         }
         /* Now get the class object's class descriptor */
         cls = env->GetObjectClass(clsObj);
@@ -229,21 +240,30 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
             {
                 env->ExceptionDescribe();
                 env->ExceptionClear();
+                return;
             }
             /* Now get the c string from the java jstring object */
             const char *str = env->GetStringUTFChars(strObj, NULL);
-            /* record calling class */
-            j["class"] = str;
-            static std::mutex contentionMutex;
-            int samplesPerObjectType = 0;
+            if (str)
             {
-            std::lock_guard<std::mutex> lg(contentionMutex);
-            samplesPerObjectType = ++(numContentions[std::string(str)]);
+                /* record calling class */
+                j["class"] = str;
+                static std::mutex contentionMutex;
+                int samplesPerObjectType = 0;
+                {
+                    std::lock_guard<std::mutex> lg(contentionMutex);
+                    samplesPerObjectType = ++(numContentions[std::string(str)]);
+                }
+                j["numTypeContentions"] = samplesPerObjectType;
+                /* Release the memory pinned char array */
+                env->ReleaseStringUTFChars(strObj, str);
+                env->DeleteLocalRef(cls);
             }
-            j["numTypeContentions"] = samplesPerObjectType;
-            /* Release the memory pinned char array */
-            env->ReleaseStringUTFChars(strObj, str);
-            env->DeleteLocalRef(cls);
+            else
+            {
+                if (verbose >= ERROR)
+                    fprintf(stderr, "%s:%d ERROR: Failed to get UTF-8 characters\n", __FILE__, __LINE__);
+            }
         }
         else
         {

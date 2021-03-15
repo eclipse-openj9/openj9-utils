@@ -26,7 +26,9 @@
 
 #include "infra.hpp"
 #include "server.hpp"
+#include "json.hpp"
 
+using json = nlohmann::json;
 Server *server = NULL;
 
 void check_jvmti_error_throw(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
@@ -49,6 +51,65 @@ bool check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
         return false;
     }
     return true;
+}
+
+void EventConfig::getStackTrace(jvmtiEnv *jvmtiEnv, jthread thread, json& j, jint stackTraceDepth) {
+    if (stackTraceDepth > 0)
+    {
+        jvmtiError err;
+        jvmtiFrameInfo frames[EventConfig::getMaxTraceDepth()];
+        jint count;
+        err = jvmtiEnv->GetStackTrace(thread, 0, stackTraceDepth, frames, &count);
+        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Stack Trace.") && count >= 1)
+        {
+            auto jMethods = json::array();
+            bool error = false;
+            for (int i=0; i < count && !error; i++)
+            {
+                char *methodName;
+                char *signature;
+                err = jvmtiEnv->GetMethodName(frames[i].method, &methodName, &signature, NULL);
+                if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Name.\n"))
+                {
+                    jclass declaring_class;
+                    err = jvmtiEnv->GetMethodDeclaringClass(frames[i].method, &declaring_class);
+                    if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class.\n"))
+                    {
+                        char *declaringClassName;
+                        err = jvmtiEnv->GetClassSignature(declaring_class, &declaringClassName, NULL);
+                        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class Signature.\n"))
+                        {
+                            json jMethod;
+                            jMethod["class"] = declaringClassName;
+                            jMethod["method"] = methodName;
+                            jMethod["signature"] = signature;
+                            jMethods.push_back(jMethod);
+                            err = jvmtiEnv->Deallocate((unsigned char*)declaringClassName);
+                            check_jvmti_error(jvmtiEnv, err, "Unable to deallocate class name.\n");
+                        }
+                        else
+                        {
+                            error = true;
+                        }
+                    }
+                    else
+                    {
+                        error = true;
+                    }
+                    err = jvmtiEnv->Deallocate((unsigned char*)methodName);
+                    check_jvmti_error(jvmtiEnv, err, "Unable to deallocate methodName.\n");
+                    err = jvmtiEnv->Deallocate((unsigned char*)signature);
+                    check_jvmti_error(jvmtiEnv, err, "Unable to deallocate method signature.\n");
+                }
+                else
+                {
+                    error = true;
+                }
+            }/* end for loop */
+            j["stackTrace"] = jMethods;
+        }
+    }
+    return;
 }
 
 void EventConfig::setCallbacks(const std::string& cls, const std::string& method, const std::string& sig)

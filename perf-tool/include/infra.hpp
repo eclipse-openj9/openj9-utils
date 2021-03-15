@@ -27,6 +27,9 @@
 #include <mutex>
 #include <string>
 #include <jvmti.h>
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 class Server;
 extern Server *server;
@@ -78,6 +81,7 @@ public:
     const std::string& getCallbackMethod() const { return callbackMethod; }
     const std::string &getCallbackSignature() const { return callbackSignature; }
     void setCallbacks(const std::string& cls, const std::string& method, const std::string& sig);
+    void getStackTrace(jvmtiEnv *jvmtiEnv, jthread thread, json& j, jint StackTraceDepth);
     jclass getCachedCallbackClass() const { return callbackIDs.cachedCallbackClass; }
     jmethodID getCachedCallbackMethodId() const { return callbackIDs.cachedCallbackMethodId; }
     CallbackIDs getCallBackIDs(JNIEnv *env);

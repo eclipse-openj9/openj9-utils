@@ -29,6 +29,10 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv,
             JNIEnv* env,
             jthread thread,
             jobject object);
+JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv,
+            JNIEnv* env,
+            jthread thread,
+            jobject object);
 
 void setMonitorStackTrace(bool val);
 void setMonitorSampleRate(int rate);

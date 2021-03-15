@@ -54,6 +54,17 @@ enum Verbose { NONE, ERROR, WARN, INFO};
 
 extern int verbose;
 
+struct ExtensionFunctions
+{
+    static jvmtiExtensionFunction _jlmSet;
+    static jvmtiExtensionFunction _jlmDump;
+    static jvmtiExtensionFunction _jlmDumpStats;
+    static jvmtiExtensionFunction _osThreadID;
+    static jvmtiExtensionFunction _verboseGCSubcriber;
+    static jvmtiExtensionFunction _verboseGCUnsubcriber;
+    static void getExtensionFunctions(jvmtiEnv *jvmtiEnv);
+};
+
 class EventConfig
 {
 public:
@@ -87,5 +98,49 @@ public:
     CallbackIDs getCallBackIDs(JNIEnv *env);
 };
 
+/* Class used to change endianess: from host order to network order (big endian) */
+class Host2Network
+{
+public:
+    Host2Network()
+    {
+        int32_t val = 1;
+        _isLittleEndian = *reinterpret_cast<uint8_t*>(&val) == 1 ? true : false;
+    }
+    uint32_t convert(uint32_t val)
+    {
+        if (_isLittleEndian)
+        {
+            return ((val << (8*3)) & 0xFF000000) |
+                   ((val << (8*1)) & 0x00FF0000) |
+                   ((val >> (8*1)) & 0x0000FF00) |
+                   ((val >> (8*3)) & 0x000000FF);
+        }
+        else
+        {
+            return val;
+        }
+    }
+    uint64_t convert(uint64_t val)
+    {
+        if (_isLittleEndian)
+        {
+            return ((val << (8*7)))  |
+                   ((val << (8*5)) & 0x00FF000000000000ull) |
+                   ((val << (8*3)) & 0x0000FF0000000000ull) |
+                   ((val << (8*1)) & 0x000000FF00000000ull) |
+                   ((val >> (8*1)) & 0x00000000FF000000ull) |
+                   ((val >> (8*3)) & 0x0000000000FF0000ull) |
+                   ((val >> (8*5)) & 0x000000000000FF00ull) |
+                   ((val >> (8*7)) & 0x00000000000000FFull);
+        }
+        else
+        {
+            return val;
+        }
+    }
+    private:
+    bool _isLittleEndian;
+};
 
 #endif /* INFRA_H_ */

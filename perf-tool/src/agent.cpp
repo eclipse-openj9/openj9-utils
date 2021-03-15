@@ -183,6 +183,8 @@ JNIEXPORT jint JNICALL Agent_OnAttach(JavaVM* vm, char *options, void *reserved)
             return rc;
         }
 
+        ExtensionFunctions::getExtensionFunctions(jvmti);
+
         error = setCallbacks(jvmti);
         if (error != JVMTI_ERROR_NONE)
             return JNI_ERR; /* without callbacks I cannot do anything */
@@ -219,6 +221,8 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
         printf("Unable to get access to JVMTI version 1.2");
         return JNI_ERR;
     }
+
+    ExtensionFunctions::getExtensionFunctions(jvmti);
 
     jvmtiError error = setCallbacks(jvmti);
     if (error != JVMTI_ERROR_NONE)

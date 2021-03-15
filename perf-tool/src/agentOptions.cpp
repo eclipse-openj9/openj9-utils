@@ -267,6 +267,94 @@ void modifyExceptionEvents(const std::string& function, const std::string& comma
     }
 }
 
+void modifyJLM(const std::string& function, const std::string& command)
+{
+    if (!ExtensionFunctions::_jlmSet || !ExtensionFunctions::_jlmDumpStats)
+    {
+        if (verbose >= Verbose::ERROR)
+            fprintf(stderr, "Error using JLM; JLM extensions were not found\n");
+        return;
+    }
+
+    jvmtiError error;
+    if (!command.compare("start"))
+    {
+        if (verbose >= Verbose::INFO)
+            printf("Processing JLM start command\n");
+        error = (ExtensionFunctions::_jlmSet)(jvmti, COM_IBM_JLM_START_TIME_STAMP);
+        check_jvmti_error(jvmti, error, "Unable to start JLM.");
+    }
+    else if (!command.compare("stop"))
+    {
+        if (verbose >= Verbose::INFO)
+            printf("Processing JLM stop command\n");
+        jlm_dump* dump = NULL;
+        error = (ExtensionFunctions::_jlmDumpStats)(jvmti, &dump, COM_IBM_JLM_DUMP_FORMAT_TAGS);
+        if (check_jvmti_error(jvmti, error, "Unable to collect JLM data."))
+        {
+            /* see runtime/util/jlm.c request_MonitorJlmDump(jvmtiEnv * env, J9VMJlmDump * jlmd, jint dump_format) */
+            static const int dumpOffset = 8; /* 4b dump version + 4b dump format */
+            int dumpSize = (int)(dump->end - dump->begin) - dumpOffset;
+            Host2Network h2n;
+            auto javaMonitors = json::array();
+            auto rawMonitors = json::array();
+            char *crt = dump->begin + dumpOffset;
+            while(crt < dump->end)
+            {
+                if ((*crt) & (JVMTI_MONITOR_JAVA | JVMTI_MONITOR_RAW))
+                {
+                    json jMon;
+                    int monType = (int)(*crt);
+                    crt += sizeof(char);
+                    int held = (int)(*crt);
+                    crt += sizeof(char);
+                    uint32_t enterCount = h2n.convert(*(uint32_t*)crt);
+                    if (enterCount == 0)
+                        continue; /* don't include monitors that were never acquired */
+                    jMon["enterCount"] = enterCount;
+                    crt += sizeof(uint32_t);
+                    jMon["slowCount"] = h2n.convert(*(uint32_t*)crt);
+                    crt += sizeof(uint32_t);
+                    jMon["recursiveCount"] = h2n.convert(*(uint32_t*)crt);
+                    crt += sizeof(uint32_t);
+                    jMon["spinCount"] = h2n.convert(*(uint32_t*)crt);
+                    crt += sizeof(uint32_t);
+                    jMon["yieldCount"] = h2n.convert(*(uint32_t*)crt);
+                    crt += sizeof(uint32_t);
+                    jMon["holdTime"] = h2n.convert(*(uint64_t*)crt);
+                    crt += sizeof(uint64_t);
+                    jMon["tag"] = h2n.convert(*(uint64_t*)crt);
+                    crt += sizeof(uint64_t);
+                    jMon["monitorName"] = crt;
+                    crt += strlen(crt) + 1;
+                    if (monType & JVMTI_MONITOR_JAVA)
+                        javaMonitors.push_back(jMon);
+                    else
+                        rawMonitors.push_back(jMon);
+                }
+                else
+                {
+                    int monNameDistance = 2*sizeof(char) + 5*sizeof(uint32_t) + 2*sizeof(uint64_t);
+                    char *monName = crt + monNameDistance;
+                    crt += monNameDistance + strlen(monName) + 1;
+                }
+            }
+            jvmti->Deallocate((unsigned char*)dump);
+            json j;
+            j["JLM size"] = dumpSize;
+            j["javaMonitors"] = javaMonitors;
+            j["rawMonitors"] = rawMonitors;
+            sendToServer(j.dump());
+        }
+        error = (ExtensionFunctions::_jlmSet)(jvmti, COM_IBM_JLM_STOP_TIME_STAMP);
+        check_jvmti_error(jvmti, error, "Unable to stop JLM.");
+    }
+    else
+    {
+        invalidCommand(function, command);
+    }
+}
+
 
 void agentCommand(const json& jCommand)
 {
@@ -338,6 +426,10 @@ void agentCommand(const json& jCommand)
         else if (!function.compare("verboseLog"))
         {
             modifyVerboseLogSubscriber(function, command, sampleRate);
+        }
+        else if (!function.compare("jlm"))
+        {
+            modifyJLM(function, command);
         }
         else
         {

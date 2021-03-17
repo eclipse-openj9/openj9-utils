@@ -60,7 +60,7 @@ Server::Server(int portNo, const string &commandFileName, const string &logFileN
     }
 
     loggingClient = new LoggingClient(logFileName);
-    loggingClient->logData("Server started", "Server");
+    loggingClient->logData("Server started", "serverStartEvent", "Server");
 }
 
 void Server::handleServer()
@@ -232,7 +232,7 @@ void Server::handleClientCommand(string command, string from)
         std::cerr << "Improper command received from: " << from << '\n';
     }
 
-    loggingClient->logData(command, from);
+    loggingClient->logData(command, "commandDigestEvent", from);
 }
 
 void Server::sendMessage(const int socketFd, const string message)
@@ -254,7 +254,7 @@ void Server::sendMessage(const int socketFd, const string message)
     }
 }
 
-void Server::handleMessagingClients(string message)
+void Server::handleMessagingClients(string message, std::string event)
 {
 
     for (int i = 0; i < activeNetworkClients; i++)
@@ -262,7 +262,7 @@ void Server::handleMessagingClients(string message)
         int clientSocketFd = networkClients[i]->getSocketFd();
         sendMessage(clientSocketFd, message);
     }
-    loggingClient->logData(message, "Server");
+    loggingClient->logData(message, event, "Server");
 }
 
 void Server::startPerfThread(int time)
@@ -284,7 +284,7 @@ void Server::shutDownServer()
         perfThread.join();
     }
 
-    handleMessagingClients("Server shutting down");
+    handleMessagingClients("Server shutting down", "");
 
     /* close off commands, logs, and network client sockets */
     for (int i = 0; i < activeNetworkClients; i++)

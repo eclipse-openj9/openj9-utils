@@ -228,6 +228,12 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     if (error != JVMTI_ERROR_NONE)
         return JNI_ERR;
 
+    jvmtiCapabilities capa;
+    memset(&capa, 0, sizeof(jvmtiCapabilities));
+    capa.can_generate_method_entry_events = 1; /* this one can only be added during the load phase */
+    error = jvmti->AddCapabilities(&capa);
+    check_jvmti_error(jvmti, error, "Unable to init MethodEnter capability.");
+
     error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_INIT, (jthread)NULL);
     check_jvmti_error(jvmti, error, "Unable to init VM init event.");
 

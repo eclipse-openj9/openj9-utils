@@ -43,6 +43,8 @@ using json = nlohmann::json;
 VerboseLogSubscriber *verboseLogSubscriber;
 extern EventConfig monitorConfig;
 extern EventConfig methodEnterConfig;
+extern std::unordered_map<int, int> m_monitor;
+extern std::mutex monitorMapMutex;
 
 void invalidCommand(const std::string& function, const std::string& command)
 {
@@ -103,6 +105,10 @@ void modifyMonitorEvents(const std::string& function, const std::string& command
     {
         if (verbose >= Verbose::INFO)
             printf("Processing MonitorEvents stop command\n");
+        {
+            std::lock_guard<std::mutex> lg(monitorMapMutex);
+            m_monitor.clear();
+        }
         memset(&capa, 0, sizeof(jvmtiCapabilities));
         capa.can_generate_monitor_events = 1;
         capa.can_get_monitor_info = 1;

@@ -148,6 +148,7 @@ jvmtiError setCallbacks(jvmtiEnv *jvmti)
     callbacks.MonitorContendedEnter = &MonitorContendedEnter;
     callbacks.MonitorContendedEntered = &MonitorContendedEntered;
     callbacks.MethodEntry = &MethodEntry;
+    callbacks.MethodExit = &MethodExit;
     callbacks.Exception = &Exception;
     jvmtiError error = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
     check_jvmti_error(jvmti, error, "Cannot set jvmti callbacks.");
@@ -231,6 +232,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     jvmtiCapabilities capa;
     memset(&capa, 0, sizeof(jvmtiCapabilities));
     capa.can_generate_method_entry_events = 1; /* this one can only be added during the load phase */
+    capa.can_generate_method_exit_events = 1;
     error = jvmti->AddCapabilities(&capa);
     check_jvmti_error(jvmti, error, "Unable to init MethodEnter capability.");
 

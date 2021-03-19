@@ -34,8 +34,10 @@
 using json = nlohmann::json;
 
 EventConfig methodEnterConfig;
+EventConfig methodExitConfig;
 
 std::atomic<int> mEntrySampleCount {0};
+std::atomic<int> mExitSampleCount {0};
 
 
 /* retrieves method name and line number, and declaring class name and signature
@@ -104,5 +106,60 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
         }
 */
         sendToServer(j.dump(), "methodEntryEvent");
+    }
+}
+
+
+JNIEXPORT void JNICALL MethodExit(jvmtiEnv *jvmtiEnv,
+                                  JNIEnv* env,
+                                  jthread thread,
+                                  jmethodID method,
+                                  jboolean was_popped_by_exception,
+                                  jvalue return_value)
+{
+    /* Get number of methods and increment */
+    int numMethods = atomic_fetch_add(&mExitSampleCount, 1);
+
+    if (numMethods % methodExitConfig.getSampleRate() == 0) 
+    {          
+        json j;
+        j["methodNum"] = numMethods;
+        
+        char *name_ptr;
+        char *signature_ptr;
+        jvmtiError err = jvmtiEnv->GetMethodName(method, &name_ptr, &signature_ptr, NULL);
+        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Name.\n")) 
+        {
+            j["methodName"] = name_ptr;
+            j["methodSig"] = signature_ptr;
+            err = jvmtiEnv->Deallocate((unsigned char*)name_ptr);
+            check_jvmti_error(jvmtiEnv, err, "Unable to deallocate name_ptr.\n");
+            err = jvmtiEnv->Deallocate((unsigned char*)signature_ptr);
+            check_jvmti_error(jvmtiEnv, err, "Unable to deallocate signature_ptr.\n");
+        }
+        else
+        {
+            /* Without the method name, there is no point in continuing to get the class */
+            return; 
+        }
+
+        jclass declaring_class;
+        err = jvmtiEnv->GetMethodDeclaringClass(method, &declaring_class);
+        if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class.\n")) 
+        {
+            char *declaringClassName;
+            err = jvmtiEnv->GetClassSignature(declaring_class, &declaringClassName, NULL);
+            if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class Signature.\n")) 
+            {
+                j["methodClass"] = declaringClassName;
+                err = jvmtiEnv->Deallocate((unsigned char*)declaringClassName);
+                check_jvmti_error(jvmtiEnv, err, "Unable to deallocate declaringClassName.\n");
+            }
+        }
+
+        /* Get StackTrace */
+        methodExitConfig.getStackTrace(jvmtiEnv, thread, j, methodExitConfig.getStackTraceDepth());
+
+        sendToServer(j.dump(), "methodExitEvent");
     }
 }

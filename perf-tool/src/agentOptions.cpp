@@ -43,8 +43,10 @@ using json = nlohmann::json;
 VerboseLogSubscriber *verboseLogSubscriber;
 extern EventConfig monitorConfig;
 extern EventConfig methodEnterConfig;
+extern EventConfig methodExitConfig;
 extern std::unordered_map<int, int> m_monitor;
 extern std::mutex monitorMapMutex;
+
 
 void invalidCommand(const std::string& function, const std::string& command)
 {
@@ -205,6 +207,31 @@ void modifyMethodEntryEvents(const std::string& function, const std::string& com
             printf("Processing MethodEnter start command\n");
         error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
         check_jvmti_error(jvmti, error, "Unable to enable MethodEntry event notifications.");
+    }
+    else
+    {
+        invalidCommand(function, command);
+    }
+}
+
+void modifyMethodExitEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth)
+{
+    jvmtiError error;
+    methodExitConfig.setSampleRate(rate);
+    methodExitConfig.setStackTraceDepth(stackTraceDepth);
+    if (!command.compare("stop"))
+    {
+        if (verbose >= Verbose::INFO)
+            printf("Processing MethodExit stop command\n");
+        error = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_METHOD_EXIT, (jthread)NULL);
+        check_jvmti_error(jvmti, error, "Unable to disable MethodExit event.");
+    }
+    else if (!command.compare("start"))
+    { 
+        if (verbose >= Verbose::INFO)
+            printf("Processing MethodExit start command\n");
+        error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_METHOD_EXIT, (jthread)NULL);
+        check_jvmti_error(jvmti, error, "Unable to enable Methodexit event notifications.");
     }
     else
     {
@@ -414,6 +441,10 @@ void agentCommand(const json& jCommand)
         else if (!function.compare("methodEntryEvents"))
         {
             modifyMethodEntryEvents(function, command, sampleRate, stackTraceDepth);
+        }
+       else if (!function.compare("methodExitEvents"))
+        {
+            modifyMethodExitEvents(function, command, sampleRate, stackTraceDepth);
         }
         else if (!function.compare("exceptionEvents"))
         {

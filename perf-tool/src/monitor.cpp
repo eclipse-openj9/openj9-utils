@@ -26,6 +26,7 @@
 #include <jvmti.h>
 #include <ibmjvmti.h>
 #include <map>
+#include <unordered_map>
 #include "agentOptions.hpp"
 #include "infra.hpp"
 #include "json.hpp"
@@ -35,6 +36,8 @@ using json = nlohmann::json;
 
 std::atomic<int> monitorSampleCount{0};
 std::atomic<int> monitorEnterSampleCount{0};
+std::unordered_map<int, int> m_monitor;
+std::mutex monitorMapMutex;
 EventConfig monitorConfig;
 
 JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, jthread thread, jobject object){
@@ -55,6 +58,14 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
         sprintf(str, "0x%x", hash);
         j["monitorHash"] = str;
     }
+
+    /*monitor for protecting hashtable*/
+    int val = 1;
+    {
+        std::lock_guard<std::mutex> lg(monitorMapMutex);
+        val = ++(m_monitor[hash]);
+    }
+    j["per_object_contended_count"] = val;
 
     static std::map<std::string, int> numContentions;
     jclass cls = env->GetObjectClass(object);

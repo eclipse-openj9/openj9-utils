@@ -37,6 +37,7 @@ using json = nlohmann::json;
 std::atomic<int> monitorSampleCount{0};
 std::atomic<int> monitorEnterSampleCount{0};
 std::unordered_map<int, int> m_monitor;
+thread_local std::unordered_map<int, long long int> m_lockLatency;
 std::mutex monitorMapMutex;
 EventConfig monitorConfig;
 
@@ -57,6 +58,14 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
         char str[32];
         sprintf(str, "0x%x", hash);
         j["monitorHash"] = str;
+    }
+
+    /* calculate timestamp when thread acquired monitor */
+    auto currentClockTime = std::chrono::system_clock::now();
+    long long int nano = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
+    /* Calculate lock latency */
+    if (m_lockLatency[hash]) {
+        j["lockLatency"] = nano - m_lockLatency[hash];
     }
 
     /*monitor for protecting hashtable*/
@@ -216,6 +225,11 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
         sprintf(str, "0x%x", hash);
         j["monitorHash"] = str;
     }
+
+    /* Timestamp of thread waiting to acquire monitor */
+    auto currentClockTime = std::chrono::system_clock::now();
+    long long int nano = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
+    m_lockLatency[hash] = nano;
 
     static std::map<std::string, int> numContentions;
     jclass cls = env->GetObjectClass(object);

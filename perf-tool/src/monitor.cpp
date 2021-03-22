@@ -37,7 +37,8 @@ using json = nlohmann::json;
 std::atomic<int> monitorSampleCount{0};
 std::atomic<int> monitorEnterSampleCount{0};
 std::unordered_map<int, int> m_monitor;
-thread_local std::unordered_map<int, long long int> m_lockLatency;
+thread_local long long int startTime;
+thread_local jint objHash;
 std::mutex monitorMapMutex;
 EventConfig monitorConfig;
 
@@ -64,8 +65,8 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     auto currentClockTime = std::chrono::system_clock::now();
     long long int nano = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
     /* Calculate lock latency */
-    if (m_lockLatency[hash]) {
-        j["lockLatency"] = nano - m_lockLatency[hash];
+    if (hash == objHash) {
+        j["lockLatency"] = nano - startTime;
     }
 
     /*monitor for protecting hashtable*/
@@ -217,19 +218,17 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
         return;
 
     jvmtiError err;
-    jint hash;
-    err = jvmtiEnv->GetObjectHashCode(object, &hash);
+    err = jvmtiEnv->GetObjectHashCode(object, &objHash);
     if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve object hashcode.")) 
     {
         char str[32];
-        sprintf(str, "0x%x", hash);
+        sprintf(str, "0x%x", objHash);
         j["monitorHash"] = str;
     }
 
     /* Timestamp of thread waiting to acquire monitor */
     auto currentClockTime = std::chrono::system_clock::now();
-    long long int nano = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
-    m_lockLatency[hash] = nano;
+    startTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
 
     static std::map<std::string, int> numContentions;
     jclass cls = env->GetObjectClass(object);

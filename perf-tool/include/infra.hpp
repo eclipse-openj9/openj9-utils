@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <mutex>
+#include <regex>
 #include <string>
 #include <jvmti.h>
 #include "json.hpp"
@@ -76,6 +77,12 @@ public:
 private:
     int sampleRate = 1;
     int stackTraceDepth = 0;
+    bool methodFilter = false;
+    bool signatureFilter = false;
+    bool classFilter = false;
+    std::regex methodRegex;
+    std::regex signatureRegex;
+    std::regex classRegex; 
     std::string callbackClass;
     std::string callbackMethod;
     std::string callbackSignature;
@@ -92,6 +99,8 @@ public:
     const std::string& getCallbackMethod() const { return callbackMethod; }
     const std::string &getCallbackSignature() const { return callbackSignature; }
     void setCallbacks(const std::string& cls, const std::string& method, const std::string& sig);
+    void setFilter(const std::string& cls, const std::string& method, const std::string& sig);
+    std::tuple<bool, bool, bool, std::regex, std::regex, std::regex> getFilter();
     void getStackTrace(jvmtiEnv *jvmtiEnv, jthread thread, json& j, jint StackTraceDepth);
     jclass getCachedCallbackClass() const { return callbackIDs.cachedCallbackClass; }
     jmethodID getCachedCallbackMethodId() const { return callbackIDs.cachedCallbackMethodId; }

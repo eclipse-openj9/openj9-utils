@@ -128,7 +128,7 @@ FILE *file;
 file = fopen(commandsPath.c_str() ,"r");
 if(file == NULL)
 {
-    fprintf(stderr, "commandspath doesn't exist\n");
+    fprintf(stderr, "commandspath: %s doesn't exist\n",commandsPath.c_str());
     exit(0);
 }
 fclose(file);

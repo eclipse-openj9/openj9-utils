@@ -26,8 +26,13 @@
 #include <jvmti.h>
 
 JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
-            JNIEnv* env,
-            jthread thread,
-            jmethodID method);
-
+                                   JNIEnv* env,
+                                   jthread thread,
+                                   jmethodID method);
+JNIEXPORT void JNICALL MethodExit(jvmtiEnv *jvmtiEnv,
+                                  JNIEnv* env,
+                                  jthread thread,
+                                  jmethodID method,
+                                  jboolean was_popped_by_exception,
+                                  jvalue return_value);
 #endif /* METHODENTRY_H_ */

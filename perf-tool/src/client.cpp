@@ -149,7 +149,7 @@ void Client::receiveMessage(char buffer[])
     {
         printf("Received: %s\n", buffer);
 
-        if (string(buffer).substr(strlen(buffer) - 4, 4) == "done")
+        if (string(buffer).find("done") != string::npos)
         {
             keepPolling = false;
         }

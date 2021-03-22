@@ -130,7 +130,7 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
             check_jvmti_error(jvmtiEnv, err, "Unable to deallocate table_ptr.\n");
         }
 */
-        sendToServer(j.dump(), "methodEntryEvent");
+        sendToServer(j, "methodEntryEvent");
     }
 }
 
@@ -209,6 +209,6 @@ JNIEXPORT void JNICALL MethodExit(jvmtiEnv *jvmtiEnv,
         if (methodExitConfig.getStackTraceDepth() > 1)
             methodExitConfig.getStackTrace(jvmtiEnv, thread, j, methodExitConfig.getStackTraceDepth());
 
-        sendToServer(j.dump(), "methodExitEvent");
+        sendToServer(j, "methodExitEvent");
     }
 }

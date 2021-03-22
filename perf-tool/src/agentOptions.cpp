@@ -376,7 +376,7 @@ void modifyJLM(const std::string& function, const std::string& command)
             j["JLM size"] = dumpSize;
             j["javaMonitors"] = javaMonitors;
             j["rawMonitors"] = rawMonitors;
-            sendToServer(j.dump(), "jlm");
+            sendToServer(j, "jlm");
         }
         error = (ExtensionFunctions::_jlmSet)(jvmti, COM_IBM_JLM_STOP_TIME_STAMP);
         check_jvmti_error(jvmti, error, "Unable to stop JLM.");

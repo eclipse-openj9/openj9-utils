@@ -142,7 +142,7 @@ void Server::handleServer()
                        ntohs(cli_addr.sin_port));
 
                 /* Send a welcome message */
-                sendMessage(newsocketFd, "Connection to server succeeded");
+                sendMessage(newsocketFd, "Connection to server succeeded", "ServerStartEvent", "Server");
 
                 /* Update number of active clients */
                 activeNetworkClients++;
@@ -232,14 +232,22 @@ void Server::handleClientCommand(string command, string from)
         exit(0);
     }
 
-    loggingClient->logData(command, "commandDigestEvent", from);
+    loggingClient->logData(com, "commandDigestEvent", from);
 }
 
-void Server::sendMessage(const int socketFd, const string message)
+void Server::sendMessage(const int socketFd, const json& message, std::string event, const std::string receivedFrom)
 {
+    auto currentClockTime = std::chrono::system_clock::now();
+    long long int nano = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
+    json log;
+    log["body"] = message;
+    log["from"] = receivedFrom;
+    log["eventType"] = event;
+    log["timestamp"] = nano;
+    std::string result = log.dump(2, ' ', true);
     int n, total = 0;
-    size_t length = message.size();
-    const char *buffer = message.data();
+    size_t length = result.size();
+    const char *buffer = result.data();
 
     while (total < length) 
     {
@@ -254,13 +262,12 @@ void Server::sendMessage(const int socketFd, const string message)
     }
 }
 
-void Server::handleMessagingClients(string message, std::string event)
+void Server::handleMessagingClients(const json& message, std::string event)
 {
-
     for (int i = 0; i < activeNetworkClients; i++)
     {
         int clientSocketFd = networkClients[i]->getSocketFd();
-        sendMessage(clientSocketFd, message);
+        sendMessage(clientSocketFd, message, event, "Server");
     }
     loggingClient->logData(message, event, "Server");
 }
@@ -289,7 +296,7 @@ void Server::shutDownServer()
     /* close off commands, logs, and network client sockets */
     for (int i = 0; i < activeNetworkClients; i++)
     {
-        sendMessage(networkClients[i]->getSocketFd(), "done");
+        sendMessage(networkClients[i]->getSocketFd(), "done", "ShutdownEvent", "Server");
         networkClients[i]->closeFd();
         delete networkClients[i];
     }

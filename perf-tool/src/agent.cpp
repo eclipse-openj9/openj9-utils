@@ -122,11 +122,10 @@ void parseAgentOptions(const char *options)
             }
         }
     }
-
 //check if commandspath exists or not
 FILE *file;
 file = fopen(commandsPath.c_str() ,"r");
-if(file == NULL)
+if (file == NULL)
 {
     fprintf(stderr, "commandspath: %s doesn't exist\n",commandsPath.c_str());
     exit(0);

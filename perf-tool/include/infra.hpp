@@ -40,6 +40,10 @@ void check_jvmti_error_throw(jvmtiEnv *jvmti, jvmtiError errnum, const char *str
 /* returns False if error detected. */
 bool check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str);
 
+void getThreadName(jvmtiEnv *jvmtiEnv, jthread thread, json& j);
+void getThreadID(JNIEnv *env, jthread thread, json& j);
+void getOSThreadID(jvmtiEnv *jvmtiEnv, jthread thread, json& j);
+
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread);
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env);
 jthread createNewThread(JNIEnv* jni_env);
@@ -96,9 +100,6 @@ public:
     const std::string &getCallbackSignature() const { return callbackSignature; }
     void setCallbacks(const std::string& cls, const std::string& method, const std::string& sig);
     void getStackTrace(jvmtiEnv *jvmtiEnv, jthread thread, json& j, jint StackTraceDepth);
-    void getThreadName(jvmtiEnv *jvmtiEnv, jthread thread, json& j);
-    void getThreadID(JNIEnv *env, jthread thread, json& j);
-    void getOSThreadID(jvmtiEnv *jvmtiEnv, jthread thread, json& j);
     jclass getCachedCallbackClass() const { return callbackIDs.cachedCallbackClass; }
     jmethodID getCachedCallbackMethodId() const { return callbackIDs.cachedCallbackMethodId; }
     CallbackIDs getCallBackIDs(JNIEnv *env);

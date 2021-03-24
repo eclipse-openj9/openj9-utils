@@ -410,20 +410,6 @@ void agentCommand(const json& jCommand)
             invalidStackTraceDepth(function, command, stackTraceDepth);
         }
     }
-    bool waitersInfo = false; /* default is not to print waiters info */
-    if (jCommand.contains("waitersInfo"))
-    {
-        try
-        {
-            waitersInfo = jCommand["waitersInfo"].get<bool>();
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << e.what() << " Recieved from waitersInfo field\n";
-            exit(0);
-        }
-    }
-
     std::string callbackClass;
     std::string callbackMethod;
     std::string callbackSignature;
@@ -446,6 +432,18 @@ void agentCommand(const json& jCommand)
     {
         if (!function.compare("monitorEvents"))
         {
+            bool waitersInfo = false; /* default is not to print waiters info */
+            if (jCommand.contains("waitersInfo"))
+            {
+                try
+                {
+                    waitersInfo = jCommand["waitersInfo"].get<bool>();
+                }
+                catch (const std::exception& e)
+                {
+                    fprintf(stderr, "%s Received from waitersInfo field\n", e.what());
+                }
+            }
             modifyMonitorEvents(function, command, sampleRate, stackTraceDepth, callbackClass, callbackMethod, callbackSignature, waitersInfo);
         }
         else if (!function.compare("objectAllocEvents"))

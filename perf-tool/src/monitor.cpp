@@ -131,11 +131,11 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     /* Get StackTrace */
     monitorConfig.getStackTrace(jvmtiEnv, thread, j, monitorConfig.getStackTraceDepth());
     /* Get the thread name */
-    monitorConfig.getThreadName(jvmtiEnv, thread, j);
+    getThreadName(jvmtiEnv, thread, j);
     /* Get Java thread ID */
-    monitorConfig.getThreadID(env, thread, j);
+    getThreadID(env, thread, j);
     /* Get OS thread ID */
-    monitorConfig.getOSThreadID(jvmtiEnv, thread, j);
+    getOSThreadID(jvmtiEnv, thread, j);
     /* get waiters info if required*/
     if (monitorConfig.getWaitersInfo())
     {
@@ -149,9 +149,9 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
             {
                 /* Get the waiter thread Details */
                 json j_waiter;
-                monitorConfig.getThreadName(jvmtiEnv, monitor_usage.waiters[i], j_waiter);
-                monitorConfig.getThreadID(env, monitor_usage.waiters[i], j_waiter);
-                monitorConfig.getOSThreadID(jvmtiEnv, monitor_usage.waiters[i], j_waiter);
+                getThreadName(jvmtiEnv, monitor_usage.waiters[i], j_waiter);
+                getThreadID(env, monitor_usage.waiters[i], j_waiter);
+                getOSThreadID(jvmtiEnv, monitor_usage.waiters[i], j_waiter);
                 waiters_list.push_back(j_waiter);
             }
             j["waiters"] = waiters_list;
@@ -279,11 +279,11 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
             /* Get StackTrace */
             monitorConfig.getStackTrace(jvmtiEnv, monitor_usage.owner, jOwner, stackTraceDepth);
             /* Get the thread name */
-            monitorConfig.getThreadName(jvmtiEnv, monitor_usage.owner, jOwner);
+            getThreadName(jvmtiEnv, monitor_usage.owner, jOwner);
             /* Get Java thread ID */
-            monitorConfig.getThreadID(env, monitor_usage.owner, jOwner);
+            getThreadID(env, monitor_usage.owner, jOwner);
             /* Get OS thread ID */
-            monitorConfig.getOSThreadID(jvmtiEnv, monitor_usage.owner, jOwner);
+            getOSThreadID(jvmtiEnv, monitor_usage.owner, jOwner);
             j["OwnerThread"] = jOwner;
         }
     }
@@ -291,11 +291,11 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
     /* Get StackTrace */
     monitorConfig.getStackTrace(jvmtiEnv, thread, jCurrent, stackTraceDepth);
     /* Get the current thread name */
-    monitorConfig.getThreadName(jvmtiEnv, thread, jCurrent);
+    getThreadName(jvmtiEnv, thread, jCurrent);
     /* Get Java thread ID */
-    monitorConfig.getThreadID(env, thread, jCurrent);
+    getThreadID(env, thread, jCurrent);
     /* Get OS thread ID */
-    monitorConfig.getOSThreadID(jvmtiEnv, thread, jCurrent);
+    getOSThreadID(jvmtiEnv, thread, jCurrent);
     j["CurrentThread"] = jCurrent;
     sendToServer(j.dump(), "MonitorContendedEnterEvent");
 

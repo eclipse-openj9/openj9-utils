@@ -54,7 +54,7 @@ bool check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
     return true;
 }
 
-void EventConfig::getThreadName(jvmtiEnv *jvmtiEnv, jthread thread, json& j) {
+void getThreadName(jvmtiEnv *jvmtiEnv, jthread thread, json& j) {
     jvmtiThreadInfo threadInfo;
     jvmtiError error;
     error = jvmtiEnv->GetThreadInfo(thread, &threadInfo);
@@ -67,7 +67,7 @@ void EventConfig::getThreadName(jvmtiEnv *jvmtiEnv, jthread thread, json& j) {
     }
 }
 
-void EventConfig::getThreadID(JNIEnv *env, jthread thread, json& j) {
+void getThreadID(JNIEnv *env, jthread thread, json& j) {
     jclass threadClass = env->FindClass("java/lang/Thread");
     if (threadClass)
     {
@@ -85,11 +85,12 @@ void EventConfig::getThreadID(JNIEnv *env, jthread thread, json& j) {
     }
     else
     {
-        printf ("Error calling FindClass for java/lang/Thread\n");
+        if (verbose >= ERROR)
+            fprintf (stderr, "Error calling FindClass for java/lang/Thread\n");
     }
 }
 
-void EventConfig::getOSThreadID(jvmtiEnv *jvmtiEnv, jthread thread, json& j) {
+void getOSThreadID(jvmtiEnv *jvmtiEnv, jthread thread, json& j) {
     /* We need to use OpenJ9 JVMTI extension functions */
     jvmtiError error;
     if (ExtensionFunctions::_osThreadID)

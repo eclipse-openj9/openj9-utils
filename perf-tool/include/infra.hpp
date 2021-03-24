@@ -76,6 +76,7 @@ public:
 private:
     int sampleRate = 1;
     int stackTraceDepth = 0;
+    bool waitersInfo = false;
     std::string callbackClass;
     std::string callbackMethod;
     std::string callbackSignature;
@@ -86,6 +87,8 @@ public:
     static constexpr int getMaxTraceDepth() { return MAX_TRACE_DEPTH; } 
     int getSampleRate(void) const { return sampleRate; }
     void setSampleRate(int rate) { sampleRate = (rate > 0 ? rate : 1); }
+    bool getWaitersInfo() const { return waitersInfo; }
+    void setWaitersInfo(bool waiters) { waitersInfo = waiters; }
     int getStackTraceDepth() const { return stackTraceDepth; }
     void setStackTraceDepth(int depth) { stackTraceDepth = std::min(depth, MAX_TRACE_DEPTH); }
     const std::string& getCallbackClass() const { return callbackClass; }
@@ -93,6 +96,9 @@ public:
     const std::string &getCallbackSignature() const { return callbackSignature; }
     void setCallbacks(const std::string& cls, const std::string& method, const std::string& sig);
     void getStackTrace(jvmtiEnv *jvmtiEnv, jthread thread, json& j, jint StackTraceDepth);
+    void getThreadName(jvmtiEnv *jvmtiEnv, jthread thread, json& j);
+    void getThreadID(JNIEnv *env, jthread thread, json& j);
+    void getOSThreadID(jvmtiEnv *jvmtiEnv, jthread thread, json& j);
     jclass getCachedCallbackClass() const { return callbackIDs.cachedCallbackClass; }
     jmethodID getCachedCallbackMethodId() const { return callbackIDs.cachedCallbackMethodId; }
     CallbackIDs getCallBackIDs(JNIEnv *env);

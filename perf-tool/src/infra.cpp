@@ -54,6 +54,56 @@ bool check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str) {
     return true;
 }
 
+void EventConfig::getThreadName(jvmtiEnv *jvmtiEnv, jthread thread, json& j) {
+    jvmtiThreadInfo threadInfo;
+    jvmtiError error;
+    error = jvmtiEnv->GetThreadInfo(thread, &threadInfo);
+    if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread info."))
+    {
+        j["threadName"] = threadInfo.name;
+        error = jvmtiEnv->Deallocate((unsigned char*)(threadInfo.name));
+        check_jvmti_error(jvmtiEnv, error, "Unable to deallocate thread name.\n");
+        // Local JNI refs to threadInfo.thread_group and threadInfo.context_class_loader will be freed upon return
+    }
+}
+
+void EventConfig::getThreadID(JNIEnv *env, jthread thread, json& j) {
+    jclass threadClass = env->FindClass("java/lang/Thread");
+    if (threadClass)
+    {
+         jmethodID getIdMethod = env->GetMethodID(threadClass, "getId", "()J");
+         if (getIdMethod)
+         {
+             jlong tid = env->CallLongMethod(thread, getIdMethod);
+             j["threadID"] = tid;
+         }
+         else
+         {
+             if (verbose >= ERROR)
+                 fprintf (stderr, "Error calling GetMethodID for java/lang/Thread.getId()J\n");
+         }
+    }
+    else
+    {
+        printf ("Error calling FindClass for java/lang/Thread\n");
+    }
+}
+
+void EventConfig::getOSThreadID(jvmtiEnv *jvmtiEnv, jthread thread, json& j) {
+    /* We need to use OpenJ9 JVMTI extension functions */
+    jvmtiError error;
+    if (ExtensionFunctions::_osThreadID)
+    {
+        jlong threadID = 0;
+        /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
+        error = (ExtensionFunctions::_osThreadID)(jvmtiEnv, thread, &threadID);
+        if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
+        {
+            j["threadNativeID"] = threadID;
+        }
+    }
+}
+
 void EventConfig::getStackTrace(jvmtiEnv *jvmtiEnv, jthread thread, json& j, jint stackTraceDepth) {
     if (stackTraceDepth > 0)
     {

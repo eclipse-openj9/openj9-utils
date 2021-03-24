@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <atomic>
+#include <regex>
 
 using json = nlohmann::json;
 
@@ -54,18 +55,36 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
     {          
         json j;
         j["methodNum"] = numMethods;
+
+        /* retrieve the filter, if any */
+        auto filter = methodEnterConfig.getFilter();
+        bool classFilter = std::get<0>(filter);
+        bool methodFilter = std::get<1>(filter);
+        bool signatureFilter = std::get<2>(filter);
         
         char *name_ptr;
         char *signature_ptr;
         jvmtiError err = jvmtiEnv->GetMethodName(method, &name_ptr, &signature_ptr, NULL);
         if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Name.\n")) 
         {
-            j["methodName"] = name_ptr;
-            j["methodSig"] = signature_ptr;
+            bool abort = false;
+            std::regex &methodRegex    = std::get<4>(filter);
+            std::regex &signatureRegex = std::get<5>(filter);
+            if ((methodFilter    && !std::regex_search(name_ptr, methodRegex)) ||
+                (signatureFilter && !std::regex_search(signature_ptr, signatureRegex)))
+                abort = true;
+            
+            if (!abort)
+            {
+                j["methodName"] = name_ptr;
+                j["methodSig"] = signature_ptr;
+            }
             err = jvmtiEnv->Deallocate((unsigned char*)name_ptr);
             check_jvmti_error(jvmtiEnv, err, "Unable to deallocate name_ptr.\n");
             err = jvmtiEnv->Deallocate((unsigned char*)signature_ptr);
             check_jvmti_error(jvmtiEnv, err, "Unable to deallocate signature_ptr.\n");
+            if (abort)
+                return;
         }
         else
         {
@@ -81,14 +100,20 @@ JNIEXPORT void JNICALL MethodEntry(jvmtiEnv *jvmtiEnv,
             err = jvmtiEnv->GetClassSignature(declaring_class, &declaringClassName, NULL);
             if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class Signature.\n")) 
             {
-                j["methodClass"] = declaringClassName;
+                std::regex &classRegex = std::get<3>(filter);
+                bool abort = classFilter && !std::regex_search(declaringClassName, classRegex);
+                if (!abort)
+                    j["methodClass"] = declaringClassName;
                 err = jvmtiEnv->Deallocate((unsigned char*)declaringClassName);
                 check_jvmti_error(jvmtiEnv, err, "Unable to deallocate declaringClassName.\n");
+                if (abort)
+                    return;
             }
         }
 
         /* Get StackTrace */
-        methodEnterConfig.getStackTrace(jvmtiEnv, thread, j, methodEnterConfig.getStackTraceDepth());
+        if (methodEnterConfig.getStackTraceDepth() > 1)
+            methodEnterConfig.getStackTrace(jvmtiEnv, thread, j, methodEnterConfig.getStackTraceDepth());
 /*
         The following code needs "can_get_line_numbers" capability.
         Due to the high frequency of MethodEnter events it's better to keep
@@ -124,18 +149,36 @@ JNIEXPORT void JNICALL MethodExit(jvmtiEnv *jvmtiEnv,
     {          
         json j;
         j["methodNum"] = numMethods;
+
+        /* retrieve the filter, if any */
+        auto filter = methodExitConfig.getFilter();
+        bool classFilter = std::get<0>(filter);
+        bool methodFilter = std::get<1>(filter);
+        bool signatureFilter = std::get<2>(filter);
         
         char *name_ptr;
         char *signature_ptr;
         jvmtiError err = jvmtiEnv->GetMethodName(method, &name_ptr, &signature_ptr, NULL);
         if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Name.\n")) 
         {
-            j["methodName"] = name_ptr;
-            j["methodSig"] = signature_ptr;
+            bool abort = false;
+            std::regex &methodRegex    = std::get<4>(filter);
+            std::regex &signatureRegex = std::get<5>(filter);
+            if ((methodFilter    && !std::regex_search(name_ptr, methodRegex)) ||
+                (signatureFilter && !std::regex_search(signature_ptr, signatureRegex)))
+                abort = true;
+
+            if (!abort)
+            {
+                j["methodName"] = name_ptr;
+                j["methodSig"] = signature_ptr;
+            }
             err = jvmtiEnv->Deallocate((unsigned char*)name_ptr);
             check_jvmti_error(jvmtiEnv, err, "Unable to deallocate name_ptr.\n");
             err = jvmtiEnv->Deallocate((unsigned char*)signature_ptr);
             check_jvmti_error(jvmtiEnv, err, "Unable to deallocate signature_ptr.\n");
+            if (abort)
+                return;
         }
         else
         {
@@ -151,14 +194,20 @@ JNIEXPORT void JNICALL MethodExit(jvmtiEnv *jvmtiEnv,
             err = jvmtiEnv->GetClassSignature(declaring_class, &declaringClassName, NULL);
             if (check_jvmti_error(jvmtiEnv, err, "Unable to retrieve Method Declaring Class Signature.\n")) 
             {
-                j["methodClass"] = declaringClassName;
+                std::regex &classRegex = std::get<3>(filter);
+                bool abort = classFilter && !std::regex_search(declaringClassName, classRegex);
+                if (!abort)
+                    j["methodClass"] = declaringClassName;
                 err = jvmtiEnv->Deallocate((unsigned char*)declaringClassName);
                 check_jvmti_error(jvmtiEnv, err, "Unable to deallocate declaringClassName.\n");
+                if (abort)
+                    return;
             }
         }
 
         /* Get StackTrace */
-        methodExitConfig.getStackTrace(jvmtiEnv, thread, j, methodExitConfig.getStackTraceDepth());
+        if (methodExitConfig.getStackTraceDepth() > 1)
+            methodExitConfig.getStackTrace(jvmtiEnv, thread, j, methodExitConfig.getStackTraceDepth());
 
         sendToServer(j.dump(), "methodExitEvent");
     }

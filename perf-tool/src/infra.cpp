@@ -177,6 +177,24 @@ void EventConfig::setCallbacks(const std::string& cls, const std::string& method
     callbackIDs.cachedCallbackMethodId = NULL;
 }
 
+void EventConfig::setFilter(const std::string& cls, const std::string& method, const std::string& sig)
+{
+    std::lock_guard<std::mutex> lg(configMutex);
+    classFilter = !cls.empty();
+    classRegex.assign(cls);
+    methodFilter = !method.empty();
+    methodRegex.assign(method);
+    signatureFilter = !sig.empty();
+    signatureRegex.assign(sig);
+}
+
+std::tuple<bool, bool, bool, std::regex, std::regex, std::regex> EventConfig::getFilter()
+{
+    std::lock_guard<std::mutex> lg(configMutex);
+    return { classFilter, methodFilter, signatureFilter, classRegex, methodRegex, signatureRegex };
+}
+
+
 EventConfig::CallbackIDs EventConfig::getCallBackIDs(JNIEnv *env)
 {
     std::lock_guard<std::mutex> lg(configMutex);

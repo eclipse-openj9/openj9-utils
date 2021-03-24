@@ -190,7 +190,8 @@ void modifyObjectAllocEvents(const std::string& function,const std::string& comm
 }
 
 
-void modifyMethodEntryEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth)
+void modifyMethodEntryEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth,
+                             const std::string& classFilter, const std::string& methodFilter, const std::string& signatureFilter)
 {
     jvmtiError error;
     methodEnterConfig.setSampleRate(rate);
@@ -204,6 +205,7 @@ void modifyMethodEntryEvents(const std::string& function, const std::string& com
     }
     else if (!command.compare("start"))
     { 
+        methodEnterConfig.setFilter(classFilter, methodFilter, signatureFilter);
         if (verbose >= Verbose::INFO)
             printf("Processing MethodEnter start command\n");
         error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_METHOD_ENTRY, (jthread)NULL);
@@ -215,7 +217,8 @@ void modifyMethodEntryEvents(const std::string& function, const std::string& com
     }
 }
 
-void modifyMethodExitEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth)
+void modifyMethodExitEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth,
+                            const std::string& classFilter, const std::string& methodFilter, const std::string& signatureFilter)
 {
     jvmtiError error;
     methodExitConfig.setSampleRate(rate);
@@ -229,6 +232,7 @@ void modifyMethodExitEvents(const std::string& function, const std::string& comm
     }
     else if (!command.compare("start"))
     { 
+        methodExitConfig.setFilter(classFilter, methodFilter, signatureFilter);
         if (verbose >= Verbose::INFO)
             printf("Processing MethodExit start command\n");
         error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_METHOD_EXIT, (jthread)NULL);
@@ -452,11 +456,27 @@ void agentCommand(const json& jCommand)
         }
         else if (!function.compare("methodEntryEvents"))
         {
-            modifyMethodEntryEvents(function, command, sampleRate, stackTraceDepth);
+            std::string classFilter, methodFilter, signatureFilter;
+            if (jCommand.contains("filter"))
+            {
+                auto jfilter = jCommand["filter"];
+                classFilter = jfilter["class"].get<std::string>();
+                methodFilter = jfilter["method"].get<std::string>();
+                signatureFilter = jfilter["signature"].get<std::string>();
+            }
+            modifyMethodEntryEvents(function, command, sampleRate, stackTraceDepth, classFilter, methodFilter, signatureFilter);
         }
        else if (!function.compare("methodExitEvents"))
         {
-            modifyMethodExitEvents(function, command, sampleRate, stackTraceDepth);
+            std::string classFilter, methodFilter, signatureFilter;
+            if (jCommand.contains("filter"))
+            {
+                auto jfilter = jCommand["filter"];
+                classFilter = jfilter["class"].get<std::string>();
+                methodFilter = jfilter["method"].get<std::string>();
+                signatureFilter = jfilter["signature"].get<std::string>();
+            }
+            modifyMethodExitEvents(function, command, sampleRate, stackTraceDepth, classFilter, methodFilter, signatureFilter);
         }
         else if (!function.compare("exceptionEvents"))
         {

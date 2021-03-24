@@ -228,8 +228,8 @@ void Server::handleClientCommand(string command, string from)
     }
     catch (const std::exception &e)
     {
-        std::cerr << e.what() << '\n';
-        std::cerr << "Improper command received from: " << from << '\n';
+        fprintf(stderr, "%s and Improper command received from: %s \n", e.what(), from.c_str());
+        exit(0);
     }
 
     loggingClient->logData(command, "commandDigestEvent", from);

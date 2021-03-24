@@ -41,6 +41,10 @@ void check_jvmti_error_throw(jvmtiEnv *jvmti, jvmtiError errnum, const char *str
 /* returns False if error detected. */
 bool check_jvmti_error(jvmtiEnv *jvmti, jvmtiError errnum, const char *str);
 
+void getThreadName(jvmtiEnv *jvmtiEnv, jthread thread, json& j);
+void getThreadID(JNIEnv *env, jthread thread, json& j);
+void getOSThreadID(jvmtiEnv *jvmtiEnv, jthread thread, json& j);
+
 JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread);
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env);
 jthread createNewThread(JNIEnv* jni_env);
@@ -77,6 +81,7 @@ public:
 private:
     int sampleRate = 1;
     int stackTraceDepth = 0;
+    bool waitersInfo = false;
     bool methodFilter = false;
     bool signatureFilter = false;
     bool classFilter = false;
@@ -93,6 +98,8 @@ public:
     static constexpr int getMaxTraceDepth() { return MAX_TRACE_DEPTH; } 
     int getSampleRate(void) const { return sampleRate; }
     void setSampleRate(int rate) { sampleRate = (rate > 0 ? rate : 1); }
+    bool getWaitersInfo() const { return waitersInfo; }
+    void setWaitersInfo(bool waiters) { waitersInfo = waiters; }
     int getStackTraceDepth() const { return stackTraceDepth; }
     void setStackTraceDepth(int depth) { stackTraceDepth = std::min(depth, MAX_TRACE_DEPTH); }
     const std::string& getCallbackClass() const { return callbackClass; }

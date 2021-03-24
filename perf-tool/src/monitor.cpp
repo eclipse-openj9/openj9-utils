@@ -131,50 +131,36 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
     /* Get StackTrace */
     monitorConfig.getStackTrace(jvmtiEnv, thread, j, monitorConfig.getStackTraceDepth());
     /* Get the thread name */
-    jvmtiThreadInfo threadInfo;
-    error = jvmtiEnv->GetThreadInfo(thread, &threadInfo);
-    if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread info."))
-    {
-        j["threadName"] = threadInfo.name;
-        error = jvmtiEnv->Deallocate((unsigned char*)(threadInfo.name));
-        check_jvmti_error(jvmtiEnv, error, "Unable to deallocate thread name.\n");
-        // Local JNI refs to threadInfo.thread_group and threadInfo.context_class_loader will be freed upon return
-    }
+    getThreadName(jvmtiEnv, thread, j);
     /* Get Java thread ID */
-    jclass threadClass = env->FindClass("java/lang/Thread");
-    if (threadClass)
+    getThreadID(env, thread, j);
+    /* Get OS thread ID */
+    getOSThreadID(jvmtiEnv, thread, j);
+    /* get waiters info if required*/
+    if (monitorConfig.getWaitersInfo())
     {
-        jmethodID getIdMethod = env->GetMethodID(threadClass, "getId", "()J");
-        if (getIdMethod)
+        jvmtiMonitorUsage monitor_usage;
+        error = jvmtiEnv->GetObjectMonitorUsage(object, &monitor_usage);
+        if (check_jvmti_error(jvmtiEnv, error, "Unable to get Monitor usage info."))
         {
-            jlong tid = env->CallLongMethod(thread, getIdMethod);
-            j["threadID"] = tid; 
-        }
-        else
-        {
-            if (verbose >= ERROR)
-                fprintf (stderr, "Error calling GetMethodID for java/lang/Thread.getId()J\n");
-        }
-    }
-    else
-    {
-        printf ("Error calling FindClass for java/lang/Thread\n");
-    }
-
-    /* Get OS thread ID 
-     * We need to use OpenJ9 JVMTI extension functions
-     */
-    if (ExtensionFunctions::_osThreadID)
-    {
-        jlong threadID = 0;
-        /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
-        error = (ExtensionFunctions::_osThreadID)(jvmtiEnv, thread, &threadID);
-        if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
-        {
-            j["threadNativeID"] = threadID;
+            j["waitersCount"] = monitor_usage.waiter_count;
+            auto waiters_list = json::array();
+            for (int i = 0; i < monitor_usage.waiter_count; i++)
+            {
+                /* Get the waiter thread Details */
+                json j_waiter;
+                getThreadName(jvmtiEnv, monitor_usage.waiters[i], j_waiter);
+                getThreadID(env, monitor_usage.waiters[i], j_waiter);
+                getOSThreadID(jvmtiEnv, monitor_usage.waiters[i], j_waiter);
+                waiters_list.push_back(j_waiter);
+            }
+            j["waiters"] = waiters_list;
+            error = jvmtiEnv->Deallocate((unsigned char *)(monitor_usage.waiters));
+            check_jvmti_error(jvmtiEnv, error, "Unable to deallocate waiters.\n");
+            error =  jvmtiEnv->Deallocate((unsigned char *)(monitor_usage.notify_waiters));
+            check_jvmti_error(jvmtiEnv, error, "Unable to deallocate notify waiters.\n");
         }
     }
-    
     sendToServer(j.dump(), "monitorContendedEnteredEvent");
 
     /* Also call the callback */
@@ -293,47 +279,11 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
             /* Get StackTrace */
             monitorConfig.getStackTrace(jvmtiEnv, monitor_usage.owner, jOwner, stackTraceDepth);
             /* Get the thread name */
-            jvmtiThreadInfo threadInfo;
-            error = jvmtiEnv->GetThreadInfo(monitor_usage.owner, &threadInfo);
-            if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread info."))
-            {
-                jOwner["threadName"] = threadInfo.name;
-                error = jvmtiEnv->Deallocate((unsigned char*)(threadInfo.name));
-                check_jvmti_error(jvmtiEnv, error, "Unable to deallocate thread name.\n");
-                // Local JNI refs to threadInfo.thread_group and threadInfo.context_class_loader will be freed upon return
-            }
+            getThreadName(jvmtiEnv, monitor_usage.owner, jOwner);
             /* Get Java thread ID */
-            jclass threadClass = env->FindClass("java/lang/Thread");
-            if (threadClass)
-            {
-                jmethodID getIdMethod = env->GetMethodID(threadClass, "getId", "()J");
-                if (getIdMethod)
-                {
-                    jlong tid = env->CallLongMethod(monitor_usage.owner, getIdMethod);
-                    jOwner["threadID"] = tid;
-                }
-                else
-                {
-                    printf ("Error calling GetMethodID for java/lang/Thread.getId()J\n");
-                }
-            }
-            else
-            {
-                printf ("Error calling FindClass for java/lang/Thread\n");
-            }
-            /* Get OS thread ID
-             * We need to use OpenJ9 JVMTI extension functions
-             */
-            if (ExtensionFunctions::_osThreadID)
-            {
-                jlong threadID = 0;
-                /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
-                error = (ExtensionFunctions::_osThreadID)(jvmtiEnv, monitor_usage.owner, &threadID);
-                if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
-                {
-                    jOwner["threadNativeID"] = threadID;
-                }
-            }
+            getThreadID(env, monitor_usage.owner, jOwner);
+            /* Get OS thread ID */
+            getOSThreadID(jvmtiEnv, monitor_usage.owner, jOwner);
             j["OwnerThread"] = jOwner;
         }
     }
@@ -341,47 +291,11 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
     /* Get StackTrace */
     monitorConfig.getStackTrace(jvmtiEnv, thread, jCurrent, stackTraceDepth);
     /* Get the current thread name */
-    jvmtiThreadInfo threadInfo;
-    error = jvmtiEnv->GetThreadInfo(thread, &threadInfo);
-    if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread info."))
-    {
-        jCurrent["threadName"] = threadInfo.name;
-        error = jvmtiEnv->Deallocate((unsigned char*)(threadInfo.name));
-        check_jvmti_error(jvmtiEnv, error, "Unable to deallocate thread name.\n");
-        // Local JNI refs to threadInfo.thread_group and threadInfo.context_class_loader will be freed upon return
-    }
+    getThreadName(jvmtiEnv, thread, jCurrent);
     /* Get Java thread ID */
-    jclass threadClass = env->FindClass("java/lang/Thread");
-    if (threadClass)
-    {
-        jmethodID getIdMethod = env->GetMethodID(threadClass, "getId", "()J");
-        if (getIdMethod)
-        {
-            jlong tid = env->CallLongMethod(thread, getIdMethod);
-            jCurrent["threadID"] = tid;
-        }
-        else
-        {
-            printf ("Error calling GetMethodID for java/lang/Thread.getId()J\n");
-        }
-    }
-    else
-    {
-        printf ("Error calling FindClass for java/lang/Thread\n");
-    }
-    /* Get OS thread ID
-     * We need to use OpenJ9 JVMTI extension functions
-     */
-    if (ExtensionFunctions::_osThreadID)
-    {
-        jlong threadID = 0;
-        /* jvmtiError GetOSThreadID(jvmtiEnv* jvmti_env, jthread thread, jlong * threadid_ptr); */
-        error = (ExtensionFunctions::_osThreadID)(jvmtiEnv, thread, &threadID);
-        if (check_jvmti_error(jvmtiEnv, error, "Unable to retrieve thread ID."))
-        {
-            jCurrent["threadNativeID"] = threadID;
-        }
-    }
+    getThreadID(env, thread, jCurrent);
+    /* Get OS thread ID */
+    getOSThreadID(jvmtiEnv, thread, jCurrent);
     j["CurrentThread"] = jCurrent;
     sendToServer(j.dump(), "MonitorContendedEnterEvent");
 

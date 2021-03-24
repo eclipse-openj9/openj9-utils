@@ -73,13 +73,14 @@ void invalidStackTraceDepth(const std::string& function, const std::string& comm
 }
 
 void modifyMonitorEvents(const std::string& function, const std::string& command, int rate, int stackTraceDepth,
-                         const std::string& callbackClass, const std::string& callbackMethod, const std::string& callbackSignature)
+                         const std::string& callbackClass, const std::string& callbackMethod, const std::string& callbackSignature, bool waitersInfo)
 {
     jvmtiCapabilities capa;
     jvmtiError error;
 
     memset(&capa, 0, sizeof(jvmtiCapabilities));
     monitorConfig.setSampleRate(rate);
+    monitorConfig.setWaitersInfo(waitersInfo);
     monitorConfig.setStackTraceDepth(stackTraceDepth);
     monitorConfig.setCallbacks(callbackClass, callbackMethod, callbackSignature);
     if (!command.compare("start"))
@@ -417,15 +418,14 @@ void agentCommand(const json& jCommand)
     std::string callbackMethod;
     std::string callbackSignature;
     if (jCommand.contains("callback"))
-        {
+    {
         auto jcallback = jCommand["callback"];
         callbackClass = jcallback["class"].get<std::string>();
         callbackMethod = jcallback["method"].get<std::string>();
         callbackSignature = jcallback["signature"].get<std::string>();
         if (verbose == INFO)
             printf("Found callback: %s.%s%s\n", callbackClass.c_str(), callbackMethod.c_str(), callbackSignature.c_str());
-        }
- 
+    }
 
     jvmti->GetPhase(&phase);
     if (!(phase == JVMTI_PHASE_ONLOAD || phase == JVMTI_PHASE_LIVE))
@@ -436,7 +436,19 @@ void agentCommand(const json& jCommand)
     {
         if (!function.compare("monitorEvents"))
         {
-            modifyMonitorEvents(function, command, sampleRate, stackTraceDepth, callbackClass, callbackMethod, callbackSignature);
+            bool waitersInfo = false; /* default is not to print waiters info */
+            if (jCommand.contains("waitersInfo"))
+            {
+                try
+                {
+                    waitersInfo = jCommand["waitersInfo"].get<bool>();
+                }
+                catch (const std::exception& e)
+                {
+                    fprintf(stderr, "%s Received from waitersInfo field\n", e.what());
+                }
+            }
+            modifyMonitorEvents(function, command, sampleRate, stackTraceDepth, callbackClass, callbackMethod, callbackSignature, waitersInfo);
         }
         else if (!function.compare("objectAllocEvents"))
         {

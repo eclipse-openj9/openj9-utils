@@ -107,7 +107,7 @@ void LoggingClient::logData(const string message, std::string event, const std::
         {
             log["body"] = log.parse(message);
         }
-        catch(const std::exception& e)
+        catch (const std::exception& e)
         {
             log["body"] = message;
         }
@@ -128,8 +128,15 @@ CommandClient::CommandClient(const string filename)
             printf("filename: %s\n", filename.c_str());
         perror("ERROR opening commands file");
     }
-
-    commands = json::parse(commandsFile);
+    try
+    {
+        commands = json::parse(commandsFile);
+    }
+    catch (const std::exception& e)
+    {
+        fprintf(stderr, "%s and Improper command received from: %s \n", e.what(), filename.c_str());
+        exit(0);
+    }
 }
 
 void CommandClient::closeFile(void)

@@ -74,7 +74,7 @@ protected:
 public:
 private:
     int currentInterval = ServerConstants::COMMAND_INTERVALS;
-    std::ifstream commandsFile;
+    FILE * commandsFile;
     json commands;
 
     /*

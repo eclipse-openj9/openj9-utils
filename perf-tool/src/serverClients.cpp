@@ -121,12 +121,11 @@ void LoggingClient::logData(const string message, std::string event, const std::
 
 CommandClient::CommandClient(const string filename)
 {
-    commandsFile.open(filename);
-    if (!commandsFile.is_open())
+    commandsFile = fopen(filename.c_str() ,"r");
+    if (commandsFile == NULL)
     {
-        if (verbose >= ERROR)
-            printf("filename: %s\n", filename.c_str());
-        perror("ERROR opening commands file");
+        fprintf(stderr, "commands file %s doesn't exists\n", filename.c_str());
+        exit(0);
     }
     try
     {
@@ -141,9 +140,9 @@ CommandClient::CommandClient(const string filename)
 
 void CommandClient::closeFile(void)
 {
-    if (commandsFile.is_open())
+    if (commandsFile)
     {
-        commandsFile.close();
+        fclose(commandsFile);
     }
 }
 

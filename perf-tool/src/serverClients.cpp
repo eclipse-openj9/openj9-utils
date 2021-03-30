@@ -68,37 +68,37 @@ void NetworkClient::closeFd(void)
 
 LoggingClient::LoggingClient(const string filename)
 {
-    logFile.open(filename);
-    if (!logFile.is_open())
+    logFile = fopen(filename.c_str() ,"a");
+    if (logFile == NULL)
     {
-        perror("ERROR opening logs file");
+        fprintf(stderr, "Error opening  %s\n", filename.c_str());
     }
     else
     {
-        logFile << "[" << endl;
+        fputs("[\n", logFile);
     }
 }
 
 void LoggingClient::closeFile(void)
 {
-    if (logFile.is_open())
+    if (logFile)
     {
         /* Delete last comma to make a proper json array */
-        long currentPos = logFile.tellp();
-        logFile.seekp(currentPos - 2);
-        logFile << '\n' << "]" << endl;
+        long currentPos = ftell(logFile);
+        fseek(logFile, currentPos - 2, SEEK_SET);
+        fputs("\n]\n", logFile);
         
-        logFile.close();
+        fclose(logFile);
     }
 }
 
 void LoggingClient::logData(const string message, std::string event, const std::string receivedFrom)
 {
-    if (logFile.is_open())
+    if (logFile)
     {
         json log;
         auto currentClockTime = std::chrono::system_clock::now();
-	long long int nano = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
+        long long int nano = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
         
         /* If message was a proper json, log as formatted json
          * otherwise log the string as it is
@@ -115,7 +115,9 @@ void LoggingClient::logData(const string message, std::string event, const std::
         log["from"] = receivedFrom;
         log["eventType"] = event;
         log["timestamp"] = nano;
-        logFile << log.dump(2, ' ', true) << ',' << endl;
+        std::string s = log.dump(2, ' ', true);
+        fputs(s.c_str(), logFile);
+        fputs(",\n", logFile);
     }
 }
 

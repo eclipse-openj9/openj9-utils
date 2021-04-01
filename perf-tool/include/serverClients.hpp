@@ -24,7 +24,6 @@
 #define SERVERCLIENTS_H_
 
 #include <string>
-#include <fstream>
 #include <unistd.h>
 
 #include "json.hpp"
@@ -99,7 +98,7 @@ class LoggingClient
 protected:
 public:
 private:
-    std::ofstream logFile;
+    FILE * logFile;
 
     /*
      * Function members

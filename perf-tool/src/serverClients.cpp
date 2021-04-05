@@ -92,26 +92,14 @@ void LoggingClient::closeFile(void)
     }
 }
 
-void LoggingClient::logData(const string message, std::string event, const std::string receivedFrom)
+void LoggingClient::logData(const json& message, std::string event, const std::string receivedFrom)
 {
     if (logFile)
     {
         json log;
         auto currentClockTime = std::chrono::system_clock::now();
         long long int nano = std::chrono::duration_cast<std::chrono::nanoseconds>(currentClockTime.time_since_epoch()).count();
-        
-        /* If message was a proper json, log as formatted json
-         * otherwise log the string as it is
-         */
-        try
-        {
-            log["body"] = log.parse(message);
-        }
-        catch (const std::exception& e)
-        {
-            log["body"] = message;
-        }
-        
+        log["body"] = message;
         log["from"] = receivedFrom;
         log["eventType"] = event;
         log["timestamp"] = nano;

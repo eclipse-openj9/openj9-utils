@@ -109,7 +109,7 @@ public:
     LoggingClient(const std::string filename);
 
     void closeFile(void);
-    void logData(const std::string data, std::string event, const std::string receivedFrom);
+    void logData(const json& data, std::string event, const std::string receivedFrom);
 };
 
 #endif

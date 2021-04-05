@@ -181,5 +181,5 @@ JNIEXPORT void JNICALL Exception(jvmtiEnv *jvmtiEnv,
         }
     }
 
-    sendToServer(jdata.dump(), "exceptionEvent");
+    sendToServer(jdata, "exceptionEvent");
 }

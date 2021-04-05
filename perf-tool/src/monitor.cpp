@@ -171,7 +171,7 @@ JNIEXPORT void JNICALL MonitorContendedEntered(jvmtiEnv *jvmtiEnv, JNIEnv *env, 
             check_jvmti_error(jvmtiEnv, error, "Unable to deallocate notify waiters.\n");
         }
     }
-    sendToServer(j.dump(), "monitorContendedEnteredEvent");
+    sendToServer(j, "monitorContendedEnteredEvent");
 
     /* Also call the callback */
     
@@ -310,7 +310,7 @@ JNIEXPORT void JNICALL MonitorContendedEnter(jvmtiEnv *jvmtiEnv, JNIEnv *env, jt
     /* Get OS thread ID */
     getOSThreadID(jvmtiEnv, thread, jCurrent);
     j["CurrentThread"] = jCurrent;
-    sendToServer(j.dump(), "MonitorContendedEnterEvent");
+    sendToServer(j, "MonitorContendedEnterEvent");
 
     /* Also call the callback */
 

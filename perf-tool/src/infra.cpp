@@ -317,7 +317,7 @@ void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void *p)
     server->handleServer();
 }
 
-void sendToServer(const std::string message, std::string event)
+void sendToServer(const json& message, std::string event)
 {
     server->handleMessagingClients(message, event);
 }

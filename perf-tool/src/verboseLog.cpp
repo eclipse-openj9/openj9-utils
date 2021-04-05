@@ -84,8 +84,7 @@ jvmtiError verboseSubscriberCallback(jvmtiEnv *jvmti_env, const char *record, jl
 {
     if (verboseSampleCount % verboseSampleRate == 0)
     {
-        string s = string(record);
-        sendToServer(s, "verboseGCEvent");
+        sendToServer(record, "verboseGCEvent");
     }
 
     verboseSampleCount++;
@@ -95,6 +94,5 @@ jvmtiError verboseSubscriberCallback(jvmtiEnv *jvmti_env, const char *record, jl
 
 void verboseAlarmCallback(jvmtiEnv *jvmti_env, void *subscription_id, void *user_data)
 {
-    string s = string("ERROR subscriber returned error");
-    sendToServer(s, "verboseAlarmEvent");
+    sendToServer("ERROR subscriber returned error", "verboseAlarmEvent");
 }

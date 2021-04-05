@@ -67,7 +67,7 @@ public:
     void handleServer(void);
 
     /* Handle the message queue, and sends to all clients */
-    void handleMessagingClients(std::string message, std::string event);
+    void handleMessagingClients(const json& message, std::string event);
 
     /* Closes all open files, connectend socketfd, and then the server's socket */
     void shutDownServer(void);
@@ -78,7 +78,7 @@ private:
 
     void execCommand(json command);
 
-    void sendMessage(const int socketFd, const std::string message);
+    void sendMessage(const int socketFd, const json& message, std::string event, const std::string receivedFrom);
 
     void startPerfThread(int time);
 };

@@ -45,6 +45,7 @@
 
 using namespace std;
 using json = nlohmann::json;
+std::mutex Server::serverMutex;
 
 Server::Server(int portNo, const string &commandFileName, const string &logFileName)
 {

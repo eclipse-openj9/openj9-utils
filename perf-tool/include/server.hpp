@@ -27,6 +27,7 @@
 #include <thread>
 #include <poll.h>
 #include <vector>
+#include <mutex>
 
 #include "serverClients.hpp"
 #include "json.hpp"
@@ -46,6 +47,7 @@ class Server
      */
 protected:
 public:
+    static std::mutex serverMutex;
 private:
     int serverSocketFd = -1, activeNetworkClients = 0, portNo;
     bool headlessMode = true, keepPolling = true;

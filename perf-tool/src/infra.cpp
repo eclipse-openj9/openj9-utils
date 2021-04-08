@@ -319,10 +319,16 @@ void JNICALL startServer(jvmtiEnv * jvmti, JNIEnv* jni, void *p)
 
 void sendToServer(const json& message, std::string event)
 {
-    server->handleMessagingClients(message, event);
+    /* Must make sure the server is not shutdown while we use it 
+       The lock also makes sure that output from different JVM 
+       threads is not interleaved */
+    std::lock_guard<std::mutex> lg(Server::serverMutex);
+    if (server)
+        server->handleMessagingClients(message, event);
 }
 
-JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) {
+JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread thread) 
+{
     jvmtiError error;
     server = new Server(portNo, commandsPath, logPath);
 
@@ -332,14 +338,16 @@ JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread threa
         printf("VM starting up.\n");
 }
 
-JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env) {
+JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env) 
+{
     if (verbose >= INFO)
         printf("VM shutting down.\n");
+
+    std::lock_guard<std::mutex> lg(Server::serverMutex);
     if (server)
     {
         server->shutDownServer();
         delete server;
         server = NULL;
     }
-
 }

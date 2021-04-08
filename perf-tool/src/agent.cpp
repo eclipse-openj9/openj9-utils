@@ -50,77 +50,69 @@ int portNo = ServerConstants::DEFAULT_PORT;
 std::string commandsPath = "";
 std::string logPath = "logs.json";
 int verbose = NONE;
+bool enableMethodEnterCapability = false;
+
+void parseSingleOption(std::string token)
+{
+    const std::string pathDelim = ":";
+    auto pos = token.find(pathDelim);
+    if (pos != std::string::npos)
+        {
+        std::string optionName = token.substr(0, pos);
+        std::string optionValue = token.substr(pos + pathDelim.length());
+        if (!optionName.compare("commandFile"))
+        {
+            commandsPath = optionValue;
+        }
+        else if (!optionName.compare("logFile"))
+        {
+            logPath = optionValue;
+        }
+        else if (!optionName.compare("portNo"))
+        {
+            portNo = stoi(optionValue);
+        }
+        else if (!optionName.compare("verbose"))
+        {
+            verbose = static_cast<Verbose>(stoi(optionValue));
+        }
+        else if (!optionName.compare("methodEnterCapability"))
+        {
+            enableMethodEnterCapability = (optionValue.compare("on") == 0 ? true : false);
+        }
+        else
+        {
+            fprintf(stderr, "Warning: ignoring unknown option: %s\n", optionName.c_str());
+        }
+    }
+    else
+    {
+        fprintf(stderr, "Warning: ignoring option because no value found for it: %s\n", token.c_str());
+    }
+}
 
 void parseAgentOptions(const char *options)
 {
     const std::string optionsDelim = ",";
-    const std::string pathDelim = ":";
     std::string oIn(options);
-    int pos1, pos2 = 0;
+    int pos1 = 0;
     
-    /* there is a max of four options the user can supply here
+    /* Possible options the user can supply here:
      * "commands" is followed by a path to the commands file
      * "log" is followed by the path to the location for the log file
      * "portNo" is followed by a number indicating the port to run the server on
-     * "verbose" is used to indicate the degree of verbosity to show the 
-     * additional information
+     * "verbose" is used to indicate the degree of verbosity to show the additional information
+     * "methodEnterCapability" is followed by "on" of "off" (default is "off")
      */
     while ((pos1 = oIn.find(optionsDelim)) != std::string::npos)
     {
         std::string token = oIn.substr(0, pos1);
-        if ((pos2 = token.find(pathDelim)) != std::string::npos)
-        {
-            if (!token.substr(0, pos2).compare("commandFile"))
-            {
-                token.erase(0, pos2 + pathDelim.length());
-                commandsPath = token;
-            }
-            else if (!token.substr(0, pos2).compare("logFile"))
-            {
-                token.erase(0, pos2 + pathDelim.length());
-                logPath = token;
-            }
-            else if (!token.substr(0, pos2).compare("portNo"))
-            {
-                token.erase(0, pos2 + pathDelim.length());
-                portNo = stoi(token);
-            }
-            else if (!token.substr(0, pos2).compare("verbose"))
-            {
-                token.erase(0, pos2 + pathDelim.length());
-                verbose = static_cast<Verbose>(stoi(token));
-            }
-        }
-	    
+        parseSingleOption(token);
         oIn.erase(0, pos1 + optionsDelim.length());
     }
     if (!oIn.empty())
     {
-        std::string token = oIn;
-        if ((pos2 = token.find(pathDelim)) != std::string::npos)
-        {
-            if (!token.substr(0, pos2).compare("commandFile"))
-            {
-                token.erase(0, pos2 + pathDelim.length());
-                commandsPath = token;
-            }
-            else if (!token.substr(0, pos2).compare("logFile"))
-            {
-                token.erase(0, pos2 + pathDelim.length());
-                logPath = token;
-            }
-            else if (!token.substr(0, pos2).compare("portNo"))
-            {
-                token.erase(0, pos2 + pathDelim.length());
-                portNo = stoi(token);
-            }
-            else if (!token.substr(0, pos2).compare("verbose"))
-            {
-                token.erase(0, pos2 + pathDelim.length());
-                verbose = static_cast<Verbose>(stoi(token));
-	
-            }
-        }
+        parseSingleOption(oIn);
     }
 
     if (verbose != ERROR && verbose != WARN && verbose != INFO)
@@ -134,6 +126,7 @@ void parseAgentOptions(const char *options)
         printf("path to command: %s\n", commandsPath.c_str());
         printf("logpath: %s\n", logPath.c_str());
         printf("port number: %i\n", portNo);
+        printf("methodEnter/Exit capability enabled: %d\n", enableMethodEnterCapability);
     }
 }
 
@@ -229,12 +222,15 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
     if (error != JVMTI_ERROR_NONE)
         return JNI_ERR;
 
-    jvmtiCapabilities capa;
-    memset(&capa, 0, sizeof(jvmtiCapabilities));
-    capa.can_generate_method_entry_events = 1; /* this one can only be added during the load phase */
-    capa.can_generate_method_exit_events = 1;
-    error = jvmti->AddCapabilities(&capa);
-    check_jvmti_error(jvmti, error, "Unable to init MethodEnter capability.");
+    if (enableMethodEnterCapability)
+        {
+        jvmtiCapabilities capa;
+        memset(&capa, 0, sizeof(jvmtiCapabilities));
+        capa.can_generate_method_entry_events = 1; /* this one can only be added during the load phase */
+        capa.can_generate_method_exit_events = 1;
+        error = jvmti->AddCapabilities(&capa);
+        check_jvmti_error(jvmti, error, "Unable to init MethodEnter/Exit capability.");
+        }
 
     error = jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_INIT, (jthread)NULL);
     check_jvmti_error(jvmti, error, "Unable to init VM init event.");

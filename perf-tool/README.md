@@ -34,8 +34,9 @@ These commands are passed to the agent on start up. The format of the commands s
 | --- | ---| --- |
 | commandFile | Path to file | Provide the agent with a path to a file containing commands (see [Function Commands](#function-commands)) that will be fed to the agent in headless mode |
 | logFile | Path to file | Provide the agent with a location to place a log file for agent output. The agent will create a new file if it does not exist. |
-| portNo | Port Number | Provide the agent with a port to start the server on. The default port is 9002.  
+| portNo | Port Number | Provide the agent with a port to start the server on. The default port is 9002. | 
 | verbose | 1,2,3 | Provide the agent with a degree of verbosity to show the additional information. |
+| methodEnterCapability | "on" or "off" | Allow agent to collect method enter/exit traces. Default is "off" |
 
 
 # Function Commands

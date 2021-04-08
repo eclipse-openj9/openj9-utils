@@ -333,12 +333,13 @@ JNIEXPORT void JNICALL VMInit(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env, jthread threa
 }
 
 JNIEXPORT void JNICALL VMDeath(jvmtiEnv *jvmtiEnv, JNIEnv* jni_env) {
+    if (verbose >= INFO)
+        printf("VM shutting down.\n");
     if (server)
     {
         server->shutDownServer();
         delete server;
         server = NULL;
     }
-    if (verbose >= WARN)
-        printf("VM shutting down.\n");
+
 }

@@ -35,8 +35,12 @@ std::atomic<int> verboseSampleRate {1};
 
 void VerboseLogSubscriber::setVerboseGCLogSampleRate(int rate) 
 {
-    if (rate > 0)
-        verboseSampleRate = rate;
+    if (rate > 1)
+    {
+        if (verbose >= Verbose::INFO)
+            printf("Resetting sampling rate to 1 to avoid inconsistency in output data\n");
+        verboseSampleRate = 1;
+    }
 }
 
 void VerboseLogSubscriber::Subscribe()

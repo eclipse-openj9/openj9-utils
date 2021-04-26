@@ -246,6 +246,7 @@ void Server::sendMessage(const int socketFd, const json& message, std::string ev
     log["eventType"] = event;
     log["timestamp"] = nano;
     std::string result = log.dump(2, ' ', true);
+    result += ",\n";
     int n, total = 0;
     size_t length = result.size();
     const char *buffer = result.data();
@@ -292,7 +293,7 @@ void Server::shutDownServer()
         perfThread.join();
     }
 
-    handleMessagingClients("Server shutting down", "");
+    handleMessagingClients("Server shutting down", "ShutdownEvent");
 
     /* close off commands, logs, and network client sockets */
     for (int i = 0; i < activeNetworkClients; i++)

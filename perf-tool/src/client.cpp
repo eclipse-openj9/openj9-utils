@@ -23,6 +23,7 @@
 #include "client.hpp"
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
@@ -37,9 +38,10 @@
 
 using namespace std;
 
-Client::Client(int _portno, const string _hostname, bool _interactive_mode)
+Client::Client(int _portno, const string _clientLogPath, const string _hostname, bool _interactive_mode)
 {
     portno = _portno;
+    clientLogPath = _clientLogPath;
     hostname = _hostname;
     interactive_mode = _interactive_mode;
 }
@@ -76,10 +78,32 @@ void Client::openServerConnection()
     }
 }
 
+void Client::openFile()
+{
+    clientLogFile = fopen(clientLogPath.c_str() ,"a");
+    if (clientLogFile == NULL)
+        fprintf(stderr, "Error opening  %s\n", clientLogPath.c_str());
+    else
+        fputs("[\n", clientLogFile);
+}
+
+void Client::closeFile()
+{
+     if (clientLogFile)
+     {
+         /* Delete last comma to make a proper json array */
+         long currentPos = ftell(clientLogFile);
+         fseek(clientLogFile, currentPos - 2, SEEK_SET);
+         fputs("\n]\n", clientLogFile);
+         fclose(clientLogFile);
+     }
+}
+
 void Client::startClient()
 {
 
     openServerConnection();
+    openFile();
 
     if (interactive_mode)
     {
@@ -122,6 +146,7 @@ void Client::handlePolling()
         }
     }
 
+    closeFile();
     closeClient();
 }
 
@@ -147,7 +172,7 @@ void Client::receiveMessage(char buffer[])
 
     if (n > 0)
     {
-        printf("Received: %s\n", buffer);
+        fputs(buffer, clientLogFile);
 
         if (string(buffer).find("done") != string::npos)
         {
@@ -162,20 +187,76 @@ void Client::closeClient()
     close(socketFd);
     printf("Closed connection with server.\n");
 }
+void printUsage()
+{
+    printf("Usage: ./a.out [OPTIONS]\n\n"
+            "Options:\n"
+            "--p, --portNo=Port          Specify port number to connect to server\n"
+            "--l, --log=logname          Specify Output file name, default log is clientLogs.json\n"
+            "--h, --host=hostname        Specify host, default is localhost\n"
+            "--u, --usage                shows usage\n\n"
+            "Eg: ./a.out --portNo=9002 --log=log.json --host=localhost\n"
+            "(OR) Use Short_Options: ./a.out --p=9002 --l=log.json --h=localhost\n");
+}
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
     string hostname = "localhost";
+    std::string clientLogPath = "clientLogs.json";
     int portno = ServerConstants::DEFAULT_PORT;
+    static struct option long_options[] = {
+        {"portNo", optional_argument, 0, 'p'},
+        {"host", optional_argument, 0, 'h'},
+        {"log", optional_argument, 0, 'l'},
+        {"usage", no_argument, 0, 'u'},
+        {0, 0, 0, 0}
+    };
+    int c, index;
+    while (true) {
+        c = getopt_long(argc, argv, ":hlpu", long_options, &index);
+        if (c == -1)
+            break;
+        switch (c) {
+            case 'h':
+                if (optarg)
+                    hostname = optarg;
+                else
+                    printf("No argument passed to hostname using default\n");
+                break;
 
-    if (argc > 1)
-    {
-        portno = atoi(argv[1]);
-        if (argc > 2)
-            hostname = argv[2];
-    }
+            case 'l':
+                if (optarg)
+                    clientLogPath = optarg;
+                else
+                    printf("No argument passed to log using default\n");
+                break;
 
-    Client client(portno, hostname, true);
+            case 'p':
+                if (optarg)
+                {
+                    portno = atoi(optarg);
+                }
+                else
+                {
+                    printf("specify portNo to connect to server\n");
+                    exit(0);
+                }
+                break;
+
+            case 'u':
+                printUsage();
+                break;
+
+            case '?':
+                printf("Unknown Option\n");
+                break;
+
+            default:
+                printf("?? getopt returned character code 0%o ??\n", c);
+                break;
+        }
+    }    
+    Client client(portno, clientLogPath, hostname, true);
 
     client.startClient();
 

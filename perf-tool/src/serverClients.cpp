@@ -64,11 +64,12 @@ int NetworkClient::getSocketFd(void)
 void NetworkClient::closeFd(void)
 {
     close(socketFd);
+    socketFd = -1;
 }
 
 LoggingClient::LoggingClient(const string filename)
 {
-    logFile = fopen(filename.c_str() ,"a");
+    logFile = fopen(filename.c_str() ,"w");
     if (logFile == NULL)
     {
         fprintf(stderr, "Error opening  %s\n", filename.c_str());
@@ -89,6 +90,7 @@ void LoggingClient::closeFile(void)
         fputs("\n]\n", logFile);
         
         fclose(logFile);
+        logFile = NULL;
     }
 }
 
@@ -109,51 +111,4 @@ void LoggingClient::logData(const json& message, std::string event, const std::s
     }
 }
 
-CommandClient::CommandClient(const string filename)
-{
-    commandsFile = fopen(filename.c_str() ,"r");
-    if (commandsFile == NULL)
-    {
-        fprintf(stderr, "commands file %s doesn't exists\n", filename.c_str());
-        exit(0);
-    }
-    try
-    {
-        commands = json::parse(commandsFile);
-    }
-    catch (const std::exception& e)
-    {
-        fprintf(stderr, "%s and Improper command received from: %s \n", e.what(), filename.c_str());
-        exit(0);
-    }
-}
 
-void CommandClient::closeFile(void)
-{
-    if (commandsFile)
-    {
-        fclose(commandsFile);
-    }
-}
-
-json CommandClient::handlePoll()
-{
-    static int commandNumber = 0;
-    static const int numCommands = commands.size();
-    json j;
-
-    if (currentInterval <= 0)
-    {
-        if (commandNumber < numCommands)
-        {
-            return commands[commandNumber++];
-        }
-        currentInterval = ServerConstants::COMMAND_INTERVALS;
-    }
-    else
-    {
-        currentInterval = currentInterval - ServerConstants::POLL_INTERVALS;
-    }
-
-    return j;
-}

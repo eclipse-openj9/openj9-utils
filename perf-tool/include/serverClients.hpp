@@ -35,7 +35,7 @@ class ServerConstants
 public:
     static constexpr int NUM_CLIENTS = 5;
     static constexpr int BASE_POLLS = 1;
-    static constexpr int POLL_INTERVALS = 250;
+    static constexpr int POLL_INTERVALS = 500;
     static constexpr int COMMAND_INTERVALS = 500;
     static constexpr int BUFFER_SIZE = 512;
     static constexpr int DEFAULT_PORT = 0;
@@ -62,32 +62,6 @@ public:
     int getSocketFd(void);
     void closeFd(void);
     std::string handlePoll();
-};
-
-class CommandClient
-{
-    /*
-     * Data members
-     */
-protected:
-public:
-private:
-    int currentInterval = ServerConstants::COMMAND_INTERVALS;
-    FILE * commandsFile;
-    json commands;
-
-    /*
-     * Function members
-     */
-protected:
-private:
-    void execCommand(json command);
-
-public:
-    CommandClient(const std::string filename);
-
-    void closeFile(void);
-    json handlePoll(void);
 };
 
 class LoggingClient

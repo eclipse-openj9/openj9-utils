@@ -38,6 +38,7 @@
 #include <thread>
 #include <unistd.h>
 
+#include "server.hpp"
 #include "agentOptions.hpp"
 #include "perf.hpp"
 #include "utils.hpp"
@@ -51,17 +52,48 @@ Server::Server(int portNo, const string &commandFileName, const string &logFileN
 {
     this->portNo = portNo;
 
+    loggingClient = new LoggingClient(logFileName);
+    loggingClient->logData("Server started", "serverStartEvent", "Server");
+
     if (commandFileName != "")
     {
-        commandClient = new CommandClient(commandFileName);
+        FILE *commandsFile = fopen(commandFileName.c_str() ,"r");
+        if (commandsFile == NULL)
+        {
+            fprintf(stderr, "commands file %s doesn't exists\n", commandFileName.c_str());
+            exit(0);
+        }
+        json commands;
+        try
+        {
+            commands = json::parse(commandsFile);
+        }
+        catch (const std::exception& e)
+        {
+            fprintf(stderr, "%s\n Improper command received from: %s \n", e.what(), commandFileName.c_str());
+            exit(0);
+        }
+        fclose(commandsFile);
+
+        for (int i=0; i < commands.size(); i++)
+        {
+            /* Add this command to the ordered queue of commands */
+            enqueueCommand(commands[i]);
+            loggingClient->logData(commands[i], "commandDigestEvent", "Commands file");
+        }
+      
+        /* Print commands */
+        if (verbose >= Verbose::INFO)
+        {
+            printf("Commands from command file %s:\n", commandFileName.c_str());
+            for (auto it : delayedCommands)
+                printf("%s\n", it.command.dump().c_str());
+        }
     }
     else
     {
         headlessMode = false;
     }
-
-    loggingClient = new LoggingClient(logFileName);
-    loggingClient->logData("Server started", "serverStartEvent", "Server");
 }
 
 void Server::handleServer()
@@ -109,132 +141,187 @@ void Server::handleServer()
         pollFds[0].revents = 0;
     }
     
-    if (verbose >= WARN)
+    if (verbose >= Verbose::WARN)
         printf("Server started.\n");
 
-    /* Use polling to keep track of clients and keyboard input */
-    while (keepPolling)
+    /* Use polling to keep track of network clients */
+    if (serverSocketFd > 0)
     {
-        if (serverSocketFd >= 0)
+        while (keepPolling)
         {
-            if (poll(pollFds, activeNetworkClients + ServerConstants::BASE_POLLS, ServerConstants::POLL_INTERVALS) == -1)
+            int pollTimeMillis = ServerConstants::POLL_INTERVALS;
+            if (!delayedCommands.empty())
+            {
+                int nextOperationDelay = executeAllDueCommands();
+                if (nextOperationDelay > 0)
+                    pollTimeMillis = std::min(nextOperationDelay*1000, pollTimeMillis);
+            }
+            int pollResult = poll(pollFds, activeNetworkClients + ServerConstants::BASE_POLLS, pollTimeMillis);
+            if (pollResult == -1)
             {
                 perror("ERROR on polling, server will now shut down");
                 break;
             }
 
-            if (activeNetworkClients < ServerConstants::NUM_CLIENTS && (pollFds[0].revents & POLLIN))
+            if (pollResult > 0) /* data is ready on at least one socket */
             {
-                /* The accept() call actually accepts an incoming connection */
-                clilen = sizeof(cli_addr);
-
-                /* This accept() function will write the connecting client's address info 
-                 *into the the address structure and the size of that structure is clilen.
-                 */
-                newsocketFd = accept(serverSocketFd, (struct sockaddr *)&cli_addr, &clilen);
-                if (newsocketFd < 0)
-                    perror("ERROR on accept");
-                else
-                    networkClients[activeNetworkClients] = new NetworkClient(newsocketFd);
-                
-                if (verbose == INFO)
-                    printf("server: got connection from %s port %d\n",
-                       inet_ntoa(cli_addr.sin_addr),
-                       ntohs(cli_addr.sin_port));
-
-                /* Send a welcome message */
-                sendMessage(newsocketFd, "Connection to server succeeded", "ServerStartEvent", "Server");
-
-                /* Update number of active clients */
-                activeNetworkClients++;
-            }
-        }
-        /* Check for commands from commands file if running in headless mode */
-        if (headlessMode)
-        {
-            jsonCommand = commandClient->handlePoll();
-            if (!jsonCommand.empty())
-            {
-                command = jsonCommand.dump();
-                handleClientCommand(command, "Commands file");
-            }
-        }
-
-        /* Receiving messages to clients */
-        for (int i = 0; i < activeNetworkClients; i++)
-        {
-            command = networkClients[i]->handlePoll();
-            if (!command.empty())
-            {
-                handleClientCommand(command, "Client");
-            }
-        }
-
-        /* Checks if it is the time for any delayed command to be fired */
-        if (!delayedCommands.empty()) {
-            auto currentClockTime = std::chrono::system_clock::now();
-            std::time_t currentTime = std::chrono::system_clock::to_time_t(currentClockTime);
-
-            while(delayedCommands.size() > 0)
-            {
-                if (delayedCommands[0].delayTill <= currentTime) {
-                    agentCommand(delayedCommands[0].command);
-                    delayedCommands.erase(delayedCommands.begin());
-                } else{
-                    break;
+                /* First check for incoming commands from network clients */
+                for (int i = 0; i < activeNetworkClients; i++)
+                {
+                    int socketIndex = ServerConstants::BASE_POLLS + i;
+                    if (pollFds[socketIndex].fd < 0)
+                        continue; /* skip connections that have been closed */
+                        
+                    if (pollFds[socketIndex].revents & (POLLERR | POLLHUP | POLLNVAL))
+                    {
+                        /* Error encountered; we should close the socket */
+                        if (pollFds[socketIndex].fd > 0)
+                        {
+                            networkClients[i]->closeFd();
+                            pollFds[socketIndex].fd = -1; /* TODO: we need a linked list rather than an array */
+                        }
+                    }
+                    else if (pollFds[ServerConstants::BASE_POLLS + activeNetworkClients].revents & POLLIN)
+                    {
+                        command = networkClients[i]->handlePoll();
+                        if (!command.empty())
+                        {
+                            handleClientCommand(command, "Client");
+                        }
+                    }
                 }
+                /* Now, handle new connection requests */
+                if (pollFds[0].revents & POLLIN)
+                {
+                    /* The accept() call actually accepts an incoming connection */
+                    clilen = sizeof(cli_addr);
+
+                    /* This accept() function will write the connecting client's address info 
+                     * into the the address structure and the size of that structure is clilen.
+                     */
+                    newsocketFd = accept(serverSocketFd, (struct sockaddr *)&cli_addr, &clilen);
+                    if (newsocketFd < 0)
+                    {
+                        perror("ERROR on accept");
+                    }
+                    else
+                    {
+                        /* Check the upper limit on active connections */
+                        if (activeNetworkClients < ServerConstants::NUM_CLIENTS)
+                        {
+                            networkClients[activeNetworkClients] = new NetworkClient(newsocketFd);
+                            if (verbose >= Verbose::INFO)
+                                printf("server: got connection from %s port %d\n",
+                                        inet_ntoa(cli_addr.sin_addr),
+                                        ntohs(cli_addr.sin_port));
+
+                            /* Send a welcome message */
+                            sendMessage(newsocketFd, "Connection to server succeeded", "ServerStartEvent", "Server");
+
+                            /* Prepare for poll */
+                            int socketIndex = ServerConstants::BASE_POLLS + activeNetworkClients;
+                            pollFds[socketIndex].fd = newsocketFd;
+                            pollFds[socketIndex].events = POLLIN;
+                            pollFds[socketIndex].revents = 0;
+
+                            /* Update number of active clients */
+                            activeNetworkClients++;
+                        }
+                        else /* Too many connections */
+                        {
+                            sendMessage(newsocketFd, "Connection refused. Too many connections", "ServerStartEvent", "Server");
+                            close(newsocketFd); // TODO: send message to person that opened the socket
+                            if (verbose >= Verbose::WARN)
+                                printf("server refusing connection because there are too many\n");
+                        }
+                    }
+                } 
             }
+        }
+    }
+    else /* no network commands are allowed */
+    {
+        if (headlessMode && !delayedCommands.empty())
+        {
+            while(1) 
+            {
+                int nextOperationDelay = executeAllDueCommands();
+                if (nextOperationDelay > 0)
+                    std::this_thread::sleep_for(std::chrono::seconds(nextOperationDelay));
+                else
+                    break;
+            } 
         }
     }
 }
 
-void Server::execCommand(json command)
+int Server::executeAllDueCommands()
 {
-    if (command.find("delay") != command.end() && command["delay"].get<int>() > 0) {
-        auto currentClockTime = std::chrono::system_clock::now();
-        std::time_t currentTime = std::chrono::system_clock::to_time_t(currentClockTime);
-        std::time_t delay_till = currentTime + command["delay"].get<int>();
-
-        delayed_command_t delayedCommand;
-        delayedCommand.command = command;
-        delayedCommand.delayTill = delay_till;
-        delayedCommands.push_back(delayedCommand);
-
-        sort(delayedCommands.begin(), delayedCommands.end(),
-            [](delayed_command_t a, delayed_command_t b) {
-                if (a.delayTill < b.delayTill) {
-                    return true;
-                } else {
-                    return false;
-                }
-        });
-    }
-    else if ((command["functionality"].get<std::string>()).compare("perf"))
+    int nextOperationDelay = 0;
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    while (!delayedCommands.empty())
     {
-        agentCommand(command);
+        auto &firstEntry = delayedCommands.front();
+        if (firstEntry.delayTill <= currentTime)
+        {
+            agentCommand(firstEntry.command);
+            delayedCommands.pop_front();
+        }
+        else
+        {
+            /* find the time we need to schedule the next operation */
+            nextOperationDelay = firstEntry.delayTill - currentTime;
+            break;
+        }
+    }
+    return nextOperationDelay; /* 0 means all the commands are finished */
+}
+
+
+void Server::enqueueCommand(json command)
+{
+    int delayValue = 0;
+    if (command.find("delay") != command.end()) 
+        {
+        delayValue = command["delay"].get<int>();
+        if (delayValue < 0)
+            delayValue = 0;
+        }
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::time_t delay_till = currentTime + delayValue;
+    delayed_command_t dc(delay_till, command);
+    /* Common case is to insert at the back */
+    if (delayedCommands.empty() || delay_till >= delayedCommands.back().delayTill)
+    {
+        delayedCommands.push_back(dc);
     }
     else
     {
-        startPerfThread(command["time"]);
+        /* Search the insertion point starting from back */
+        auto rit = delayedCommands.rbegin();
+        for (; rit != delayedCommands.rend() && rit->delayTill > delay_till; ++rit)
+        {}
+        delayedCommands.insert(rit.base(), dc);
     }
 }
+
 
 void Server::handleClientCommand(string command, string from)
 {
     json com;
     try
     {
-        com = json::parse(command);
-        execCommand(com);
+        com = json::parse(command);   
     }
     catch (const std::exception &e)
     {
         fprintf(stderr, "%s and Improper command received from: %s \n", e.what(), from.c_str());
         exit(0);
     }
-
+    enqueueCommand(com);
     loggingClient->logData(com, "commandDigestEvent", from);
 }
+
 
 void Server::sendMessage(const int socketFd, const json& message, std::string event, const std::string receivedFrom)
 {
@@ -289,7 +376,7 @@ void Server::shutDownServer()
     /* wait on perf processing thread to join so its data can be sent before server closing */
     if (perfThread.joinable())
     {
-        cout << "Waiting on perf data." << endl;
+        printf("Waiting on perf data\n");
         perfThread.join();
     }
 
@@ -301,18 +388,16 @@ void Server::shutDownServer()
         sendMessage(networkClients[i]->getSocketFd(), "done", "ShutdownEvent", "Server");
         networkClients[i]->closeFd();
         delete networkClients[i];
-    }
-
-    if (headlessMode)
-    {
-        commandClient->closeFile();
-        delete commandClient;
+        networkClients[i] = NULL;
     }
 
     loggingClient->closeFile();
     delete loggingClient;
+    loggingClient = NULL;
 
     close(serverSocketFd);
+    serverSocketFd = -1;
 
-    cout << "Server shutdown." << endl;
+    if (verbose >= Verbose::INFO)
+        printf("Server shutdown.\n");
 }

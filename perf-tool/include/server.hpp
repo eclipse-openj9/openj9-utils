@@ -28,6 +28,7 @@
 #include <poll.h>
 #include <vector>
 #include <mutex>
+#include <list>
 
 #include "serverClients.hpp"
 #include "json.hpp"
@@ -36,8 +37,11 @@ using json = nlohmann::json;
 
 struct delayed_command_t
 {
-    std::time_t delayTill;
+    std::time_t delayTill; /* Although not defined, this is almost always an integral value 
+                              holding the number of seconds since 00:00, Jan 1 1970 UTC, 
+                              corresponding to POSIX time */
     json command;
+    delayed_command_t(std::time_t d, const json& c) : delayTill(d), command(c) {}
 };
 
 class Server
@@ -50,13 +54,13 @@ public:
     static std::mutex serverMutex;
 private:
     int serverSocketFd = -1, activeNetworkClients = 0, portNo;
-    bool headlessMode = true, keepPolling = true;
+    bool headlessMode = true;
+    volatile bool keepPolling = true;
     struct pollfd pollFds[ServerConstants::BASE_POLLS + ServerConstants::NUM_CLIENTS];
     NetworkClient *networkClients[ServerConstants::NUM_CLIENTS];
-    CommandClient *commandClient;
     LoggingClient *loggingClient;
     std::thread perfThread;
-    std::vector<delayed_command_t> delayedCommands;
+    std::list< delayed_command_t> delayedCommands;
 
     /*
      * Function members
@@ -74,15 +78,22 @@ public:
     /* Closes all open files, connectend socketfd, and then the server's socket */
     void shutDownServer(void);
 
+    /* Execute all commands from the priority queue which have an expired due date */
+    int executeAllDueCommands();
+
 private:
-    /* Handles recieving commands for the agent from clients */
+    /* Handles receiving commands for the agent from clients */
     void handleClientCommand(const std::string command, const std::string from);
 
-    void execCommand(json command);
+    void enqueueCommand(json command);
 
     void sendMessage(const int socketFd, const json& message, std::string event, const std::string receivedFrom);
 
     void startPerfThread(int time);
+
+    /* Executes a json command by configuring the JVM to call callbacks on certain events */
+    void agentCommand(const json& jCommand);
+
 };
 
 #endif /* SERVER_H_ */

@@ -181,7 +181,7 @@ void Server::handleServer()
                             pollFds[socketIndex].fd = -1; /* TODO: we need a linked list rather than an array */
                         }
                     }
-                    else if (pollFds[ServerConstants::BASE_POLLS + activeNetworkClients].revents & POLLIN)
+                    else if (pollFds[socketIndex].revents & POLLIN)
                     {
                         command = networkClients[i]->handlePoll();
                         if (!command.empty())

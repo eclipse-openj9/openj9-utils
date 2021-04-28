@@ -30,7 +30,5 @@ using json = nlohmann::json;
 
 extern jvmtiEnv *jvmti;
 extern JavaVM *javaVM;
-void agentCommand(const json& jCommand);
-
 
 #endif /* agent_Options_H */

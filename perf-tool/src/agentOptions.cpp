@@ -34,6 +34,7 @@
 #include "objectalloc.hpp"
 #include "exception.hpp"
 #include "methodEntry.hpp"
+#include "server.hpp"
 #include "verboseLog.hpp"
 
 #include "json.hpp"
@@ -388,7 +389,7 @@ void modifyJLM(const std::string& function, const std::string& command)
 }
 
 
-void agentCommand(const json& jCommand)
+void Server::agentCommand(const json& jCommand)
 {
     jvmtiCapabilities capa;
     jvmtiError error;
@@ -466,7 +467,7 @@ void agentCommand(const json& jCommand)
             }
             modifyMethodEntryEvents(function, command, sampleRate, stackTraceDepth, classFilter, methodFilter, signatureFilter);
         }
-       else if (!function.compare("methodExitEvents"))
+        else if (!function.compare("methodExitEvents"))
         {
             std::string classFilter, methodFilter, signatureFilter;
             if (jCommand.contains("filter"))
@@ -489,6 +490,18 @@ void agentCommand(const json& jCommand)
         else if (!function.compare("jlm"))
         {
             modifyJLM(function, command);
+        }
+        else if (!function.compare("perf"))
+        {
+            if (jCommand.contains("time"))
+            {
+                startPerfThread(jCommand["time"]);
+            }
+            else
+            {
+                if (verbose >= Verbose::WARN)
+                    printf("perf command must contain a 'time' field. Command ignored\n");
+            }
         }
         else
         {

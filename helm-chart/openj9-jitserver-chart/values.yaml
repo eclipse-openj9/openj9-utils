@@ -24,8 +24,8 @@ replicaCount: 1
 
 image:
   repository: adoptopenjdk
-  tag: jdk8u292-b10_openj9-0.26.0
-  pullPolicy: Always
+  tag: 8u292-b10-jdk-openj9-0.26.0
+  pullPolicy: IfNotPresent
 
 env:
   - name: OPENJ9_JAVA_OPTIONS

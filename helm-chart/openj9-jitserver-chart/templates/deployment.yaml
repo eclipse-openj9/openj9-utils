@@ -47,7 +47,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           command: ["/bin/bash"]
-          args: ["-c", "jitserver &> /tmp/output.log"]
+          args: ["-c", "jitserver 2>&1 | tee  /tmp/output.log"]
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

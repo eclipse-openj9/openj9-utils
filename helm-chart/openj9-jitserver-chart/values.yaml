@@ -85,7 +85,7 @@ affinity:
           operator: In
           values:
           - amd64
-          - ppc
+          - ppc64le
           - s390x
 #        - key: kubernetes.io/hostname
 #          operator: In

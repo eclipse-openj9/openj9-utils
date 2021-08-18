@@ -23,8 +23,8 @@
 replicaCount: 1
 
 image:
-  repository: adoptopenjdk
-  tag: 8u292-b10-jdk-openj9-0.26.0
+  repository: adoptopenjdk/openjdk8-openj9 
+  tag: jre8u302-b08_openj9-0.27.0
   pullPolicy: IfNotPresent
 
 env:

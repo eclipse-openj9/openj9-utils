@@ -50,7 +50,7 @@ entries:
     name: openj9-jitserver-chart
     type: application
     urls:
-    - https://github.com/eclipse-openj9/openj9-utils/files/7437792/openj9-jitserver-chart-0.29.0.tar.gz/openj9-jitserver-chart-0.29.0.tar.gz
+    - https://github.com/eclipse-openj9/openj9-utils/files/7437792/openj9-jitserver-chart-0.29.0.tar.gz
     version: 0.29.0
   - apiVersion: v2
     appVersion: 0.27.0

@@ -23,8 +23,8 @@
 replicaCount: 1
 
 image:
-  repository: adoptopenjdk/openjdk8-openj9 
-  tag: jre8u302-b08_openj9-0.27.0
+  repository: ibm-semeru-runtimes
+  tag: open-8u312-b07-jre
   pullPolicy: IfNotPresent
 
 env:
@@ -47,7 +47,7 @@ serviceAccount:
 podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext: 
+securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
@@ -76,11 +76,11 @@ nodeSelector: {}
 
 tolerations: []
 
-affinity: 
+affinity:
   nodeAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
-      - matchExpressions: 
+      - matchExpressions:
         - key: beta.kubernetes.io/arch
           operator: In
           values:

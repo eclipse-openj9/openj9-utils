@@ -1,4 +1,4 @@
-{{- /*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2021, 2021 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
@@ -18,7 +18,7 @@
  * [2] http://openjdk.java.net/legal/assembly-exception.html
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
- *******************************************************************************/ -}}
+ *******************************************************************************/
 import org.objectweb.asm.*;
 
 public class InvokeDebugAdapter extends MethodVisitor {

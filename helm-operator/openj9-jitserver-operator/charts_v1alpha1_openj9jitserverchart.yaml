@@ -1,0 +1,56 @@
+apiVersion: charts.rouagarw/v1alpha1
+kind: Openj9JitserverChart
+metadata:
+  name: openj9jitserverchart-sample
+spec:
+  # Default values copied from <project_dir>/helm-charts/openj9-jitserver-chart/values.yaml
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: beta.kubernetes.io/arch
+            operator: In
+            values:
+            - amd64
+            - ppc64le
+            - s390x
+  env:
+  - name: OPENJ9_JAVA_OPTIONS
+    value: ""
+  fullnameOverride: ""
+  image:
+    pullPolicy: IfNotPresent
+    repository: ibm-semeru-runtimes
+    tag: open-8u322-b06-jre
+  imagePullSecrets: []
+  nameOverride: ""
+  nodeSelector: {}
+  podSecurityContext: {}
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 512Mi
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    privileged: false
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: 1001
+  service:
+    port: 38400
+    sessionAffinity: ClientIP
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    create: true
+    name: null
+  tolerations: []
+

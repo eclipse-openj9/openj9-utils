@@ -12,7 +12,7 @@ You can install the JITServer Operator into a Kubernetes cluster via `kubectl` c
 - Deploy the operator:
   
   ```
-  kubectl apply -f deploy.yaml
+  kubectl apply -f https://raw.githubusercontent.com/eclipse-openj9/openj9-utils/master/helm-operator/openj9-jitserver-operator/deploy.yaml
   ```
 
 - Verify the operator is running:
@@ -32,7 +32,7 @@ You can install the JITServer Operator into a Kubernetes cluster via `kubectl` c
 - Deploy the Custom Resource:
   
   ```
-  kubectl apply -f charts_v1alpha1_openj9jitserverchart.yaml
+  kubectl apply -f https://raw.githubusercontent.com/eclipse-openj9/openj9-utils/master/helm-operator/openj9-jitserver-operator/charts_v1alpha1_openj9jitserverchart.yaml
   ```
 
 - Verify the Custom Resource is running:
@@ -61,6 +61,39 @@ You can install the JITServer Operator into a Kubernetes cluster via `kubectl` c
   OpenJ9   - 9dccbe076
   OMR      - dac962a28
   JCL      - c1d9a7af7c based on jdk8u322-b06)
+  ```
+  
+- Deploy JITServer with a specific Java version:
+  
+  To change the Java version for JITServer, you need to first download the JITServer Custom Resource YAML file.
+  ```
+  curl -O https://raw.githubusercontent.com/eclipse-openj9/openj9-utils/master/helm-operator/openj9-jitserver-operator/charts_v1alpha1_openj9jitserverchart.yaml
+  ```
+  
+  Now, change `spec.image.tag` in `charts_v1alpha1_openj9jitserverchart.yaml` to the appropriate Java version docker image tag.
+  
+  Then deploy the JITServer Custom Resource.
+  ```
+  kubectl apply -f charts_v1alpha1_openj9jitserverchart.yaml
+  ```
+
+- Deploy two different JITServer deployments:
+  
+  Download the JITServer Custom Resource YAML file.
+  ```
+  curl -O https://raw.githubusercontent.com/eclipse-openj9/openj9-utils/master/helm-operator/openj9-jitserver-operator/charts_v1alpha1_openj9jitserverchart.yaml
+  ```
+  
+  Create a copy of the JITServer Custom Resource YAML file with a different name.
+  ```
+  cp charts_v1alpha1_openj9jitserverchart.yaml charts_v1alpha1_openj9jitserverchart_1.yaml
+  ```
+  
+  Now, change `spec.image.tag` in `charts_v1alpha1_openj9jitserverchart.yaml` and `charts_v1alpha1_openj9jitserverchart_1.yaml` to the appropriate Java version docker image tag.
+  
+  Then deploy the JITServer Custom Resources.
+  ```
+  kubectl apply -f charts_v1alpha1_openj9jitserverchart.yaml charts_v1alpha1_openj9jitserverchart_1.yaml
   ```
 
 ### Uninstallation

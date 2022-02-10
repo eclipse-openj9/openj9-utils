@@ -1,4 +1,4 @@
-apiVersion: charts.rouagarw/v1alpha1
+apiVersion: charts.openj9jitserver/v1alpha1
 kind: Openj9JitserverChart
 metadata:
   name: openj9jitserverchart-sample
@@ -53,4 +53,3 @@ spec:
     create: true
     name: null
   tolerations: []
-

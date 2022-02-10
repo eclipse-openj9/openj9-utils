@@ -8,9 +8,9 @@ metadata:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: openj9jitservercharts.charts.rouagarw
+  name: openj9jitservercharts.charts.openj9jitserver
 spec:
-  group: charts.rouagarw
+  group: charts.openj9jitserver
   names:
     kind: Openj9JitserverChart
     listKind: Openj9JitserverChartList
@@ -113,7 +113,7 @@ rules:
   verbs:
   - create
 - apiGroups:
-  - charts.rouagarw
+  - charts.openj9jitserver
   resources:
   - openj9jitservercharts
   - openj9jitservercharts/status
@@ -220,7 +220,7 @@ data:
 
     leaderElection:
       leaderElect: true
-      resourceName: 811c9dc5.rouagarw
+      resourceName: 811c9dc5.openj9jitserver
 kind: ConfigMap
 metadata:
   name: jitserver-operator-manager-config
@@ -276,7 +276,7 @@ spec:
         - --metrics-bind-address=127.0.0.1:8080
         - --leader-elect
         - --leader-election-id=jitserver-operator
-        image: rouagarw/jitserver-operator:0.0.1
+        image: rouagarw/jitserver-operator:v0.0.1
         livenessProbe:
           httpGet:
             path: /healthz
@@ -303,4 +303,3 @@ spec:
         runAsNonRoot: true
       serviceAccountName: jitserver-operator-controller-manager
       terminationGracePeriodSeconds: 10
-

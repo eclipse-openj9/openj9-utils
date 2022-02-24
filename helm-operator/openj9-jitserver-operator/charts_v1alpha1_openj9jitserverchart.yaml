@@ -23,7 +23,7 @@
 apiVersion: charts.openj9jitserver/v1alpha1
 kind: Openj9JitserverChart
 metadata:
-  name: openj9jitserverchart-sample
+  name: openj9jitserver
 spec:
   # Default values copied from <project_dir>/helm-charts/openj9-jitserver-chart/values.yaml
   affinity:

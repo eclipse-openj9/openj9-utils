@@ -57,6 +57,7 @@ OpenJ9 Release | Java 8             | Java 11              | Java 17
 0.30.0         | open-8u322-b06-jre | open-11.0.14_8-jre   | open-17.0.2_8-jre
 0.30.1         |                    | open-11.0.14.1_1-jre |
 0.32.0         | open-8u332-b09-jre | open-11.0.15_10-jre  | open-17.0.3_7-jre
+0.33.1         | open-8u345-b01-jre | open-11.0.16.1_1-jre | open-17.0.4.1_1-jre
 
 **Note:** up until release 0.26.0, OpenJ9 JVM images could be found in the [AdoptOpenJDK](https://hub.docker.com/_/adoptopenjdk) repo of Docker Hub. Starting with release 0.27.0, OpenJ9 JVM images can be pulled from their new repo, [IBM Semeru Runtimes](https://hub.docker.com/_/ibm-semeru-runtimes) in Docker Hub.
 

@@ -24,7 +24,7 @@ replicaCount: 1
 
 image:
   repository: ibm-semeru-runtimes
-  tag: open-8u332-b09-jre
+  tag: open-8u345-b01-jre
   pullPolicy: IfNotPresent
 
 env:
@@ -70,7 +70,7 @@ resources:
   # Resource allocated
   requests:
     cpu: 1
-    memory: 512Mi
+    memory: 1Gi
 
 nodeSelector: {}
 
@@ -81,7 +81,7 @@ affinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
       - matchExpressions:
-        - key: beta.kubernetes.io/arch
+        - key: kubernetes.io/arch
           operator: In
           values:
           - amd64

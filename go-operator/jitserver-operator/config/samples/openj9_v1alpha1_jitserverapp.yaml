@@ -1,0 +1,6 @@
+apiVersion: openj9.jitserver/v1alpha1
+kind: JitserverApp
+metadata:
+  name: jitserverapp-sample
+spec:
+  # TODO(user): Add fields here

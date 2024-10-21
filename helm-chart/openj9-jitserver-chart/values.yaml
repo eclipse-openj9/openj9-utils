@@ -24,7 +24,7 @@ replicaCount: 1
 
 image:
   repository: ibm-semeru-runtimes
-  tag: open-8u402-b06-jre
+  tag: open-8u412-b08-jre
   pullPolicy: IfNotPresent
 
 env:

@@ -15,13 +15,13 @@ jobs:
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
-      - uses: AdoptOpenJDK/install-jdk@v1
+      - uses: AdoptOpenJDK/install-jdk@2f15d3f82051aa50984186fc1184467d0d9f87d0 # v1.1.1
         with:
           version: '11'
           targets: 'JAVA_HOME'
           impl: 'openj9'
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
       - name: create build directory
         run: cd ./perf-tool && mkdir build
       - name: cmake build

@@ -23,9 +23,39 @@ apiVersion: v1
 entries:
   openj9-jitserver-chart:
   - apiVersion: v2
+    appVersion: 0.46.1
+    created: "2024-10-22T00:38:00.943354962Z"
+    description: |-
+      Eclipse OpenJ9 JITServer Helm Chart.
+
+      License
+
+      This chart is made available under the terms of the Eclipse Public License 2.0
+      which accompanies this distribution and is available at https://www.eclipse.org/legal/epl-2.0/
+      or the Apache License, Version 2.0 which accompanies this distribution and
+      is available at https://www.apache.org/licenses/LICENSE-2.0.
+
+      The JDK binaries installed by this chart are licensed under the GPLv2+CE.
+    digest: 4fbcdcf900170f5ce9377c9ca741ac3a9069d45f580b5d8578fe9f4beac9fc3e
+    icon: https://pbs.twimg.com/profile_images/910853900181364736/bmWkKoLn_400x400.jpg
+    keywords:
+    - amd64
+    - ppc64le
+    - Java
+    - Eclipse
+    - OpenJ9
+    - JITServer
+    - JVM
+    - JIT
+    name: openj9-jitserver-chart
+    type: application
+    urls:
+    - https://github.com/user-attachments/files/17468202/openj9-jitserver-chart-0.46.1.tar.gz
+    version: 0.46.1
+  - apiVersion: v2
     appVersion: 0.44.0
     created: "2024-10-19T01:39:38.39317108Z"
-    description: | -
+    description: |-
       Eclipse OpenJ9 JITServer Helm Chart.
 
       License
@@ -442,4 +472,4 @@ entries:
     urls:
     - https://github.com/eclipse/openj9-utils/files/5825427/openj9-jitserver-chart-0.24.0.tar.gz
     version: 0.24.0
-generated: "2024-10-19T01:39:38.392400897Z"
+generated: "2024-10-22T00:38:00.9425641Z"

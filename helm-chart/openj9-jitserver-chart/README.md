@@ -49,28 +49,29 @@ JCL      - b7b5b42ea6 based on jdk-11.0.15+10)
 Find the corresponding image from [IBM Semeru Runtimes Docker Hub](https://hub.docker.com/_/ibm-semeru-runtimes) through keyword search of architecture, Java version and release. In this example, `0.32.0` release of Java 11 is used in the application image, thus the corresponding image with tag is [`ibm-semeru-runtimes:open-11.0.15_10-jre`](https://hub.docker.com/layers/ibm-semeru-runtimes/library/ibm-semeru-runtimes/open-11.0.15_10-jre/images/sha256-a7f2c008c986dd45e22c764333a7182ab0872d80d52f3e5e8d1195b3a3a0108b?context=explore). The image tag `open-11.0.15_10-jre` will be used in the following step. For convenience, [Table 1](#table-1-image-tags-from-ibm-semeru-runtimes-repository-in-docker-hub) below lists all IBM Semeru Runtimes tags per OpenJ9 release and Java version.
 
 #### Table 1. Image tags from IBM Semeru Runtimes repository in Docker Hub
-OpenJ9 Release | Java 8             | Java 11              | Java 17            | Java 21
----------------|--------------------|----------------------|--------------------|--------------
-0.27.0         | open-8u302-b08-jre | open-11.0.12_7-jre   |                    |
-0.29.0         | open-8u312-b07-jre | open-11.0.13_8-jre   |                    |
-0.29.1         |                    |                      | open-17.0.1_12-jre |
-0.30.0         | open-8u322-b06-jre | open-11.0.14_8-jre   | open-17.0.2_8-jre  |
-0.30.1         |                    | open-11.0.14.1_1-jre |                    |
-0.32.0         | open-8u332-b09-jre | open-11.0.15_10-jre  | open-17.0.3_7-jre  |
-0.33.1         | open-8u345-b01-jre | open-11.0.16.1_1-jre | open-17.0.4.1_1-jre|
-0.35.0         | open-8u352-b08-jre | open-11.0.17_8-jre   | open-17.0.5_8-jre  |
-0.36.0         | open-8u362-b09-jre | open-11.0.18_10-jre  | open-17.0.6_10-jre |
-0.38.0         | open-8u372-b07-jre | open-11.0.19_7-jre   | open-17.0.7_7-jre  |
-0.40.0         | open-8u382-b05-jre | open-11.0.20_8-jre   | open-17.0.8_7-jre  |
-0.41.0         | open-8u392-b08-jre | open-11.0.21_9-jre   | open-17.0.9_9-jre  |
-0.43.0         | open-8u402-b06-jre | open-11.0.22_7-jre   | open-17.0.10_7-jre |
-0.44.0         | open-8u412-b08-jre | open-11.0.23_9-jre   | open-17.0.11_9-jre | open-21.0.3_9-jre
-0.46.1         | open-8u422-b05-jre | open-11.0.24_8-jre   | open-17.0.12_7-jre | open-21.0.4_7-jre
-0.48.0         | open-8u432-b06-jre | open-11.0.25_9-jre   | open-17.0.13_11-jre| open-21.0.5_11-jre
-0.49.0         | open-8u442-b06-jre | open-11.0.26_4-jre   | open-17.0.14_7-jre | open-21.0.6_7-jre
-0.51.0         | open-8u452-b09-jre | open-11.0.27_6-jre   | open-17.0.15_6-jre | open-21.0.7_6-jre
-0.53.0         | open-8u462-b08-jre | open-11.0.28_6-jre   | open-17.0.16_8-jre | open-21.0.8_9-jre
-0.56.0         | open-8u472-b08-jre | open-11.0.29_7-jre   | open-17.0.17_9-jre | open-21.0.9_10-jre
+OpenJ9 Release | Java 8               | Java 11              | Java 17              | Java 21              | Java 25
+---------------|----------------------|----------------------|----------------------|----------------------|-----------------------
+0.27.0         | open-8u302-b08-jre   | open-11.0.12_7-jre   |                      |                      |
+0.29.0         | open-8u312-b07-jre   | open-11.0.13_8-jre   |                      |                      |
+0.29.1         |                      |                      | open-17.0.1_12-jre   |                      |
+0.30.0         | open-8u322-b06-jre   | open-11.0.14_8-jre   | open-17.0.2_8-jre    |                      |
+0.30.1         |                      | open-11.0.14.1_1-jre |                      |                      |
+0.32.0         | open-8u332-b09-jre   | open-11.0.15_10-jre  | open-17.0.3_7-jre    |                      |
+0.33.1         | open-8u345-b01-jre   | open-11.0.16.1_1-jre | open-17.0.4.1_1-jre  |                      |
+0.35.0         | open-8u352-b08-jre   | open-11.0.17_8-jre   | open-17.0.5_8-jre    |                      |
+0.36.0         | open-8u362-b09-jre   | open-11.0.18_10-jre  | open-17.0.6_10-jre   |                      |
+0.38.0         | open-8u372-b07-jre   | open-11.0.19_7-jre   | open-17.0.7_7-jre    |                      |
+0.40.0         | open-8u382-b05-jre   | open-11.0.20_8-jre   | open-17.0.8_7-jre    |                      |
+0.41.0         | open-8u392-b08-jre   | open-11.0.21_9-jre   | open-17.0.9_9-jre    |                      |
+0.43.0         | open-8u402-b06-jre   | open-11.0.22_7-jre   | open-17.0.10_7-jre   |                      |
+0.44.0         | open-8u412-b08-jre   | open-11.0.23_9-jre   | open-17.0.11_9-jre   | open-21.0.3_9-jre    |
+0.46.1         | open-8u422-b05-jre   | open-11.0.24_8-jre   | open-17.0.12_7-jre   | open-21.0.4_7-jre    |
+0.48.0         | open-8u432-b06-jre   | open-11.0.25_9-jre   | open-17.0.13_11-jre  | open-21.0.5_11-jre   |
+0.49.0         | open-8u442-b06-jre   | open-11.0.26_4-jre   | open-17.0.14_7-jre   | open-21.0.6_7-jre    |
+0.51.0         | open-8u452-b09-jre   | open-11.0.27_6-jre   | open-17.0.15_6-jre   | open-21.0.7_6-jre    |
+0.53.0         | open-8u462-b08-jre   | open-11.0.28_6-jre   | open-17.0.16_8-jre   | open-21.0.8_9-jre    |
+0.56.0         | open-8u472-b08-jre   | open-11.0.29_7-jre   | open-17.0.17_9-jre   | open-21.0.9_10-jre   |
+0.57.0         | open-8u482-b08.1-jre | open-11.0.30_7.1-jre | open-17.0.18_8.1-jre | open-21.0.10_7.1-jre | open-jdk-25.0.2_10.1-jre
 
 
 **Note:** up until release 0.26.0, OpenJ9 JVM images could be found in the [AdoptOpenJDK](https://hub.docker.com/_/adoptopenjdk) repo of Docker Hub. Starting with release 0.27.0, OpenJ9 JVM images can be pulled from their new repo, [IBM Semeru Runtimes](https://hub.docker.com/_/ibm-semeru-runtimes) in Docker Hub.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2020 IBM Corp. and others
+ * Copyright (c) 2020, 2026 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -61,7 +61,7 @@ public class JMin {
     private HierarchyContext context;
     private WorkList worklist;
     private ReferenceInfo info;
-    private static String[] jdkWhitelist = new String[] {
+    private static String[] jdkAllowlist = new String[] {
         "java/util/jar",
         "java/util/zip",
         "com/ibm/oti",
@@ -245,14 +245,14 @@ public class JMin {
         System.out.println("Create minimized jar for " + jar);
         while (entry != null) {
             String entryName = entry.getName();
-            boolean isWhitelisted = false;
-            for (String pattern : jdkWhitelist) {
+            boolean isAllowlisted = false;
+            for (String pattern : jdkAllowlist) {
                 if (entryName.startsWith(pattern)) {
-                    isWhitelisted = true;
+                    isAllowlisted = true;
                     break;
                 }
             }
-            if (isWhitelisted
+            if (isAllowlisted
                     || !entryName.endsWith(".class")
                     || entryName.equals("class-info.class")) {
                 if (entryName.endsWith(".class") && !entryName.equals("class-info.class")) {

@@ -1,0 +1,24 @@
+# permissions for end users to edit jitserverapps.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jitserverapp-editor-role
+rules:
+- apiGroups:
+  - openj9.jitserver
+  resources:
+  - jitserverapps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - openj9.jitserver
+  resources:
+  - jitserverapps/status
+  verbs:
+  - get

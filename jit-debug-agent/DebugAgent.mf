@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Premain-Class: DebugAgent
+Agent-Class: DebugAgent
+Class-path: asm-9.2.jar junit-4.12.jar
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true

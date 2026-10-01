@@ -332,6 +332,8 @@ void modifyJLM(const std::string& function, const std::string& command)
             auto javaMonitors = json::array();
             auto rawMonitors = json::array();
             char *crt = dump->begin + dumpOffset;
+            char str[32];
+            jint hash;
             while(crt < dump->end)
             {
                 if ((*crt) & (JVMTI_MONITOR_JAVA | JVMTI_MONITOR_RAW))
@@ -360,6 +362,10 @@ void modifyJLM(const std::string& function, const std::string& command)
                     crt += sizeof(uint64_t);
                     jMon["monitorName"] = crt;
                     crt += strlen(crt) + 1;
+                    hash = h2n.convert(*(uint32_t*)crt);
+                    sprintf(str, "0x%x", hash);
+                    jMon["monitorHash"] = str;
+                    crt += sizeof(uint32_t);
                     if (monType & JVMTI_MONITOR_JAVA)
                         javaMonitors.push_back(jMon);
                     else
@@ -369,7 +375,7 @@ void modifyJLM(const std::string& function, const std::string& command)
                 {
                     int monNameDistance = 2*sizeof(char) + 5*sizeof(uint32_t) + 2*sizeof(uint64_t);
                     char *monName = crt + monNameDistance;
-                    crt += monNameDistance + strlen(monName) + 1;
+                    crt += monNameDistance + strlen(monName) + 1 + sizeof(uint32_t);
                 }
             }
             jvmti->Deallocate((unsigned char*)dump);
